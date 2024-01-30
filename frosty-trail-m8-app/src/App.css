@@ -25,6 +25,12 @@
   font-size: 100px;
 }
 
+/* You can adjust these styles based on your layout requirements */
+.MapComponent {
+  height: 400px;
+  width: 100%;
+}
+
 .products {
   background-image: url('./components/images/img-4.jpg');
   background-position: center;

@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from './components/Navbar';
+import MapComponent from './components/MapComponent'; // Import the map component
 import './App.css';
 import Home from './components/pages/Home';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -13,10 +14,11 @@ function App() {
       <Router>
         <Navbar />
         <Routes>
-          <Route exact path='/' element={<Home/>} />
-          <Route path='/services' element={<Services/>} />
-          <Route path='/products' element={<Products/>} />
-          <Route path='/sign-up' element={<SignUp/>} />
+          <Route exact path='/' element={<Home />} />
+          <Route path='/services' element={<Services />} />
+          <Route path='/products' element={<Products />} />
+          <Route path='/sign-up' element={<SignUp />} />
+          <Route path='/map' element={<MapComponent />} />
         </Routes>
       </Router>
     </>
@@ -24,3 +26,4 @@ function App() {
 }
 
 export default App;
+
