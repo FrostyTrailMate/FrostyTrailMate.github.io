@@ -29,11 +29,6 @@
   align-items: center;
 }
 
-.fa-typo3 {
-  margin-left: 0.5rem;
-  font-size: 1.8rem;
-}
-
 .nav-menu {
   display: grid;
   grid-template-columns: repeat(4, auto);
@@ -65,10 +60,6 @@
 
 .fa-bars {
   color: #fff;
-}
-
-.nav-links-mobile {
-  display: none;
 }
 
 .menu-icon {
@@ -133,26 +124,5 @@
   .fa-times {
     color: #fff;
     font-size: 2rem;
-  }
-
-  .nav-links-mobile {
-    display: block;
-    text-align: center;
-    margin: 2rem auto;
-    border-radius: 4px;
-    width: 80%;
-    text-decoration: none;
-    font-size: 1.5rem;
-    background-color: transparent;
-    color: #fff;
-    padding: 14px 20px;
-    border: 1px solid #fff;
-    transition: all 0.3s ease-out;
-  }
-
-  .nav-links-mobile:hover {
-    background: #fff;
-    color: #242424;
-    transition: 250ms;
   }
 }
