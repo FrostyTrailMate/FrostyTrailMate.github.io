@@ -5,10 +5,7 @@
   font-family: 'PT Sans', sans-serif;
 }
 
-.home,
-.services,
-.products,
-.sign-up {
+.Home,.About{
   display: flex;
   height: 90vh;
   align-items: center;
@@ -16,7 +13,7 @@
   font-size: 3rem;
 }
 
-.services {
+.About {
   background-image: url('./components/images/img-2.jpg');
   background-position: center;
   background-size: cover;
@@ -25,26 +22,7 @@
   font-size: 100px;
 }
 
-/* You can adjust these styles based on your layout requirements */
 .MapComponent {
   height: 400px;
   width: 100%;
-}
-
-.products {
-  background-image: url('./components/images/img-4.jpg');
-  background-position: center;
-  background-size: fill;
-  background-repeat: no-repeat;
-  color: #fff;
-  font-size: 100px; 
-}
-
-.sign-up {
-  background-image: url('./components/images/img-8.jpg');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  color: #fff;
-  font-size: 100px;
 }
