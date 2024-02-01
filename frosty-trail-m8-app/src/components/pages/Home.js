@@ -1,14 +1,14 @@
 import React from 'react';
 import '../../App.css';
 import HeroSection from '../HeroSection';
-import MapWithDrawing from '../MapWithDrawing';
+import MapComponent from '../MapComponent';
 import Footer from '../Footer';
 
 function Home() {
   return (
     <>
       <HeroSection />
-      <MapWithDrawing />
+      <MapComponent />
       <Footer />
     </>
   );
