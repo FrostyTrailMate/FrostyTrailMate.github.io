@@ -5,10 +5,15 @@ import earthpy.io as eio
 from ipyleaflet import Map, Polygon, DrawControl
 
 ##################################### Start Sentinel-1 data pull request #########################################
+from sentinelhub import SHConfig, SentinelHubRequest, bbox_to_dimensions, DataCollection, MimeType
+from datetime import datetime, timedelta
+import pandas as pd
+
 # Set up Sentinel Hub configuration
 config = SHConfig()
-config.instance_id = '44b8b66c-925c-4ab5-a776-b1f48364172d'
-# Function to handle user input and download Sentinel-1 data
+config.instance_id = '44b8b66c-925c-4ab5-a776-b1f48364172d'  # Replace with your Sentinel Hub instance ID
+
+# Function to download Sentinel-1 data
 def download_sentinel_data(bbox, time_range, output_path):
     resolution = 10  # Resolution in meters
     image_width, image_height = bbox_to_dimensions(bbox, resolution=resolution)
@@ -31,27 +36,12 @@ def download_sentinel_data(bbox, time_range, output_path):
         time_slice.save(image_path)
         print(f'Saved image {image_path}')
 
-# Function to handle map drawing
-def handle_map_drawn(event, **kwargs):
-    bbox = event['geometry']['coordinates'][0]
-    time_range = (start_date_picker.value, end_date_picker.value)
-    output_path = 'sentinel1_image.tif'
-    download_sentinel_data(bbox, time_range, output_path)
+# Define the study area bounding box [min_lon, min_lat, max_lon, max_lat]
+study_area_bbox = [longitude_min, latitude_min, longitude_max, latitude_max]
 
-# Create an interactive map with a drawing control
-m = Map(center=(45, 10), zoom=4)
-draw_control = DrawControl()
-m.add_control(draw_control)
+# Determine the most recent September
+today = datetime
 
-# Date picker widgets for time range
-start_date_picker = widgets.DatePicker(description='Start Date', value=datetime.today)
-end_date_picker = widgets.DatePicker(description='End Date', value=datetime.today)
-
-# Display the map and date pickers
-display(m, start_date_picker, end_date_picker)
-
-# Event handler for map drawing
-draw_control.on_draw(handle_map_drawn)
 
 
 
