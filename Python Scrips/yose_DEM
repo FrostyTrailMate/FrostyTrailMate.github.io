@@ -1,1 +1,39 @@
+# Set the Earth Explorer M2M code
+m2m_code = "gpul8A@ScIhEe2DG!EGFgUUxKPnLREn@7@yCO6TFoo9!Z1FHnMu4OegGUEhaWpdx"
 
+# Set the shapefile path
+shapefile_path = "/Shapefiles/Yosemite_Boundary.shp"
+
+# Set your output directory
+output_dir = "/Shapefiles"
+os.makedirs(output_dir, exist_ok=True)
+
+# Set Earth Explorer API key
+et.set_key(api_key=m2m_code)
+
+# Download and extract the DEM data using Earth Explorer API
+et.data.get_data(
+    url="https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/1/TIFF/n36w113/USGS_1_n36w113/USGS_1_n36w113_dem_10m.tif",
+    replace=False,
+)
+
+# Set the path to the downloaded DEM file
+dem_path = os.path.join(et.io.HOME, "earthpy-downloads", "usgs_1_n36w113_dem_10m.tif")
+
+# Read shapefile and clip the DEM to the bounding box
+boundary = gpd.read_file(shapefile_path)
+clipped_dem, dem_extent = clip_raster(dem_path, boundary.geometry, nodata=-9999)
+
+# Set the output contour shapefile path
+contour_shp_path = os.path.join(output_dir, "elevation_contours.shp")
+
+# Generate 100-meter elevation contours from the clipped DEM
+et.spatial.contour_from_raster(
+    clipped_dem,
+    output_path=contour_shp_path,
+    interval=100,
+    crs=dem_extent.spatialReference.ExportToWkt(),
+)
+
+# Print success message
+print(f"Contours saved to: {contour_shp_path}")
