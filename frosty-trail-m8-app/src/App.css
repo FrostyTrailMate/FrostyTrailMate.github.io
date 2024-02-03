@@ -14,12 +14,13 @@
 }
 
 .About {
-  background-image: url('./components/images/Hikers_About.jpg');
+  background-image: url('./components/images/HikingAboutUs.png');
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
   color: #fff;
-  font-size: 100px;
+  text-align: justify;
+  font-size: 20px;
 }
 
 .MapComponent {

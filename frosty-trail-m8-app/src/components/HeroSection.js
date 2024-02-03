@@ -6,7 +6,7 @@ function HeroSection() {
   return (
     <div className='hero-container'>
       <h1> FROSTY TRAIL MATE </h1>
-      <p> Your best hiking friend </p>
+      <p> Explore Yosemite's Trails with Confidence </p>
     </div>
   );
 }
