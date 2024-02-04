@@ -1,15 +1,15 @@
 import React from 'react';
 import '../../App.css';
-import HeroSection from '../HeroSection';
 import MapComponent from '../MapComponent';
-import Footer from '../Footer';
 
 function Home() {
   return (
     <>
-      <HeroSection />
+    <div className='hero-container'>
+      <h1> FROSTY TRAIL MATE </h1>
+      <p> Explore Yosemite's Trails with Confidence </p>
+    </div>
       <MapComponent />
-      <Footer />
     </>
   );
 }

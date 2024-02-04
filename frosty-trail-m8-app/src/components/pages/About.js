@@ -1,6 +1,5 @@
 import React from 'react';
 import '../../App.css';
-import Footer from '../Footer';
 
 function About() {
   return (
@@ -10,9 +9,9 @@ function About() {
           Our project emerged from the desire to simplify the hiking experience by providing precise information 
           about the location of snow on the trails. Frosty Trail Mate is designed to pinpoint the areas with snow, 
           allowing hikers to plan their routes with ease. Explore Yosemite confidently with our user-friendly platform, 
-          ensuring you stay informed about snow locations for a seamless and enjoyable hiking adventure.</p>
+          ensuring you stay informed about snow locations for a seamless and enjoyable hiking adventure.
+        </p>
       </div>;
-      <Footer />
     </>
   );
 }
