@@ -10,12 +10,12 @@ function App() {
   return (
     <>
       <Router>
-        <Navbar />
+      <Navbar/>
         <Routes>
           <Route exact path='/' element={<Home />} />
           <Route path='/About' element={<About />} />
         </Routes>
-        <Footer />
+        <Footer/>
       </Router>
     </>
   );
