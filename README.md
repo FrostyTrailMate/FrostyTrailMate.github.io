@@ -11,16 +11,17 @@
 #         and for the previous September (the most recent snow-free period). Images were clipped to the study area.
 #     c) Collect and store DEM data in a separate folder. Images were clipped to the study area.
 # 3) Process DEM
-#     a) 
-#     b) 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
+#     a) Convert the DEM raster into a topographic strata (layers) of 100 meters.
+#     b) Save to DB
+# 4) Process Sentinel-1 SAR Imagery
+#     a) Divide the image into cells equivalent to the DEM layer (30m)
+#     b) Calculate image reflectance difference between 'current' imagery and 'snow-free' (September) imagery
+#     c) Save result to DB
+# 5) Databases
+#     a) Raw Sentinel-1 files
+#     b) Raw DEM files
+#     c) Processed Sentinel-1 files
+#     d) Processed DEM files
 # 
 # 
 # 
