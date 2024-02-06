@@ -11,15 +11,13 @@ os.makedirs(output_dir, exist_ok=True)
 # Set Earth Explorer API key
 et.set_key(api_key=m2m_code)
 
-# Download and extract the DEM data using Earth Explorer API
+# Download DEM data from Earth Explorer
 print("Downloading DEM data...")
-et.data.get_data(
-    url="https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/1/TIFF/n36w113/USGS_1_n36w113/USGS_1_n36w113_dem_10m.tif",
-    replace=False,
+dem_path = et.data.get_data(
+    product_id="AEAC29-5B68-4674-A3FB-E6E2D0A22EC0",
+    destination_folder=output_dir,
+    scene_id="LE07_L1TP_039030_20000907_20170126_01_T1",
 )
-
-# Set the path to the downloaded DEM file
-dem_path = os.path.join(et.io.HOME, "earthpy-downloads", "usgs_1_n36w113_dem_10m.tif")
 
 # Read shapefile and clip the DEM to the bounding box
 print("Reading shapefile and clipping DEM...")
@@ -27,7 +25,7 @@ boundary = gpd.read_file(shapefile_path)
 clipped_dem, dem_extent = clip_raster(dem_path, boundary.geometry, nodata=-9999)
 
 # Set the output contour shapefile path
-contour_shp_path = os.path.join(output_dir, "elevation_contours.shp")
+#contour_shp_path = os.path.join(output_dir, "elevation_contours.shp")
 
 # Generate 100-meter elevation contours from the clipped DEM
 print("Generating contours...")
@@ -38,5 +36,38 @@ et.spatial.contour_from_raster(
     crs=dem_extent.spatialReference.ExportToWkt(),
 )
 
+# Connect to your PostgreSQL database
+conn = psycopg2.connect(
+    dbname="FTM8",
+    user="postgres",
+    password="admin",
+    host="DESKTOP-UIUIA2A",
+    port="5432"
+)
+
+# Create a cursor object
+cur = conn.cursor()
+
+# Create a table if it doesn't exist
+cur.execute("""
+    CREATE TABLE IF NOT EXISTS dem_p (
+        id SERIAL PRIMARY KEY,
+        vector GEOMETRY(LINESTRING, 4326)
+    )
+""")
+
+# Insert contours into the database
+for contour in contours:
+    cur.execute("INSERT INTO dem_p (vector) VALUES (ST_GeomFromText(%s, 4326))", (contour.wkt,))
+
+# Commit changes
+conn.commit()
+
+# Close cursor and connection
+cur.close()
+conn.close()
+
+print("Contours saved to the database.")
+
 # Print success message
-print(f"Contours saved to: {contour_shp_path}")
+# print(f"Contours saved to: {contour_shp_path}")
