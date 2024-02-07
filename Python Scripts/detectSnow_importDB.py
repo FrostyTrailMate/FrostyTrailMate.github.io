@@ -1,4 +1,4 @@
-"""Steps for detecting snow in Synthetic Aperture Radar (SAR) images using machine learning: 
+Steps for detecting snow in Synthetic Aperture Radar (SAR) images using machine learning: 
 
 ############# MY SEARCH
 I want to detect snow in Synthetic Aperture Radar (SAR) images using machine learning. 
@@ -20,7 +20,7 @@ And the fact that the SAR images are obtained from the sRaster field of the sar_
 Give me the full python code for a machine learning algorithm that does all of this automatically.
 
 ########### This code assumes you have the necessary libraries installed, including pandas, 
-    ############## scikit-learn, psycopg2 for PostgreSQL database access"""
+    ############## scikit-learn, psycopg2 for PostgreSQL database access 
     
 import numpy as np
 import pandas as pd
@@ -107,7 +107,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-"""
+
 Data Collection:
 
 The script connects to a PostgreSQL database and retrieves SAR images along with their corresponding labels (indicating whether they contain snow or not).
@@ -141,7 +141,7 @@ The final trained and optimized model can be deployed for making predictions on 
 
 
 ################################ other option, the code bellow can be improved with the things in the detect_snow.py document
-"""
+
 import psycopg2
 from pyroSAR import identify
 from pyroSAR.ancillary import groupby_helper
