@@ -46,4 +46,4 @@ with engine.connect() as connection:
     connection.execute("ALTER TABLE samples ADD COLUMN vectorType TEXT")
 
 # Close the connection
-print("Process completed. Connection closed.")
+print("Process completed!")
