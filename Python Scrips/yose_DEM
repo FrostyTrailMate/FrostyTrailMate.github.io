@@ -2,11 +2,11 @@
 m2m_code = "gpul8A@ScIhEe2DG!EGFgUUxKPnLREn@7@yCO6TFoo9!Z1FHnMu4OegGUEhaWpdx"
 
 # Set your shapefile path
-shapefile_path = "path/to/your/Shapefiles/Yosemite_Boundary.shp"
+shapefile_path = "/Shapefiles/Yosemite_Boundary.shp"
 
-# Set your output directory
-output_dir = "path/to/your/output_directory"
-os.makedirs(output_dir, exist_ok=True)
+# Processed DEM output directory
+#output_dir = "/Outputs/"
+#os.makedirs(output_dir, exist_ok=True)
 
 # Set Earth Explorer API key
 et.set_key(api_key=m2m_code)
