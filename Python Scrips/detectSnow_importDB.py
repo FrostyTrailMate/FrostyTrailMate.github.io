@@ -20,7 +20,7 @@ And the fact that the SAR images are obtained from the sRaster field of the sar_
 Give me the full python code for a machine learning algorithm that does all of this automatically.
 
 ########### This code assumes you have the necessary libraries installed, including pandas, 
-    ############## scikit-learn, psycopg2 for PostgreSQL database access hello 
+    ############## scikit-learn, psycopg2 for PostgreSQL database access 
     
 import numpy as np
 import pandas as pd
