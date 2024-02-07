@@ -18,8 +18,8 @@ Project Overview
    - Using the shape from step 1, create a multipoint sampling grid at every 100 meters
    - Save the sampling grid to the DB
 5. Process Sentinel-1 SAR Imagery
-   - 
-   - 
+   - a
+   - b
    - Save result to DB
 6. Databases Utilized
    - Raw Sentinel-1 files
