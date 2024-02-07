@@ -14,7 +14,7 @@ SELECT sRaster FROM sar_raw WHERE id = <image_id>;
 
 
 
-CHRIS
+###########  CHRIS  ##############
 
 # Connect to your PostgreSQL database
 conn = psycopg2.connect(
