@@ -2,7 +2,11 @@
 Steps for detecting snow in Synthetic Aperture Radar (SAR) images using machine learning: 
 
 ############# MY SEARCH ###############
-I want to detect snow in Synthetic Aperture Radar (SAR) images using machine learning. 
+I want to create a machine learning algorithm for an unsupervised learning problem, where I'm aiming to detect the presence of snow in SAR images, with backsatter intensity above 0.8, without having explicit labels indicating whether snow is present or not.
+
+Assuming the SAR images are obtained from the sRaster field of the sar_raw table from a PostgreSQL database.
+
+This algorithm should do everything automatically.
 
 Assuming the workflow:
 1. Data collection
@@ -16,121 +20,141 @@ Assuming the workflow:
 9. Tuning and optimizing it
 10. Deploying it
 
-And the fact that the SAR images are obtained from the sRaster field of the sar_raw table from a PostgreSQL database.
 
-Give me the full python code for a machine learning algorithm that does all of this automatically.
+Give me the full python code for this.
 """"
-########### This code assumes you have the necessary libraries installed, including pandas, 
-    ############## scikit-learn, psycopg2 for PostgreSQL database access 
-    
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import GridSearchCV
+
+# Required Libraries
 import psycopg2
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 
-# Data collection
-## The script connects to a PostgreSQL database and retrieves SAR images along with their corresponding labels (indicating whether they contain snow or not).
+# Step 1: Data Collection (Assuming PostgreSQL Database)
+conn = psycopg2.connect(
+    dbname="your_db_name",
+    user="your_username",
+    password="your_password",
+    host="your_host",
+    port="your_port"
+)
+cur = conn.cursor()
 
-def fetch_sar_data_from_db():
-    conn = psycopg2.connect(
-        dbname="your_database_name",
-        user="your_username",
-        password="your_password",
-        host="your_host",
-        port="your_port"
-    )
-    cursor = conn.cursor()
-    cursor.execute("SELECT sRaster, is_snow FROM sar_raw")
-    rows = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return rows
+# Step 2: Data Preprocessing & Feature Extraction
+cur.execute("SELECT sRaster FROM sar_raw")
+sar_images = cur.fetchall()
 
-# Data preprocessing, feature extraction and labeling
-## No explicit preprocessing is performed in this code snippet. Preprocessing steps could include resizing images, normalization, or noise reduction, depending on the specific requirements of your data.
-## For each SAR image, the script calculates a single feature, which is the average backscatter intensity of the image. This serves as a representative feature for detecting snow in the image.
-## The script extracts labels indicating whether each SAR image contains snow or not.
-def extract_features(sar_data):
+# Step 3: Feature Extraction (Backscatter Intensity)
+def extract_features(sar_images):
     features = []
-    labels = []
-    for row in sar_data:
-        sar_image = row[0]  # Assuming the SAR image is in the first column
-        is_snow = row[1]    # Assuming the label (0 or 1) is in the second column
-        # Extract features from SAR image (using backscatter intensity as an example)
-        backscatter_intensity = np.mean(sar_image)  # Example feature extraction
-        features.append(backscatter_intensity)
-        labels.append(is_snow)
-    return np.array(features).reshape(-1, 1), np.array(labels)
+    for sar_image in sar_images:
+        # Implement your feature extraction method here
+        # For simplicity, let's assume we are extracting the mean backscatter intensity
+        mean_intensity = np.mean(sar_image)
+        features.append(mean_intensity)
+    return np.array(features)
 
-# Splitting the dataset
-## The dataset is split into training and testing sets using a standard 80-20 split.
+X = extract_features(sar_images)
 
-def split_dataset(features, labels):
-    return train_test_split(features, labels, test_size=0.2, random_state=42)
+# Step 4: Labeling (Unsupervised)
+# We're assuming intensity above 0.8 indicates snow presence
+y = (X > 0.8).astype(int)
 
-# Selecting a machine learning model
-## A RandomForestClassifier is selected as the machine learning model. RandomForest is a popular choice for classification tasks due to its robustness and ability to handle high-dimensional data.
+# Step 5: Splitting the Dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-def select_model():
-    return RandomForestClassifier()
+# Step 6: Selecting a Machine Learning Model
+# For unsupervised learning, we'll use KMeans clustering
+model = KMeans(n_clusters=2, random_state=42)
 
-# Training the model
-## The selected RandomForest model is trained on the training dataset.
+# Step 7: Training the Model
+model.fit(X_train.reshape(-1, 1))
 
-def train_model(model, X_train, y_train):
-    model.fit(X_train, y_train)
-    return model
+# Step 8: Evaluating the Model
+y_pred_train = model.predict(X_train.reshape(-1, 1))
+y_pred_test = model.predict(X_test.reshape(-1, 1))
 
-# Evaluating the model
-## The trained model is evaluated on the testing dataset, and the accuracy of the model is calculated. Accuracy measures the proportion of correctly classified samples out of the total samples.
+train_accuracy = accuracy_score(y_train, y_pred_train)
+test_accuracy = accuracy_score(y_test, y_pred_test)
 
-def evaluate_model(model, X_test, y_test):
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    print("Accuracy:", accuracy)
-    return accuracy
+print("Training Accuracy:", train_accuracy)
+print("Test Accuracy:", test_accuracy)
 
-# Tuning and optimizing the model
-## GridSearchCV is used to perform hyperparameter tuning on the RandomForest model. This step aims to find the best combination of hyperparameters that maximize the model's performance.
+# Step 9: Tuning and Optimizing the Model (Not needed for unsupervised learning)
 
-def tune_model(model, X_train, y_train):
-    param_grid = {
-        'n_estimators': [100, 200, 300],
-        'max_depth': [None, 10, 20, 30],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4]
-    }
-    grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=3, n_jobs=-1, verbose=2)
-    grid_search.fit(X_train, y_train)
-    return grid_search.best_estimator_
-
-# Deploying the model (Optional)
-## The final trained and optimized model can be deployed for making predictions on new, unseen SAR images.
-
-# Main function
-def main():
-    sar_data = fetch_sar_data_from_db()
-    features, labels = extract_features(sar_data)
-    X_train, X_test, y_train, y_test = split_dataset(features, labels)
-    model = select_model()
-    tuned_model = tune_model(model, X_train, y_train)
-    trained_model = train_model(tuned_model, X_train, y_train)
-    accuracy = evaluate_model(trained_model, X_test, y_test)
-    print("Model training and evaluation complete.")
-
-if __name__ == "__main__":
-    main()
+# Step 10: Deploying the Model (Not covered in this code snippet)
 
 
 
-############## other option ##############
 
+
+#########################################################
+############ other option ##############################
+
+import psycopg2
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import StandardScaler
+
+# Step 1: Data Collection
+conn = psycopg2.connect(database="your_database", user="your_username", password="your_password", host="your_host", port="your_port")
+cur = conn.cursor()
+cur.execute("SELECT sRaster FROM sar_raw")
+sar_images = cur.fetchall()
+
+# Step 2: Data Preprocessing (Normalization)
+def normalize_backscatter_intensity(sar_image):
+    # Example normalization function (replace with appropriate method based on your data)
+    normalized_image = (sar_image - np.min(sar_image)) / (np.max(sar_image) - np.min(sar_image))
+    return normalized_image
+
+# Step 3: Feature Extraction (using backscatter intensity)
+def extract_backscatter_intensity(sar_image, threshold=0.8):
+    # Threshold can be adjusted based on the characteristics of your data
+    high_backscatter = np.sum(sar_image > threshold)  # Count pixels with intensity above threshold
+    return high_backscatter
+
+features = []
+for sar_image in sar_images:
+    normalized_image = normalize_backscatter_intensity(sar_image)
+    backscatter_intensity = extract_backscatter_intensity(normalized_image)
+    features.append(backscatter_intensity)
+
+# Step 4: Labeling (Unsupervised, so no explicit labeling needed)
+
+# Step 5: Splitting the Dataset (not necessary for unsupervised learning, but for evaluation)
+X_train, X_test = train_test_split(features, test_size=0.2, random_state=42)
+
+# Step 6: Selecting a Machine Learning Model (KMeans clustering)
+kmeans = KMeans(n_clusters=2, random_state=42)
+
+# Step 7: Training the Model
+kmeans.fit(X_train)
+
+# Step 8: Evaluating the Model (using Silhouette Score)
+train_silhouette_score = silhouette_score(X_train, kmeans.labels_)
+test_silhouette_score = silhouette_score(X_test, kmeans.predict(X_test))
+print("Train Silhouette Score:", train_silhouette_score)
+print("Test Silhouette Score:", test_silhouette_score)
+
+# Step 9: Tuning and Optimizing (Not applicable for unsupervised learning)
+
+# Step 10: Deploying the Model (For deployment, you might save the model and use it on new data)
+# For instance, you can save the trained model using joblib
+from joblib import dump
+dump(kmeans, 'kmeans_model.joblib')
+
+
+
+
+#########################################################
+############ other option ##############################
 """"
-Steps for detecting snow in Synthetic Aperture Radar (SAR) images using machine learning: 
-
 ############# MY SEARCH ###############
 I want to detect snow in Synthetic Aperture Radar (SAR) images using machine learning. 
 Assuming the fact that the SAR images are obtained from the sRaster field of the sar_raw table from a PostgreSQL database.
