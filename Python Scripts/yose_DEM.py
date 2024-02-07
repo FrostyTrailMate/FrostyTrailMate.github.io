@@ -17,6 +17,10 @@ os.makedirs(output_dir, exist_ok=True)
 # Set Earth Explorer API key
 et.set_key(api_key=m2m_code)
 
+
+
+
+
 # Download DEM data from Earth Explorer
 print("Downloading DEM data...")
 dem_path = et.data.get_data(
@@ -40,6 +44,10 @@ if len(dem_metadata) == 0:
     print("No DEM data found for the specified area.")
     exit()
     '''
+
+
+
+
 
 # Read shapefile and clip the DEM to the bounding box
 print("Reading shapefile and clipping DEM...")
@@ -79,8 +87,17 @@ cur.execute("""
 """)
 
 # Insert contours into the database
+# Fetch the last recorded id from the database
+cur.execute("SELECT MAX(id) FROM dem_p")
+last_id = cur.fetchone()[0]
+
+# Increment the last recorded id by 1
+new_id = last_id + 1 if last_id is not None else 1
+
+# Insert contours into the database with the incremented id
 for contour in contours:
-    cur.execute("INSERT INTO dem_p (vector) VALUES (ST_GeomFromText(%s, 4326))", (contour.wkt,))
+    cur.execute("INSERT INTO dem_p (id, vector, area_name) VALUES (%s, ST_GeomFromText(%s, 4326), 'Yosemite')", (new_id, contour.wkt,))
+    new_id += 1  # Increment the id for the next contour
 
 # Commit changes
 conn.commit()

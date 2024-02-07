@@ -1,9 +1,10 @@
 import psycopg2
 from psycopg2 import sql
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
-from sentinelhub import SHConfig, DataCollection, SentinelHubRequest
+from sentinelhub import SHConfig, DataCollection, SentinelHubRequest, bbox_to_dimensions
 import geopandas as gpd
+import pandas as pd
 
 # Set up Sentinel Hub configuration
 config = SHConfig()
@@ -11,11 +12,11 @@ config.instance_id = '44b8b66c-925c-4ab5-a776-b1f48364172d'  # Replace with your
 
 # Function to check if image already exists in the database
 def check_image_existence(datetime_value):
-    connection = psycopg2.connect(user="your_username",
-                                  password="your_password",
-                                  host="your_host",
-                                  port="your_port",
-                                  database="your_database")
+    connection = psycopg2.connect(user="postgres",
+                                  password="admin",
+                                  host="DESKTOP-UIUIA2A",
+                                  port="5432",
+                                  database="FTM8")
     cursor = connection.cursor()
     query = sql.SQL("SELECT * FROM your_table WHERE datetime = %s;")
     cursor.execute(query, (datetime_value,))
@@ -59,13 +60,13 @@ def download_sentinel_data(bbox, time_range, output_path, clip_shapefile):
         else:
             print(f"Image already obtained for datetime: {datetime_value}")
 
-# Function to insert datetime into the database
+# Function to insert datetime into the database   #### NEED TO UPDATE THIS
 def insert_datetime(datetime_value):
-    connection = psycopg2.connect(user="your_username",
-                                  password="your_password",
-                                  host="your_host",
-                                  port="your_port",
-                                  database="your_database")
+    connection = psycopg2.connect(user="postgres",
+                                  password="admin",
+                                  host="DESKTOP-UIUIA2A",
+                                  port="5432t",
+                                  database="FTM8")
     cursor = connection.cursor()
     query = sql.SQL("INSERT INTO your_table (datetime) VALUES (%s);")
     cursor.execute(query, (datetime_value,))
@@ -78,11 +79,14 @@ yosemite_boundary_shapefile = '/Shapefiles/Yosemite_Boundary.shp'
 yosemite_boundary_gdf = gpd.read_file(yosemite_boundary_shapefile)
 yosemite_bbox = yosemite_boundary_gdf.total_bounds
 
-# Determine the most recent September
+# Determine date ranges
 today = datetime.today()
+yesterday = datetime(today - 1)
+most_recent_range = (yesterday, today)
 most_recent_september_start = datetime(today.year, 9, 1) if today.month >= 9 else datetime(today.year - 1, 9, 1)
-most_recent_september_end = datetime(today.year, 9, 30)
+most_recent_september_end = datetime(today.year, 9, 30) if today.month >= 9 else datetime(today.year - 1, 9, 30)
 most_recent_september_range = (most_recent_september_start, most_recent_september_end)
+
 
 # Output paths
 most_recent_september_output = 'most_recent_september_image.tif'
@@ -97,14 +101,3 @@ download_sentinel_data(yosemite_bbox, most_recent_range, most_recent_output, yos
 # Perform further analysis and comparison with DEM elevations
 # (This part depends on your specific requirements and analysis methods)
 
-# Example: Create a DataFrame with information about each area
-data = {
-    'Longitude': [yosemite_bbox[0], yosemite_bbox[2]],
-    'Latitude': [yosemite_bbox[1], yosemite_bbox[3]],
-    'Elevation (DEM)': [elevation_at_point(lon, lat) for lon, lat in zip([yosemite_bbox[0], yosemite_bbox[2]], [yosemite_bbox[1], yosemite_bbox[3]])],
-    'Most Recent September Snow': ['Yes', 'No'],  # Placeholder values, actual snow detection might require more sophisticated methods
-    'Most Recent Snow': ['No', 'Yes'],  # Placeholder values
-}
-
-df = pd.DataFrame(data)
-print(df)
