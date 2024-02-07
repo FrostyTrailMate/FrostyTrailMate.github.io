@@ -1,4 +1,4 @@
-""""
+"""
 Steps for detecting snow in Synthetic Aperture Radar (SAR) images using machine learning: 
 
 ############# MY SEARCH ###############
@@ -22,7 +22,7 @@ Assuming the workflow:
 
 
 Give me the full python code for this.
-""""
+"""
 
 # Required Libraries
 import psycopg2
@@ -154,7 +154,7 @@ dump(kmeans, 'kmeans_model.joblib')
 
 #########################################################
 ############ other option ##############################
-""""
+"""
 ############# MY SEARCH ###############
 I want to detect snow in Synthetic Aperture Radar (SAR) images using machine learning. 
 Assuming the fact that the SAR images are obtained from the sRaster field of the sar_raw table from a PostgreSQL database.
@@ -163,7 +163,7 @@ Give me the full python code for a machine learning algorithm that does all of t
 
 """
 
-pip install numpy pandas psycopg2 scikit-learn rasterio
+## pip install numpy pandas psycopg2 scikit-learn rasterio
 
 import numpy as np
 import psycopg2
