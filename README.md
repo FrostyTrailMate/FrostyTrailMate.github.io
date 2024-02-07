@@ -18,8 +18,11 @@ Project Overview
    - Using the shape from step 1, create a multipoint sampling grid at every 100 meters
    - Save the sampling grid to the DB
 5. Process Sentinel-1 SAR Imagery
-   - a
-   - b
+   - Pull the Sentinel-1 SAR image from the database
+   - Preprocess the image
+   - Divide the data into training and processing
+   - Train a random forest classifier
+   - Test and obtain accuracy results
    - Save result to DB
 6. Databases Utilized
    - Raw Sentinel-1 files
