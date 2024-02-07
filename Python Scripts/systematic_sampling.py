@@ -1,14 +1,18 @@
+import geopandas as gpd
+from shapely.geometry import Point
+from sqlalchemy import create_engine
+
 # Read the shapefile
 shapefile_path = '/Shapefiles/Yosemite_Boundary.shp'
 print("Reading shapefile...")
 gdf = gpd.read_file(shapefile_path)
 
-# Assuming there's only one polygon, extract it
+# Extract the polygon from the shapefile
 polygon = gdf.iloc[0]['geometry']
 min_x, min_y, max_x, max_y = polygon.bounds
 
 # Create systematic sampling points at 100 meter intervals
-sampling_distance = 100  # in meters
+sampling_distance = 100 
 
 # Create empty DataFrame to store sampled points
 sampled_points = gpd.GeoDataFrame(columns=['geometry'])

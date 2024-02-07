@@ -1,3 +1,9 @@
+# Required imports
+import os
+import geopandas as gpd
+import earthpy.spatial as et
+import psycopg2
+
 # Set your Earth Explorer M2M code
 m2m_code = "gpul8A@ScIhEe2DG!EGFgUUxKPnLREn@7@yCO6TFoo9!Z1FHnMu4OegGUEhaWpdx"
 
@@ -5,8 +11,8 @@ m2m_code = "gpul8A@ScIhEe2DG!EGFgUUxKPnLREn@7@yCO6TFoo9!Z1FHnMu4OegGUEhaWpdx"
 shapefile_path = "/Shapefiles/Yosemite_Boundary.shp"
 
 # Processed DEM output directory
-#output_dir = "/Outputs/"
-#os.makedirs(output_dir, exist_ok=True)
+output_dir = "/Outputs/DEM"
+os.makedirs(output_dir, exist_ok=True)
 
 # Set Earth Explorer API key
 et.set_key(api_key=m2m_code)
@@ -19,17 +25,33 @@ dem_path = et.data.get_data(
     scene_id="LE07_L1TP_039030_20000907_20170126_01_T1",
 )
 
+##### This code is more flexible than the above, but I'm not sure it will work. We should test both. -Chris
+'''
+dem_metadata = et.data.search_earthexplorer(
+    geom=aoi,
+    start_date="2000-01-01",
+    end_date="2022-01-01",
+    max_cloud_cover=10,
+    product="DEM",
+    output_dir=output_dir
+)
+
+if len(dem_metadata) == 0:
+    print("No DEM data found for the specified area.")
+    exit()
+    '''
+
 # Read shapefile and clip the DEM to the bounding box
 print("Reading shapefile and clipping DEM...")
 boundary = gpd.read_file(shapefile_path)
-clipped_dem, dem_extent = clip_raster(dem_path, boundary.geometry, nodata=-9999)
+clipped_dem, dem_extent = et.spatial.clip_raster(dem_path, boundary.geometry, nodata=-9999)
 
-# Set the output contour shapefile path
-#contour_shp_path = os.path.join(output_dir, "elevation_contours.shp")
+# Set the output contour shapefile path ### If we make this more flexible, we'll need a different naming convention. -Chris
+contour_shp_path = os.path.join(output_dir, "elevation_contours.shp")
 
 # Generate 100-meter elevation contours from the clipped DEM
 print("Generating contours...")
-et.spatial.contour_from_raster(
+contours = et.spatial.contour_from_raster(
     clipped_dem,
     output_path=contour_shp_path,
     interval=100,
@@ -68,6 +90,3 @@ cur.close()
 conn.close()
 
 print("Contours saved to the database.")
-
-# Print success message
-# print(f"Contours saved to: {contour_shp_path}")
