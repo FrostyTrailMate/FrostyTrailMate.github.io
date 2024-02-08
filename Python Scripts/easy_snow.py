@@ -1,6 +1,14 @@
 """
-MY SEARCH 
-I'm aiming to detect the presence of snow in SAR images, with backsatter intensity above 0.8, without having explicit labels indicating whether snow is present or not.
+This file contains the easiest way to dected snow trough backscatter intensity. 
+
+In my search I used 0.8 just to have a value, but a common starting point for snow detection in SAR imagery 
+is to use a threshold value in the range of -10 dB (decibels) to -15 dB for backscatter intensity. 
+However, this value can vary widely depending on the aforementioned factors and may require adjustment through empirical 
+testing and validation.
+
+### MY SEARCH 
+I'm aiming to detect the presence of snow in SAR images, with backsatter intensity above 0.8, 
+without having explicit labels indicating whether snow is present or not.
 
 Assuming the SAR images are obtained from the sRaster field of the sar_raw table from a PostgreSQL database.
 
@@ -35,6 +43,7 @@ def process_sar_image(sar_image):
     backscatter_intensity = sar_img.astype(float) / 255.0
     
     # Threshold backscatter intensity to identify regions with intensity above 0.8
+    ## NEED TO CHANGE THE VALUE TO WHAT WE WANT
     snow_mask = backscatter_intensity > 0.8
     
     # Analyze the identified regions to determine if snow is present

@@ -1,6 +1,7 @@
 import React from 'react';
 import '../../App.css';
 import MapComponent from '../MapComponent';
+import ResultsTable from '../ResultsTable';
 
 function Home() {
   return (
@@ -10,6 +11,7 @@ function Home() {
       <p> Explore Yosemite's Trails with Confidence </p>
     </div>
       <MapComponent />
+      <ResultsTable />
     </>
   );
 }
