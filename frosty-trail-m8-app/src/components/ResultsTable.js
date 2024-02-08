@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const ResultsTable = () => {
     const [results, setResults] = useState([]);
 
     useEffect(() => {
-        // Fetch data from Flask backend
-        fetch('/api/results')
-            .then(response => response.json())
-            .then(data => {
-                setResults(data); // Update state with the fetched data
+        axios.get('http://127.0.0.1:5000/api/results')
+            .then(response => {
+                setResults(response.data);
             })
             .catch(error => {
                 console.error('Error fetching results:', error);
@@ -21,6 +20,7 @@ const ResultsTable = () => {
             <table>
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Altitude</th>
                         <th>Snow Cover</th>
                         <th>Area</th>
@@ -29,6 +29,7 @@ const ResultsTable = () => {
                 <tbody>
                     {results.map(result => (
                         <tr key={result.id_res}>
+                            <td>{result.id_res}</td>
                             <td>{result.altitude}</td>
                             <td>{result.snowcover}</td>
                             <td>{result.darea}</td>
