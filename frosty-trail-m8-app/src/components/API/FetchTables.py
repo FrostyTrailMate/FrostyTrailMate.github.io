@@ -1,6 +1,5 @@
-from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, jsonify, request
+from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
 DB_CONFIG = {
@@ -29,10 +28,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 # Create object to control SQLAlchemy from the Flask app
 db = SQLAlchemy(app)
 
+# Define the SQLAlchemy model
 class resultstestapi(db.Model):
     
     # Table is implicitly called by the name of the class
-    
     id_res = db.Column(db.Integer, primary_key=True)
     altitude = db.Column(db.Float)
     snowcover = db.Column(db.Integer)
@@ -40,11 +39,14 @@ class resultstestapi(db.Model):
 
 # Route to fetch data
 # This function will be called when a request is made to the '/api/results' endpoint
+# Route to fetch sorted data by altitude
 @app.route('/api/results')   
 def get_results():
-    results = resultstestapi.query.all()
+    results = resultstestapi.query.order_by(resultstestapi.altitude).all()
     data = [{'id_res': result.id_res, 'altitude': result.altitude, 'snowcover': result.snowcover, 'darea': result.darea} for result in results]
     return jsonify(data)
     
 if __name__ == '__main__':
     app.run(debug=True)
+
+

@@ -16,20 +16,19 @@ const ResultsTable = () => {
 
     return (
         <div>
-            <h1>Results Displayed</h1>
+            <h1>Snow Conditions at Yosemite's Trails </h1>
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Altitude</th>
-                        <th>Snow Cover</th>
+                        <th>Snow Coverage(%)</th>
                         <th>Area</th>
                     </tr>
                 </thead>
                 <tbody>
                     {results.map(result => (
-                        <tr key={result.id_res}>
-                            <td>{result.id_res}</td>
+                        <tr 
+                        key={result.id_res}>
                             <td>{result.altitude}</td>
                             <td>{result.snowcover}</td>
                             <td>{result.darea}</td>
