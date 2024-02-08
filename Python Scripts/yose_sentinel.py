@@ -47,7 +47,7 @@ def download_sentinel_data(bbox, time_range, output_path, clip_shapefile):
     clipped_data = data.clip(clip_gdf.geometry)
 
     # Save the clipped data if it doesn't already exist
-    output_path = '/Outputs/SAR/'
+    output_path = '/Outputs/SAR_raw/'
     
     for idx, time_slice in enumerate(clipped_data):
         datetime_value = time_slice.timestamp.strftime('%Y-%m-%d %H:%M:%S')
