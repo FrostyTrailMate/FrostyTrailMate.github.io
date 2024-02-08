@@ -3,10 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, jsonify, request
 
 DB_CONFIG = {
-    "database": "FTM8TEST",
-    "username": "postgres",
-    "password": "Rapsusklei1",
-    "host": "localhost",
+    "database": "FTM8",
+    "username": "editor_sebas",
+    "password": "12345678",
+    "host": "DESKTOP-UIUIA2A",
     "port": "5432"}
 
 # Create a flask application
@@ -27,7 +27,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 # Create object to control SQLAlchemy from the Flask app
 db = SQLAlchemy(app)
 
-class resultsdisplayed(db.Model):
+class resultstestapi(db.Model):
     
     # Table is implicitly called by the name of the class
     
@@ -41,7 +41,7 @@ class resultsdisplayed(db.Model):
 @app.route('/api/results', methods=['GET'])
 def get_results():
     if request.method == 'GET':
-        results = resultsdisplayed.query.all()
+        results = resultstestapi.query.all()
         data = [{'altitude': result.altitude, 'snowcover': result.snowcover, 'darea': result.darea} for result in results]
         return jsonify(data)
 
