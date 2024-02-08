@@ -2,7 +2,7 @@
 This file contains the easiest way to dected snow trough backscatter intensity. 
 
 In my search I used 0.8 just to have a value, but a common starting point for snow detection in SAR imagery 
-is to use a threshold value in the range of -10 dB to -15 dB for backscatter intensity. 
+is to use a threshold value in the range of -10 dB (decibels) to -15 dB for backscatter intensity. 
 However, this value can vary widely depending on the aforementioned factors and may require adjustment through empirical 
 testing and validation.
 
