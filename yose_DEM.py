@@ -16,7 +16,7 @@ output_dir = "Outputs/DEM"
 os.makedirs(output_dir, exist_ok=True)
 
 # Set Earth Explorer API key
-et.set_key(api_key=m2m_code)
+#et.set_key(api_key=m2m_code)
 
 
 
