@@ -20,7 +20,7 @@ et.set_key(api_key=m2m_code)
 
 
 
-
+'''
 # Download DEM data from Earth Explorer
 print("Downloading DEM data...")
 dem_path = et.data.get_data(
@@ -28,9 +28,9 @@ dem_path = et.data.get_data(
     destination_folder=output_dir,
     scene_id="LE07_L1TP_039030_20000907_20170126_01_T1",
 )
-
-##### This code is more flexible than the above, but I'm not sure it will work-- we'll need to make changes to how it downloads. We should test both. -Chris
 '''
+##### This code is more flexible than the above, but I'm not sure it will work-- we'll need to make changes to how it downloads. We should test both. -Chris
+
 dem_metadata = et.data.search_earthexplorer(
     geom=aoi,
     start_date="2000-01-01",
@@ -43,7 +43,7 @@ dem_metadata = et.data.search_earthexplorer(
 if len(dem_metadata) == 0:
     print("No DEM data found for the specified area.")
     exit()
-    '''
+    
 #####
 
 
@@ -52,7 +52,7 @@ if len(dem_metadata) == 0:
 # Read shapefile and clip the DEM to the bounding box
 print("Reading shapefile and clipping DEM...")
 boundary = gpd.read_file(shapefile_path)
-clipped_dem, dem_extent = et.spatial.clip_raster(dem_path, boundary.geometry, nodata=-9999)
+clipped_dem, dem_extent = et.spatial.clip_raster(dem_metadata, boundary.geometry, nodata=-9999)
 
 # Set the output contour shapefile path ### If we make this more flexible, we'll need a different naming convention for the output shapefile. -Chris
 contour_shp_path = os.path.join(output_dir, "elevation_contours.shp")
