@@ -10,8 +10,8 @@ function Home() {
       <h1> FROSTY TRAIL MATE </h1>
       <p> Explore Yosemite's Trails with Confidence </p>
     </div>
-      <MapComponent />
       <ResultsTable />
+      <MapComponent />
     </>
   );
 }

@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 DB_CONFIG = {
     "database": "FTM8",
@@ -11,7 +12,8 @@ DB_CONFIG = {
 
 # Create a flask application
 app = Flask(__name__)
-
+  # Enable CORS for all routes
+CORS(app)
 # Set the database connection URI in the app configuration
 
 username = DB_CONFIG['username']
@@ -38,12 +40,11 @@ class resultstestapi(db.Model):
 
 # Route to fetch data
 # This function will be called when a request is made to the '/api/results' endpoint
-@app.route('/api/results', methods=['GET'])
+@app.route('/api/results')   
 def get_results():
-    if request.method == 'GET':
-        results = resultstestapi.query.all()
-        data = [{'altitude': result.altitude, 'snowcover': result.snowcover, 'darea': result.darea} for result in results]
-        return jsonify(data)
-
+    results = resultstestapi.query.all()
+    data = [{'id_res': result.id_res, 'altitude': result.altitude, 'snowcover': result.snowcover, 'darea': result.darea} for result in results]
+    return jsonify(data)
+    
 if __name__ == '__main__':
     app.run(debug=True)
