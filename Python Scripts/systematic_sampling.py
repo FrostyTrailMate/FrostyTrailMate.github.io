@@ -1,17 +1,21 @@
+import geopandas as gpd
+from shapely.geometry import Point
+from sqlalchemy import create_engine
+
 # Read the shapefile
 shapefile_path = '/Shapefiles/Yosemite_Boundary.shp'
 print("Reading shapefile...")
 gdf = gpd.read_file(shapefile_path)
 
-# Assuming there's only one polygon, extract it
+# Extract the polygon from the shapefile
 polygon = gdf.iloc[0]['geometry']
 min_x, min_y, max_x, max_y = polygon.bounds
 
 # Create systematic sampling points at 100 meter intervals
-sampling_distance = 100  # in meters
+sampling_distance = 100 
 
 # Create empty DataFrame to store sampled points
-sampled_points = gpd.GeoDataFrame(columns=['geometry'])
+sampled_points = gpd.GeoDataFrame(columns=['geometry', 'shapefile'])
 
 # Create sampling points within the polygon
 x_coords = range(int(min_x), int(max_x), sampling_distance)
@@ -21,7 +25,9 @@ for i, x in enumerate(x_coords, start=1):
     for j, y in enumerate(y_coords, start=1):
         point = Point(x, y)
         if polygon.contains(point):
-            sampled_points = sampled_points.append({'geometry': point}, ignore_index=True)
+            # Check if the point already exists
+            if not any(sampled_points['geometry'].equals(point)):
+                sampled_points = sampled_points.append({'geometry': point, 'shapefile': shapefile_path}, ignore_index=True)
 
         # Progress message
         print(f"Processed {i * j} of {total_points} points.")
@@ -38,12 +44,7 @@ engine = create_engine(connection_string)
 
 # Write the sampled points to a PostgreSQL table
 print("Writing sampled points to PostgreSQL table...")
-sampled_points.to_postgis('samples', engine, if_exists='replace', index=False, dtype={'geometry': 'POINT'})
-
-# Add a column 'vectorType' to the PostgreSQL table
-print("Adding 'vectorType' column to PostgreSQL table...")
-with engine.connect() as connection:
-    connection.execute("ALTER TABLE samples ADD COLUMN vectorType TEXT")
+sampled_points.to_postgis('samples', engine, if_exists='append', index=False, dtype={'geometry': 'POINT'})
 
 # Close the connection
-print("Process completed. Connection closed.")
+print("Process completed!")
