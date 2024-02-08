@@ -15,6 +15,7 @@ Project Overview
    - Generate contour intervals (100 meters)
    - Connect to the database and save
 4. Create sample points
+   - Check if the sampled points already exist
    - Using the shape from step 1, create a multipoint sampling grid at every 100 meters
    - Save the sampling grid to the DB
 5. Process Sentinel-1 SAR Imagery
