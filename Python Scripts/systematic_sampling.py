@@ -11,8 +11,8 @@ gdf = gpd.read_file(shapefile_path)
 polygon = gdf.iloc[0]['geometry']
 min_x, min_y, max_x, max_y = polygon.bounds
 
-# Create systematic sampling points at 100 meter intervals
-sampling_distance = 100 
+# Create systematic sampling points at 500 meter intervals
+sampling_distance = 500 
 
 # Create empty DataFrame to store sampled points
 sampled_points = gpd.GeoDataFrame(columns=['geometry', 'shapefile'])

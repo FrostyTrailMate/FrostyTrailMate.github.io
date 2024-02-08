@@ -16,7 +16,7 @@ Project Overview
    - Connect to the database and save
 4. Create sample points
    - Check if the sampled points already exist
-   - Using the shape from step 1, create a multipoint sampling grid at every 100 meters
+   - Using the shape from step 1, create a sampling grid of points at every 500 meters
    - Save the sampling grid to the DB
 5. Process Sentinel-1 SAR Imagery
    - Pull the Sentinel-1 SAR image from the database
