@@ -5,18 +5,18 @@ import earthpy.spatial as et
 import psycopg2
 
 # Set the Earth Explorer M2M code
-m2m_code = "gpul8A@ScIhEe2DG!EGFgUUxKPnLREn@7@yCO6TFoo9!Z1FHnMu4OegGUEhaWpdx"
+#m2m_code = "gpul8A@ScIhEe2DG!EGFgUUxKPnLREn@7@yCO6TFoo9!Z1FHnMu4OegGUEhaWpdx"
 
 # Set the shapefile path and access the shapefile
-shapefile_path = "/Shapefiles/Yosemite_Boundary.shp"
+shapefile_path = "Shapefiles/Yosemite_Boundary.shp"
 boundary = gpd.read_file(shapefile_path)
 
 # Imported DEM output directory
-output_dir = "/Outputs/DEM"
+output_dir = "Outputs/DEM"
 os.makedirs(output_dir, exist_ok=True)
 
 # Set Earth Explorer API key
-et.set_key(api_key=m2m_code)
+#et.set_key(api_key=m2m_code)
 
 
 
@@ -78,26 +78,14 @@ conn = psycopg2.connect(
 # Create a cursor object
 cur = conn.cursor()
 
-# Create a table if it doesn't exist ### Don't need this since table is already created.
-cur.execute("""
-    CREATE TABLE IF NOT EXISTS dem_p (
-        id SERIAL PRIMARY KEY,
-        vector GEOMETRY(LINESTRING, 4326)
-    )
-""")
-
 # Insert contours into the database
 # Fetch the last recorded id from the database
 cur.execute("SELECT MAX(id) FROM dem_p")
 last_id = cur.fetchone()[0]
 
-# Increment the last recorded id by 1, unless there is no data in the table yet
-new_id = last_id + 1 if last_id is not None else 1
-
 # Insert contours into the database with the incremented id. ### I'm not sure we want a field per contour?? This might need edits. Chris
 for contour in contours:
-    cur.execute("INSERT INTO dem_p (id, vector, area_name) VALUES (%s, ST_GeomFromText(%s, 4326), 'Yosemite')", (new_id, contour.wkt,))
-    new_id += 1  # Increment the id for the next contour
+    cur.execute("INSERT INTO dem_p (vector, area_name) VALUES (%s, ST_GeomFromText(%s, 4326), 'Yosemite')", (contour.wkt,))
 
 # Commit changes
 conn.commit()
