@@ -8,7 +8,7 @@ import psycopg2
 m2m_code = "gpul8A@ScIhEe2DG!EGFgUUxKPnLREn@7@yCO6TFoo9!Z1FHnMu4OegGUEhaWpdx"
 
 # Set the shapefile path and access the shapefile
-shapefile_path = "C:\Users\Bachi\Documents\GitHub\FrostyTrailMate.github.io\Shapefiles\Yosemite_Boundary.shp"
+shapefile_path = "Shapefiles/Yosemite_Boundary.shp"
 boundary = gpd.read_file(shapefile_path)
 
 # Imported DEM output directory
