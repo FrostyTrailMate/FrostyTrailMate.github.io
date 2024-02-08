@@ -52,7 +52,7 @@ def download_sentinel_data(bbox, time_range, output_path, clip_shapefile):
     for idx, time_slice in enumerate(clipped_data):
         datetime_value = time_slice.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         if not check_image_existence(datetime_value):
-            image_path = os.path.join(output_path, f'sentinel1_clipped_image_{idx}.tif')
+            image_path = os.path.join(output_path, f'sentinel1_clipped_image_{idx}.tif') #### Change output file name - Chris
             time_slice.save(image_path)
             print(f'Saved clipped image {image_path}')
             # Insert datetime into the database
@@ -60,12 +60,12 @@ def download_sentinel_data(bbox, time_range, output_path, clip_shapefile):
         else:
             print(f"Image already obtained for datetime: {datetime_value}")
 
-# Function to insert datetime into the database   #### NEED TO UPDATE THIS
+# Function to insert datetime into the database   #### NEED TO UPDATE THIS - Chris
 def insert_datetime(datetime_value):
     connection = psycopg2.connect(user="postgres",
                                   password="admin",
                                   host="DESKTOP-UIUIA2A",
-                                  port="5432t",
+                                  port="5432",
                                   database="FTM8")
     cursor = connection.cursor()
     query = sql.SQL("INSERT INTO your_table (datetime) VALUES (%s);")
@@ -88,7 +88,7 @@ most_recent_september_end = datetime(today.year, 9, 30) if today.month >= 9 else
 most_recent_september_range = (most_recent_september_start, most_recent_september_end)
 
 
-# Output paths
+# Output paths - UPDATE - Chris
 most_recent_september_output = 'most_recent_september_image.tif'
 most_recent_output = 'most_recent_image.tif'
 
