@@ -1,0 +1,41 @@
+/* Styles for the container holding the table */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    background-color: #242424; /* Dark background color */
+  }
+  
+  /* Style for the table */
+table {
+    width: 80%; /* Adjust width as needed */
+    border-collapse: collapse;
+    background-color: #757575; /* White background color for table */
+    border-radius: 20px; /* Rounded corners */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+ }
+  
+ th {
+  background-color: #757575; /* White background color */
+  color: #f2f2f2; /* Dark text color */
+  padding: 10px;
+  text-align: center;
+}
+
+/* Style for table rows
+tr:nth-child(even) {
+  background-color: #f2f2f2; /* Light gray background color for even rows
+} */
+  
+  /* Style for table data cells */
+  td {
+    padding: 10px;
+    color: #fff;
+    text-align: center;
+  }
+  
+  /* Hover effect on table rows*/
+  tr:hover {
+    background-color: #494949; /* Darker gray background color on hover */
+  }

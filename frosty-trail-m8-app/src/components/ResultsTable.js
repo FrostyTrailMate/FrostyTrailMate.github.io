@@ -15,9 +15,8 @@ const ResultsTable = () => {
     }, []);
 
     return (
-        <div>
-            <h1>Snow Conditions at Yosemite's Trails </h1>
-            <table>
+        <div className="container">
+            <table className="styled-table">
                 <thead>
                     <tr>
                         <th>Altitude</th>
@@ -41,4 +40,3 @@ const ResultsTable = () => {
 };
 
 export default ResultsTable;
-

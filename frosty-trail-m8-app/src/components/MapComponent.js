@@ -15,13 +15,13 @@ const MapComponent = () => {
       <MapContainer
         center={[37.8451, -119.5383]}
         zoom={10}
-        style={{ height: '690px', width: '85%', margin: '0 auto' }}
-      >
+        style={{ height: '690px', width: '85%', margin: '0 auto' }}>
+
         <TileLayer
           url="https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=749cd9dc6622478d9454b931ded7943d"
           subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-          attribution='© Thunderforest by Gravitystorm Limited.'
-        />
+          attribution='© Thunderforest by Gravitystorm Limited.'/>
+          
         {geojsonData && (
           <GeoJSON data={geojsonData} />
         )}
