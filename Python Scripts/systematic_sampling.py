@@ -44,10 +44,5 @@ engine = create_engine(connection_string)
 print("Writing sampled points to PostgreSQL table...")
 sampled_points.to_postgis('samples', engine, if_exists='replace', index=False, dtype={'geometry': 'POINT'})
 
-# Add a column 'vectorType' to the PostgreSQL table
-print("Adding 'vectorType' column to PostgreSQL table...")
-with engine.connect() as connection:
-    connection.execute("ALTER TABLE samples ADD COLUMN vectorType TEXT")
-
 # Close the connection
 print("Process completed!")
