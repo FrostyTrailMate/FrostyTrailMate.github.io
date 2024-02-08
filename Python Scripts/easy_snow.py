@@ -13,15 +13,15 @@ import cv2
 
 # Connect to the PostgreSQL database
 conn = psycopg2.connect(
-    dbname="your_db_name",
-    user="your_username",
-    password="your_password",
-    host="your_host",
-    port="your_port"
+    dbname="FTM8",
+    user="postgres",
+    password="admin",
+    host="DESKTOP-UIUIA2A",
+    port="5432"
 )
 cur = conn.cursor()
 
-# Retrieve SAR images from the database
+# Retrieve SAR images from the database ##### Need to check if the image has been processed already or not
 cur.execute("SELECT sRaster FROM sar_raw")
 sar_images = cur.fetchall()
 
@@ -45,7 +45,7 @@ def process_sar_image(sar_image):
     
     return snow_present
 
-# Iterate over all SAR images and detect snow presence
+# Iterate over all SAR images and detect snow presence ### It should iterate only through one image at each of the sample points created in systematic_sampling.py
 for sar_image in sar_images:
     snow_present = process_sar_image(sar_image)
     print("Snow present:", snow_present)

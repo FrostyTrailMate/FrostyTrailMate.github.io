@@ -52,7 +52,7 @@ def download_sentinel_data(bbox, time_range, output_path, clip_shapefile):
     for idx, time_slice in enumerate(clipped_data):
         datetime_value = time_slice.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         if not check_image_existence(datetime_value):
-            image_path = os.path.join(output_path, f'sentinel1_clipped_image_{idx}.tif') #### Change output file name - Chris
+            image_path = os.path.join(output_path, f'Yosemite_{idx}.tif') #### Change output file name - Chris
             time_slice.save(image_path)
             print(f'Saved clipped image {image_path}')
             # Insert datetime into the database
