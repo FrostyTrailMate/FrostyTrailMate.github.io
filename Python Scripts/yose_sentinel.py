@@ -98,6 +98,3 @@ download_sentinel_data(yosemite_bbox, most_recent_september_range, most_recent_s
 # Download Sentinel-1 data for the most recent period and clip to Yosemite Boundary
 download_sentinel_data(yosemite_bbox, most_recent_range, most_recent_output, yosemite_boundary_shapefile)
 
-# Perform further analysis and comparison with DEM elevations
-# (This part depends on your specific requirements and analysis methods)
-
