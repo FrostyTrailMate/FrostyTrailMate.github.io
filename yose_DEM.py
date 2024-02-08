@@ -5,7 +5,7 @@ import earthpy.spatial as et
 import psycopg2
 
 # Set the Earth Explorer M2M code
-m2m_code = "gpul8A@ScIhEe2DG!EGFgUUxKPnLREn@7@yCO6TFoo9!Z1FHnMu4OegGUEhaWpdx"
+#m2m_code = "gpul8A@ScIhEe2DG!EGFgUUxKPnLREn@7@yCO6TFoo9!Z1FHnMu4OegGUEhaWpdx"
 
 # Set the shapefile path and access the shapefile
 shapefile_path = "Shapefiles/Yosemite_Boundary.shp"
