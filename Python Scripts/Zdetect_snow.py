@@ -1,9 +1,10 @@
-Steps for detecting snow in Synthetic Aperture Radar (SAR) images using machine learning: 
 
-1.	Data collection: Obtain a dataset of SAR images labeled with the presence or absence of snow. Ensure that the dataset is diverse and representative of different conditions.
+### Steps for detecting snow in Synthetic Aperture Radar (SAR) images using machine learning: 
 
-2.	Data preprocessing: SAR images often require specific preprocessing due to their nature. Preprocess the images to remove noise, normalize intensities, and handle speckle. Consider using SAR-specific libraries like pyroSAR or snappy for preprocessing.
-  a.	This example assumes that your SAR image is in a zip archive. Adjust the paths, filenames, and parameters according to your specific case.
+# 1.	Data collection: Obtain a dataset of SAR images labeled with the presence or absence of snow. Ensure that the dataset is diverse and representative of different conditions.
+
+# 2.	Data preprocessing: SAR images often require specific preprocessing due to their nature. Preprocess the images to remove noise, normalize intensities, and handle speckle. Consider using SAR-specific libraries like pyroSAR or snappy for preprocessing.
+#  a.	This example assumes that your SAR image is in a zip archive. Adjust the paths, filenames, and parameters according to your specific case.
 import pyroSAR
 from pyroSAR import identify
 from pyroSAR.ancillary import groupby_helper
@@ -31,8 +32,8 @@ output_preprocessed_image = 'path/to/your/preprocessed/image.tif'
 
 preprocess_sar_image(input_sar_image, output_preprocessed_image)
 
-3.	Feature extraction: Extract relevant features from the SAR images. These features might include texture, intensity, and statistical measures. You can use libraries like scikit-image or rasterio for feature extraction.
-  a.	Backsatter intensity feature extraction: These statistical features can be used as input features for machine learning models or combined with other features for more comprehensive analysis. Adjust the calculations or include additional features based on your specific requirements and the characteristics of your SAR images.
+# 3.	Feature extraction: Extract relevant features from the SAR images. These features might include texture, intensity, and statistical measures. You can use libraries like scikit-image or rasterio for feature extraction.
+#  a.	Backsatter intensity feature extraction: These statistical features can be used as input features for machine learning models or combined with other features for more comprehensive analysis. Adjust the calculations or include additional features based on your specific requirements and the characteristics of your SAR images.
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io, color
@@ -72,7 +73,7 @@ def backscatter_feature_extraction(image_path):
 image_path = 'path/to/your/preprocessed/image.tif'
 backscatter_feature_extraction(image_path)
 
-  b.	Texture analysis feature extraction: Adjust the parameters (distance, angles, levels) based on your specific requirements and characteristics of the SAR images. Texture analysis can be combined with other feature extraction methods to improve the performance of your machine learning model for snow detection.
+#  b.	Texture analysis feature extraction: Adjust the parameters (distance, angles, levels) based on your specific requirements and characteristics of the SAR images. Texture analysis can be combined with other feature extraction methods to improve the performance of your machine learning model for snow detection.
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io, color, img_as_ubyte
@@ -119,9 +120,9 @@ def texture_analysis(image_path, distance=1, angles=[0, np.pi/4, np.pi/2, 3*np.p
 image_path = 'path/to/your/preprocessed/image.tif'
 texture_analysis(image_path)
 
-4.	Labeling: Ensure that your dataset is labeled with the presence or absence of snow. This is crucial for supervised learning.
-  a.	Automatically labeling SAR images for the presence or absence of snow can be done using Thresholding on Intensity: SAR images of snow-covered areas often have distinct intensity characteristics. You can set a threshold on the pixel intensity to differentiate between snow and non-snow regions. This threshold can be determined manually or through histogram analysis.
-Adjust the threshold value according to the characteristics of your SAR images. You may need to experiment and fine-tune these methods based on the specific features of your dataset. Keep in mind that automatic labeling methods might not be perfect, and it's essential to validate and refine the labels through manual inspection or additional feedback loops to improve accuracy.
+# 4.	Labeling: Ensure that your dataset is labeled with the presence or absence of snow. This is crucial for supervised learning.
+#  a.	Automatically labeling SAR images for the presence or absence of snow can be done using Thresholding on Intensity: SAR images of snow-covered areas often have distinct intensity characteristics. You can set a threshold on the pixel intensity to differentiate between snow and non-snow regions. This threshold can be determined manually or through histogram analysis. 
+# Adjust the threshold value according to the characteristics of your SAR images. You may need to experiment and fine-tune these methods based on the specific features of your dataset. Keep in mind that automatic labeling methods might not be perfect, and it's essential to validate and refine the labels through manual inspection or additional feedback loops to improve accuracy.
 import cv2
 import numpy as np
 
@@ -140,10 +141,10 @@ snow_mask = label_snow_by_intensity(image_path, threshold=120)
 
 # 'snow_mask' now contains binary labels where 1 represents snow-covered areas
 
-5.	Splitting the data set: Split your dataset into training and testing sets. The training set is used to train your machine learning model, and the testing set is used to evaluate its performance on unseen data. This ensures that you can evaluate the model's performance on unseen data.
-  a.	Make sure to replace the placeholder values for X and y with your actual feature and label data. 
-The test_size parameter controls the percentage of the data that will be allocated for testing (here, 20%). Adjust this parameter based on your specific needs.
-After splitting the data, you can proceed with training your machine learning model using the X_train and y_train datasets. The X_test and y_test datasets are reserved for evaluating the model's performance.
+# 5.	Splitting the data set: Split your dataset into training and testing sets. The training set is used to train your machine learning model, and the testing set is used to evaluate its performance on unseen data. This ensures that you can evaluate the model's performance on unseen data.
+#  a.	Make sure to replace the placeholder values for X and y with your actual feature and label data. 
+# The test_size parameter controls the percentage of the data that will be allocated for testing (here, 20%). Adjust this parameter based on your specific needs.
+# After splitting the data, you can proceed with training your machine learning model using the X_train and y_train datasets. The X_test and y_test datasets are reserved for evaluating the model's performance.
 
 from sklearn.model_selection import train_test_split
 
@@ -166,12 +167,12 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 print(f"Training set size: {len(X_train)} samples")
 print(f"Testing set size: {len(X_test)} samples")
 
-6.	Selecting a machine learning model: Choose a suitable machine learning algorithm for your task. Common choices for image classification include Support Vector Machines (SVM), Random Forests, or Convolutional Neural Networks (CNNs).
-  a.	One of the simplest and widely used machine learning algorithms is the Support Vector Machine (SVM). 
-  b.	If you have a large dataset or complex relationships, you might also consider exploring more advanced algorithms such as Random Forests.
+# 6.	Selecting a machine learning model: Choose a suitable machine learning algorithm for your task. Common choices for image classification include Support Vector Machines (SVM), Random Forests, or Convolutional Neural Networks (CNNs).
+#  a.	One of the simplest and widely used machine learning algorithms is the Support Vector Machine (SVM). 
+#  b.	If you have a large dataset or complex relationships, you might also consider exploring more advanced algorithms such as Random Forests.
 
-7.	Model training: Train your chosen model using the training dataset. Feed the extracted features into the model along with their corresponding labels.
-  a.	Example for the SVM: Replace the placeholder values for X_train, y_train, X_test, and y_test with your actual training and testing data. In this example, we use a linear kernel for the SVM (kernel='linear'), which is a good starting point for many classification problems. Depending on your dataset, you might need to explore other kernel options and tune hyperparameters for better performance.
+# 7.	Model training: Train your chosen model using the training dataset. Feed the extracted features into the model along with their corresponding labels.
+#  a.	Example for the SVM: Replace the placeholder values for X_train, y_train, X_test, and y_test with your actual training and testing data. In this example, we use a linear kernel for the SVM (kernel='linear'), which is a good starting point for many classification problems. Depending on your dataset, you might need to explore other kernel options and tune hyperparameters for better performance.
 from sklearn import svm
 from sklearn.metrics import accuracy_score
 
@@ -203,8 +204,8 @@ predictions = svm_classifier.predict(X_test)
 accuracy = accuracy_score(y_test, predictions)
 print(f'Accuracy: {accuracy}')
 
-8.	Model evaluation: Evaluate the model's performance on the testing dataset. Common evaluation metrics for binary classification tasks include accuracy, precision, recall, and F1 score.
-  a.	Replace the placeholder values for predictions and y_test with your actual predicted labels and true labels, respectively.
+# 8.	Model evaluation: Evaluate the model's performance on the testing dataset. Common evaluation metrics for binary classification tasks include accuracy, precision, recall, and F1 score.
+#  a.	Replace the placeholder values for predictions and y_test with your actual predicted labels and true labels, respectively.
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 # Assuming predictions contain the predicted labels and y_test contains the true labels
@@ -229,11 +230,11 @@ class_report = classification_report(y_test, predictions)
 print('Classification Report:')
 print(class_report)
 
-9.	Tuning and optimization: Fine-tune your model parameters to improve its performance. Consider techniques like cross-validation and hyperparameter tuning.
-  a.	Grid search example: is a common technique used to search through a predefined set of hyperparameter values and find the combination that yields the best performance. 
-Adjust the param_grid values based on your specific requirements and the characteristics of your dataset. Grid search helps you find the optimal hyperparameters for your model, improving its overall performance.
-  b.	The param_grid dictionary defines the hyperparameters and their potential values that the grid search will explore.
-  c.	The GridSearchCV object performs a cross-validated grid search, trying out all possible combinations of hyperparameters.
+# 9.	Tuning and optimization: Fine-tune your model parameters to improve its performance. Consider techniques like cross-validation and hyperparameter tuning.
+#  a.	Grid search example: is a common technique used to search through a predefined set of hyperparameter values and find the combination that yields the best performance. 
+# Adjust the param_grid values based on your specific requirements and the characteristics of your dataset. Grid search helps you find the optimal hyperparameters for your model, improving its overall performance.
+#  b.	The param_grid dictionary defines the hyperparameters and their potential values that the grid search will explore.
+#  c.	The GridSearchCV object performs a cross-validated grid search, trying out all possible combinations of hyperparameters.
 from sklearn import svm, datasets
 from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.metrics import accuracy_score
@@ -269,8 +270,8 @@ predictions = best_model.predict(X_test)
 accuracy = accuracy_score(y_test, predictions)
 print(f'Accuracy on Test Set: {accuracy}')
 
-10.	Deployment: Once satisfied with the model's performance, deploy it for snow detection in new SAR images. Involves using your trained machine learning model to make predictions on new, unseen data.
-  a.	Example on how to save the trained Support Vector Machine (SVM) model and later use it for making predictions on new data: Replace the training and testing data with your actual dataset and adapt the code according to the specific requirements of your deployment environment.
+# 10.	Deployment: Once satisfied with the model's performance, deploy it for snow detection in new SAR images. Involves using your trained machine learning model to make predictions on new, unseen data.
+#  a.	Example on how to save the trained Support Vector Machine (SVM) model and later use it for making predictions on new data: Replace the training and testing data with your actual dataset and adapt the code according to the specific requirements of your deployment environment.
 We train an SVM classifier on a sample dataset (Iris dataset in this case)  We save the trained model to a file using joblib.dump -> Later, we load the saved model using joblib.load -> We make predictions on new data using the loaded model.
 
 from sklearn import svm
