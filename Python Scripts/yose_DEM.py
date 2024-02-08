@@ -7,8 +7,9 @@ import psycopg2
 # Set the Earth Explorer M2M code
 m2m_code = "gpul8A@ScIhEe2DG!EGFgUUxKPnLREn@7@yCO6TFoo9!Z1FHnMu4OegGUEhaWpdx"
 
-# Set the shapefile path
+# Set the shapefile path and access the shapefile
 shapefile_path = "/Shapefiles/Yosemite_Boundary.shp"
+boundary = gpd.read_file(shapefile_path)
 
 # Imported DEM output directory
 output_dir = "/Outputs/DEM"
@@ -29,10 +30,10 @@ dem_path = et.data.get_data(
     scene_id="LE07_L1TP_039030_20000907_20170126_01_T1",
 )
 '''
-##### This code is more flexible than the above, but I'm not sure it will work-- we'll need to make changes to how it downloads. We should test both. -Chris
+##### This code is more flexible than the above, but I'm not sure it will work-- we may need to make changes to how it downloads. We should test both. -Chris
 
 dem_metadata = et.data.search_earthexplorer(
-    geom=aoi,
+    geom=boundary,
     start_date="2000-01-01",
     end_date="2022-01-01",
     max_cloud_cover=10,
@@ -49,13 +50,12 @@ if len(dem_metadata) == 0:
 
 
 
-# Read shapefile and clip the DEM to the bounding box
-print("Reading shapefile and clipping DEM...")
-boundary = gpd.read_file(shapefile_path)
+# Clip the DEM to the bounding box
+print("Clipping DEM...")
 clipped_dem, dem_extent = et.spatial.clip_raster(dem_metadata, boundary.geometry, nodata=-9999)
 
 # Set the output contour shapefile path ### If we make this more flexible, we'll need a different naming convention for the output shapefile. -Chris
-contour_shp_path = os.path.join(output_dir, "elevation_contours.shp")
+contour_shp_path = os.path.join(output_dir, "Yosemite_contours.shp")
 
 # Generate 100-meter elevation contours from the clipped DEM
 print("Generating contours...")
