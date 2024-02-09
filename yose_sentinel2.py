@@ -88,7 +88,7 @@ def check_and_download_new_images():
 
         # Check for new images
         request_url = f'https://services.sentinel-hub.com/api/v1/process/tiles?timeFrom={yesterday.strftime("%Y-%m-%d")}&timeTo={datetime.now().strftime("%Y-%m-%d")}&tileService=sentinel-1&zoomLevel=2&tileResolution=64&geohash={boundary.centroid.y},{boundary.centroid.x}&instance_id={config.instance_id}'
-        # https://services.sentinel-hub.com/api/v1/process/tiles?timeFrom=2024-02-08&timeTo=2024-02-09&tileService=sentinel-1&zoomLevel=2&tileResolution=64&geohash=4192049.3984367144,275015.10698296566&instance_id=44b8b66c-925c-4ab5-a776-b1f48364172d
+        # https://services.sentinel-hub.com/api/v1/process/tiles?timeFrom=2024-02-08&timeTo=2024-02-09&tileService=sentinel-1-grd&zoomLevel=2&tileResolution=64&geohash=4192049.3984367144,275015.10698296566&instance_id=44b8b66c-925c-4ab5-a776-b1f48364172d
         response = requests.get(request_url)
         if response.status_code == 200:
             tiles = response.json()
