@@ -3,12 +3,13 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './CCStyles/Calendar.css'; // Import CSS for styling
 
-const CalendarComponent = () => {
+const Calendar = ({ onDateChange }) => {
   const [selectedDate, setSelectedDate] = useState(null);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    // Add logic to handle date selection events
+    // Pass the selected date to the parent component
+    onDateChange(date);
   };
 
   return (
@@ -17,10 +18,10 @@ const CalendarComponent = () => {
         selected={selectedDate}
         onChange={handleDateChange}
         dateFormat="yyyy-MM-dd"
-        className="custom-datepicker" // Add custom CSS class for styling
       />
     </div>
   );
 };
 
-export default CalendarComponent;
+export default Calendar;
+
