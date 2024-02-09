@@ -24,8 +24,6 @@
     border-right: 1px solid rgb(167, 167, 167);
   }
 
-
-
   tr:nth-child(even) {
     background-color: #6a6a6a;
   }  
