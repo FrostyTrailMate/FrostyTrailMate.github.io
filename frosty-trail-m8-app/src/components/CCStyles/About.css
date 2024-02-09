@@ -1,0 +1,22 @@
+.About{
+    display: flex;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-image: url('../images/HikingAboutUs.png');
+    background-position: center;
+    background-size: cover;
+  }
+  
+  .About > p {
+    margin-top: -380px;
+    margin-left: 150px;
+    margin-right: 150px;
+    text-align: justify;
+    color: #fffef1;
+    font-size: 26px;
+    line-height: 1.4;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande','Lucida Sans', Arial, sans-serif;
+  }
+  

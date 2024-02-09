@@ -36,6 +36,7 @@ class resultstestapi(db.Model):
     altitude = db.Column(db.Float)
     snowcover = db.Column(db.Integer)
     darea = db.Column(db.String(30))
+    rdate = db.Column(db.Date)
 
 # Route to fetch data
 # This function will be called when a request is made to the '/api/results' endpoint
@@ -43,7 +44,7 @@ class resultstestapi(db.Model):
 @app.route('/api/results')   
 def get_results():
     results = resultstestapi.query.order_by(resultstestapi.altitude).all()
-    data = [{'id_res': result.id_res, 'altitude': result.altitude, 'snowcover': result.snowcover, 'darea': result.darea} for result in results]
+    data = [{'id_res': result.id_res, 'altitude': result.altitude, 'snowcover': result.snowcover, 'darea': result.darea, 'rdate': result.rdate} for result in results]
     return jsonify(data)
     
 if __name__ == '__main__':

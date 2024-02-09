@@ -1,0 +1,32 @@
+.calendar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #242424; /* Dark background color */
+  }
+  
+  .custom-datepicker {
+    font-family: Arial, sans-serif;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 8px;
+    background-color: #ffffff;
+    color: #333;
+  }
+  
+  .custom-datepicker .react-datepicker__header {
+    background-color: #f0f0f0;
+    border-bottom: none;
+  }
+  
+  .custom-datepicker .react-datepicker__day {
+    color: #333;
+  }
+  
+  .custom-datepicker .react-datepicker__day--selected {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  /* Add more custom styles as needed */
+  

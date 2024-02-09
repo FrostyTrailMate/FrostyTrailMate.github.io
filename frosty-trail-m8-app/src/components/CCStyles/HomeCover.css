@@ -1,0 +1,25 @@
+.homecover-container {
+    background: url('../images/HikingHome.png') center center/cover no-repeat;
+    height: 89vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.2);
+    object-fit: contain;
+  }
+  
+  .homecover-container > h1 {
+    color: #fff;
+    font-size: 100px;
+    margin-top: -180px;
+  }
+  
+  .homecover-container > p {
+    margin-top: 10px;
+    color: #fff;
+    font-size: 32px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+      'Lucida Sans', Arial, sans-serif;
+  }
