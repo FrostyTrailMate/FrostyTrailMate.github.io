@@ -12,7 +12,7 @@ config = SHConfig()
 config.instance_id = '44b8b66c-925c-4ab5-a776-b1f48364172d'
 
 # Define paths
-shapefile_path = 'Shapefiles/Yosemite_Boundary.zip'
+shapefile_path = 'Shapefiles/Yosemite_Boundary_4326.zip'
 output_folder = 'Output/SAR_raw'
 
 # Connect to PostgreSQL database
@@ -77,46 +77,66 @@ def download_and_save_image(bbox, capture_datetime):
         print(f"Failed to download and save image: {e}")
         return None
 
+from sentinelhub import SHConfig, SentinelHubRequest, SentinelHubCatalog, bbox_to_dimensions, DownloadRequest, DataCollection
+
+from datetime import datetime, timedelta
+
+from shapely.geometry import Polygon
+
 def check_and_download_new_images():
     try:
         # Load shapefile
         gdf = gpd.read_file(shapefile_path)
-        boundary = shape(gdf['geometry'].iloc[0])
+        
+        # Extract bounding box coordinates
+        bbox_coords = gdf.total_bounds
+        
+        # Create a Polygon from the bounding box coordinates
+        boundary_polygon = Polygon.from_bounds(*bbox_coords)
 
         # Get yesterday's date
         yesterday = datetime.now() - timedelta(days=1)
 
-        # Check for new images
-        request_url = f'https://services.sentinel-hub.com/api/v1/process/tiles?timeFrom={yesterday.strftime("%Y-%m-%d")}&timeTo={datetime.now().strftime("%Y-%m-%d")}&tileService=sentinel-1&zoomLevel=2&tileResolution=64&geohash={boundary.centroid.y},{boundary.centroid.x}&instance_id={config.instance_id}'
-        # https://services.sentinel-hub.com/api/v1/process/tiles?timeFrom=2024-02-08&timeTo=2024-02-09&tileService=sentinel-1-grd&zoomLevel=2&tileResolution=64&geohash=4192049.3984367144,275015.10698296566&instance_id=44b8b66c-925c-4ab5-a776-b1f48364172d
-        response = requests.get(request_url)
-        if response.status_code == 200:
-            tiles = response.json()
-            for tile in tiles:
-                capture_datetime = datetime.strptime(tile['properties']['datetime'], '%Y-%m-%dT%H:%M:%SZ')
-                bbox = tile['bbox']
-                if boundary.intersects(shape({
-                    "type": "Polygon",
-                    "coordinates": [[
-                        [bbox[0], bbox[1]],
-                        [bbox[0], bbox[3]],
-                        [bbox[2], bbox[3]],
-                        [bbox[2], bbox[1]],
-                        [bbox[0], bbox[1]]
-                    ]]
-                })):
-                    file_path = download_and_save_image(bbox, capture_datetime)
-                    if file_path:
-                        path_row = f"{tile['properties']['path']}-{tile['properties']['row']}"
-                        # Insert record into database
-                        cursor.execute("INSERT INTO SAR_raw (path_row, capture_datetime, file_path) VALUES (%s, %s, %s)", (path_row, capture_datetime, file_path))
-                        conn.commit()
-        else:
-            print("Failed to retrieve tiles from Sentinel Hub API")
-            print(request_url)
-            print(response.content)
+        # Set up Sentinel Hub config
+        config = SHConfig()
+        config.instance_id = '44b8b66c-925c-4ab5-a776-b1f48364172d'  # Set instance ID
+
+        # Define search parameters
+        catalog = SentinelHubCatalog(config=config)
+        tiles = catalog.search(
+            DataCollection.SENTINEL1_IW,
+            bbox=bbox_coords,
+            time=(yesterday, datetime.now()),
+            filter={
+                "type": "OrFilter",
+                "config": [
+                    {
+                        "type": "GeometryFilter",
+                        "field_name": "geometry",
+                        "config": {
+                            "type": "Polygon",
+                            "coordinates": [boundary_polygon.exterior.coords[:]]
+                        }
+                    }
+                ]
+            }
+        )
+
+        # Iterate over search results
+        for tile_info in tiles:
+            capture_datetime = tile_info['properties']['date']
+            bbox = tile_info['geometry']['coordinates'][0]
+            tile_polygon = Polygon(bbox)
+            if boundary_polygon.intersects(tile_polygon):  # Check for intersection
+                file_path = download_and_save_image(bbox, capture_datetime)
+                if file_path:
+                    path_row = f"{tile_info['properties']['path']}-{tile_info['properties']['row']}"
+                    # Insert record into database
+                    cursor.execute("INSERT INTO SAR_raw (path_row, capture_datetime, file_path) VALUES (%s, %s, %s)", (path_row, capture_datetime, file_path))
+                    conn.commit()
     except Exception as e:
         print(f"Error occurred while checking and downloading new images: {e}")
+
 
 if __name__ == "__main__":
     check_and_download_new_images()
