@@ -2,7 +2,7 @@ import psycopg2
 from psycopg2 import sql
 from datetime import datetime, timedelta
 import os
-from sentinelhub import SHConfig, DataCollection, SentinelHubRequest, bbox_to_dimensions
+from sentinelhub import SHConfig, DataCollection, SentinelHubRequest, bbox_to_dimensions, BBox, CRS
 import geopandas as gpd
 import pandas as pd
 import rasterio
@@ -92,7 +92,7 @@ def insert_datetime(datetime_value):
     connection.close()
 
 # Read the shapefile to extract the bounding box
-yosemite_boundary_shapefile = 'Shapefiles/Yosemite_Boundary.shp'
+yosemite_boundary_shapefile = 'Shapefiles/Yosemite_Boundary.zip'
 yosemite_boundary_gdf = gpd.read_file(yosemite_boundary_shapefile)
 yosemite_bbox = yosemite_boundary_gdf.total_bounds
 yosemite_crs = yosemite_boundary_gdf.crs
