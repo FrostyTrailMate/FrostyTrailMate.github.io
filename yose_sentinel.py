@@ -2,11 +2,13 @@ import psycopg2
 from psycopg2 import sql
 from datetime import datetime, timedelta
 import os
-from sentinelhub import SHConfig, DataCollection, SentinelHubRequest, bbox_to_dimensions, BBox, CRS
+from sentinelhub import SHConfig, DataCollection, SentinelHubRequest, bbox_to_dimensions, BBox, CRS, DownloadRequest, MimeType, SentinelHubDownloadClient, SentinelHubRequest #MosaickingOrder,
 import geopandas as gpd
 import pandas as pd
 import rasterio
 from shapely.geometry import box
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Set up Sentinel Hub configuration
 config = SHConfig()
@@ -16,7 +18,7 @@ config.instance_id = '44b8b66c-925c-4ab5-a776-b1f48364172d'  # Replace with your
 def check_image_existence(datetime_value):
     connection = psycopg2.connect(user="postgres",
                                   password="admin",
-                                  host="DESKTOP-UIUIA2A",
+                                  host="DESKTOP-UIUIA2",
                                   port="5432",
                                   database="FTM8")
     cursor = connection.cursor()
@@ -35,7 +37,7 @@ def download_sentinel_data(bbox, crs, time_range, output_path, clip_shapefile):
     bbox_gdf = bbox_gdf.to_crs('EPSG:4326')  # Transform to WGS84 for bbox_to_dimensions
     bbox_transformed = bbox_gdf.geometry[0].bounds
 
-    image_width, image_height = bbox_to_dimensions(bbox_transformed, crs=crs, resolution=resolution)
+    image_width, image_height = bbox_to_dimensions(bbox_transformed, resolution=resolution)
 
     request_params = {
         'data_collection': DataCollection.SENTINEL1_GRD,
