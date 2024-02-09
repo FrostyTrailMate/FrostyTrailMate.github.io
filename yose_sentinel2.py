@@ -3,8 +3,9 @@ from datetime import datetime, timedelta
 import json
 import requests
 import geopandas as gpd
-from shapely.geometry import shape
-from sentinelhub import SHConfig, DataCollection, SentinelHubRequest, bbox_to_dimensions, DownloadRequest
+from shapely.geometry import shape, Polygon
+from sentinelhub import SHConfig, DataCollection, SentinelHubRequest, bbox_to_dimensions, DownloadRequest, SentinelHubCatalog
+
 import psycopg2
 
 # Set up Sentinel Hub configuration
@@ -51,7 +52,7 @@ def download_and_save_image(bbox, capture_datetime):
                 }''',
             input_data=[
                 SentinelHubRequest.input_data(
-                    data_collection=DataCollection.SENTINEL1_GRD,
+                    data_collection=DataCollection.SENTINEL1_IW,
                     time_interval=(capture_datetime - timedelta(days=1), capture_datetime),
                     mosaicking_order='mostRecent',
                     other_args={
@@ -72,68 +73,81 @@ def download_and_save_image(bbox, capture_datetime):
         # Download the image
         request.save_data()
 
-        return file_path
+        return file_path, True  # Return file path and success status
     except Exception as e:
         print(f"Failed to download and save image: {e}")
-        return None
-
-from sentinelhub import SHConfig, SentinelHubRequest, SentinelHubCatalog, bbox_to_dimensions, DownloadRequest, DataCollection
-
-from datetime import datetime, timedelta
-
-from shapely.geometry import Polygon
+        return None, False  # Return None and failure status
 
 def check_and_download_new_images():
     try:
         # Load shapefile
+        print("Loading shapefile...")
         gdf = gpd.read_file(shapefile_path)
         
         # Extract bounding box coordinates
+        print("Extracting bounding box coordinates...")
         bbox_coords = gdf.total_bounds
         
         # Create a Polygon from the bounding box coordinates
+        print("Creating boundary polygon...")
         boundary_polygon = Polygon.from_bounds(*bbox_coords)
+        print("Boundary polygon coordinates:", boundary_polygon.exterior.coords[:])
 
         # Get yesterday's date
+        print("Calculating yesterday's date...")
         yesterday = datetime.now() - timedelta(days=1)
 
         # Set up Sentinel Hub config
+        print("Setting up Sentinel Hub configuration...")
         config = SHConfig()
         config.instance_id = '44b8b66c-925c-4ab5-a776-b1f48364172d'  # Set instance ID
 
-        # Define search parameters
+        # Create GeoJSON filter
+        print("Setting up the geojson filter...")
+        geojson_filter = {
+            "type": "GeometryFilter",
+            "field_name": "geometry",
+            "config": {
+                "type": "Polygon",
+                "coordinates": [boundary_polygon.exterior.coords[:]]
+            }
+        }
+
+        # Define search filter
+        print("Defining the search filter...")
+        search_filter = {
+            "type": "AndFilter",
+            "config": [geojson_filter]
+        }
+
+        print("Searching the Sentinel Hub Catalog...")
         catalog = SentinelHubCatalog(config=config)
         tiles = catalog.search(
             DataCollection.SENTINEL1_IW,
             bbox=bbox_coords,
             time=(yesterday, datetime.now()),
-            filter={
-                "type": "OrFilter",
-                "config": [
-                    {
-                        "type": "GeometryFilter",
-                        "field_name": "geometry",
-                        "config": {
-                            "type": "Polygon",
-                            "coordinates": [boundary_polygon.exterior.coords[:]]
-                        }
-                    }
-                ]
-            }
+            filter=search_filter
         )
 
         # Iterate over search results
+        print("Iterating over search results...")
         for tile_info in tiles:
             capture_datetime = tile_info['properties']['date']
             bbox = tile_info['geometry']['coordinates'][0]
             tile_polygon = Polygon(bbox)
             if boundary_polygon.intersects(tile_polygon):  # Check for intersection
-                file_path = download_and_save_image(bbox, capture_datetime)
-                if file_path:
+                print("Intersection found. Downloading and saving image...")
+                file_path, success = download_and_save_image(bbox, capture_datetime)
+                if success and file_path:
+                    print("Image downloaded and saved successfully.")
                     path_row = f"{tile_info['properties']['path']}-{tile_info['properties']['row']}"
                     # Insert record into database
                     cursor.execute("INSERT INTO SAR_raw (path_row, capture_datetime, file_path) VALUES (%s, %s, %s)", (path_row, capture_datetime, file_path))
                     conn.commit()
+                else:
+                    print("Failed to download and save the image.")
+            else:
+                print("No intersection found.")
     except Exception as e:
         print(f"Error occurred while checking and downloading new images: {e}")
 
