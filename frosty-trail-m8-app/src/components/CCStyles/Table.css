@@ -8,34 +8,37 @@
   }
   
   /* Style for the table */
-table {
-    width: 80%; /* Adjust width as needed */
+.styled-table {
+    width: 70%;
     border-collapse: collapse;
-    background-color: #757575; /* White background color for table */
-    border-radius: 20px; /* Rounded corners */
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    background-color: #777777;
+    border: 1px solid rgb(167, 167, 167);
  }
   
- th {
-  background-color: #757575; /* White background color */
-  color: #f2f2f2; /* Dark text color */
-  padding: 10px;
-  text-align: center;
-}
-
-/* Style for table rows
-tr:nth-child(even) {
-  background-color: #f2f2f2; /* Light gray background color for even rows
-} */
-  
-  /* Style for table data cells */
-  td {
+  th {
+    background-color: rgb(88, 88, 88); /* White background color */
+    color: #fefff0; /* Dark text color */
     padding: 10px;
-    color: #fff;
     text-align: center;
+    border-left: 1px solid rgb(167, 167, 167);
+    border-right: 1px solid rgb(167, 167, 167);
   }
-  
+
+  tr:nth-child(even) {
+    background-color: #6a6a6a;
+  }  
+    
   /* Hover effect on table rows*/
-  tr:hover {
-    background-color: #494949; /* Darker gray background color on hover */
-  }
+    tr:hover {
+      background-color: #444444; /* Darker gray background color on hover */
+    }
+  /* Style for table data cells */
+    td {
+      padding: 8px;
+      color: #ffffff;
+      text-align: center;
+      border-left: 1px solid rgb(167, 167, 167);
+      border-right: 1px solid rgb(167, 167, 167);;
+    }
+
+

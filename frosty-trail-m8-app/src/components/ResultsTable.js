@@ -19,9 +19,10 @@ const ResultsTable = () => {
             <table className="styled-table">
                 <thead>
                     <tr>
-                        <th>Altitude</th>
-                        <th>Snow Coverage(%)</th>
-                        <th>Area</th>
+                        <th>ALTITUDE</th>
+                        <th>SNOW COVERAGE (%)</th>
+                        <th>AREA</th>
+                        <th>DATE</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,6 +32,7 @@ const ResultsTable = () => {
                             <td>{result.altitude}</td>
                             <td>{result.snowcover}</td>
                             <td>{result.darea}</td>
+                            <td>{result.rdate}</td>
                         </tr>
                     ))}
                 </tbody>
