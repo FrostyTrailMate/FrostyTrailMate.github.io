@@ -6,6 +6,7 @@ import numpy as np
 import json
 from rasterio.mask import mask
 from shapely.ops import unary_union
+import os
 
 # Connect to PostgreSQL
 def connect_to_postgres():
@@ -103,9 +104,29 @@ def main(dem_file_path):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
+def shapefile(dem_file_path, output_dir):
+    try:
+        # Generate polygons
+        with rasterio.open(dem_file_path) as dem_file:
+            generate_polygons(dem_file, output_dir)
+
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+# Push data to the database, and/or create a shapefile
 if __name__ == "__main__":
     # Input DEM file path
     dem_file_path = 'Outputs/DEM/Yosemite_DEM_clipped.tif'
 
     # Main function call
     main(dem_file_path)
+  
+    # Output directory for shapefiles
+    # output_directory = 'Shapefiles/ElevationStrata'
+
+    # Create output directory if it does not exist
+    # if not os.path.exists(output_directory):
+    #    os.makedirs(output_directory)
+
+    # Create the shapefile
+    # shapefile(dem_file_path, output_directory)
