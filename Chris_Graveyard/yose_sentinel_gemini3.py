@@ -1,85 +1,108 @@
+import os
+import json
 from datetime import datetime, timedelta
-from sentinelhub import SHConfig, CRS, BBox, DataCollection, MimeType, WcsRequest
-from shapely.geometry import shape, mapping
-from os import path
-import pyshp
+import geopandas as gpd
+from shapely.geometry import mapping
+import requests
+from oauthlib.oauth2 import BackendApplicationClient
+from requests_oauthlib import OAuth2Session
+from sentinelsat import SentinelAPI
+from osgeo import ogr, osr
 
-# Configure Sentinel Hub access
-config = SHConfig()
-# Replace with your Sentinel Hub instance ID if needed
-config.instance_id = "YOUR_INSTANCE_ID"
+# Your client credentials
+client_id = '33054a13-b0b8-45c0-b2f5-bc9e9dc8db25'
+client_secret = 'qBwcx5AQtfsLZKxZUlCIcYRQVLtzXof5'
 
-# Define output folder
-output_folder = "Outputs/SAR"
+# Create a session
+client = BackendApplicationClient(client_id=client_id)
+oauth = OAuth2Session(client=client)
 
-# Define shapefile path
-shapefile_path = path.join("Shapefiles", "Yosemite_Boundary_4326.zip")
+# Get token for the session
+token = oauth.fetch_token(token_url='https://services.sentinel-hub.com/auth/realms/main/protocol/openid-connect/token',
+                          client_secret=client_secret, include_client_id=True)
 
-# Read shapefile using pyshp
-reader = pyshp.Reader(shapefile_path)
-shape = reader.shapes()[0]  # Get the first shape
+# Define function to check if image already exists in the database
+def image_exists_in_db(sRow, sPath, sSlice, datetime):
+    # Code to check if image exists in the database
+    pass
 
-# Get the geometry object from the shape
-shape_geom = shape.__geo_interface__  # Convert pyshp shape to shapely format
+# Define function to connect to the database and store information about the imagery
+def store_image_info_in_db(datetime, sRow, sPath, sSlice, sArea, raster_path):
+    # Code to connect to the database and store information
+    pass
 
-# Bounding box from shapefile
-bbox = BBox(
-    shape.bounds[0], shape.bounds[1], shape.bounds[2], shape.bounds[3], crs=CRS.WGS84
-)
+# Define function to collect Sentinel-1 GRD IW data from Sentinel Hub
+def collect_sentinel1_data(bbox_shapefile, output_folder):
+    # Load shapefile
+    gdf = gpd.read_file(bbox_shapefile)
+    bbox = gdf.geometry.bounds.iloc[0]
 
-# Today's date and date from one week ago
-today = datetime.utcnow().date()
-week_ago = today - timedelta(days=7)
+    # Convert bbox to EPSG:4326
+    source = osr.SpatialReference()
+    source.ImportFromEPSG(4326)
+    target = osr.SpatialReference()
+    target.ImportFromEPSG(3857) # WGS 84 / Pseudo-Mercator
+    transform = osr.CoordinateTransformation(source, target)
+    min_lon, min_lat = transform.TransformPoint(bbox[0], bbox[1])[:2]
+    max_lon, max_lat = transform.TransformPoint(bbox[2], bbox[3])[:2]
 
-# Define Sentinel-1 IW data and evaluation script
-data_collection = DataCollection.SENTINEL1_GRD
-evalscript = """
-//VERSION=3
-function setup() {
-  return {
-    input: [{
-      bands: ["VV"] // Select VV polarization
-    }],
-    mosaicking: Mosaicking.ORBIT,
-    output: { id: "default", bands: 1 }
-  };
-}
+    # Define time range
+    end_date = datetime.utcnow()
+    start_date = end_date - timedelta(days=5)
 
-function evaluatePixel(sample) {
-  return [sample.VV];
-}
-"""
+    # Define search parameters
+    search_params = {
+        'platformname': 'Sentinel-1',
+        'producttype': 'GRD',
+        'sensoroperationalmode': 'IW',
+        'ingestiondate': (start_date.date(), end_date.date()),
+        'bbox': (min_lon, min_lat, max_lon, max_lat),
+        'sortby': 'ingestiondate',
+        'limit': 1
+    }
 
-# Function to download and clip imagery
-def download_and_clip(date):
-    # Create WCS request with date and bounding box
-    wcs_request = WcsRequest(
-        data_collection=data_collection,
-        time_interval=(date, date),
-        evalscript=evalscript,
-        bbox=bbox,
-        output_format=MimeType.TIFF,
-    )
+    # Connect to Sentinel Hub API
+    api = SentinelAPI(client_id, client_secret)
 
-    # Download image
-    data = config.get_wcs_data(wcs_request)
+    # Search for imagery
+    try:
+        products = api.query(**search_params)
+    except Exception as e:
+        print(f"Error occurred while querying Sentinel Hub API: {str(e)}")
+        return
 
-    # Clip image to shapefile and save
-    clipped_data = shape.intersection(data).bounds
-    output_path = path.join(output_folder, f"S1_{date}.tif")
-    with open(output_path, "wb") as f:
-        f.write(data[clipped_data[1]:clipped_data[3], clipped_data[0]:clipped_data[2]])
+    if not products:
+        print("No imagery found within the specified time frame and bounding box.")
+        return
 
-# Loop through dates from the last week
-for date in range(week_ago.year, today.year + 1):
-    for month in range(1, 13):
-        for day in range(1, 32):
-            try:
-                current_date = datetime(date, month, day).date()
-                if current_date >= week_ago and current_date <= today:
-                    download_and_clip(current_date)
-                    print(f"Downloaded image for {current_date}")
-            except:
-                pass  # Skip errors and continue
+    for product_id in products:
+        product_info = api.get_product_odata(product_id)
+        datetime_str = product_info['date']
+        sRow = product_info['s2datatake']
+        sPath = product_info['s2datatake']
+        sSlice = product_info['s2datatake']
+        sArea = os.path.basename(bbox_shapefile)
+        raster_path = os.path.join(output_folder, f"{product_id}.tiff")
 
-print("Finished downloading Sentinel-1 imagery!")
+        # Check if image already exists in the database
+        if image_exists_in_db(sRow, sPath, sSlice, datetime_str):
+            print(f"Image already exists in the database: {product_id}")
+            continue
+
+        # Download the image
+        try:
+            api.download(product_id, directory_path=output_folder)
+        except Exception as e:
+            print(f"Error occurred while downloading image {product_id}: {str(e)}")
+            continue
+
+        # Store information about the imagery in the database
+        store_image_info_in_db(datetime_str, sRow, sPath, sSlice, sArea, raster_path)
+        print(f"Image {product_id} downloaded and information stored in the database.")
+
+# Define paths
+shapefile_path = 'Shapefiles/Yosemite_Boundary_4326.shp'
+output_folder = 'Outputs/SAR'
+
+# Collect Sentinel-1 GRD IW data
+collect_sentinel1_data(shapefile_path, output_folder)
