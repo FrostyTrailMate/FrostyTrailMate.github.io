@@ -9,6 +9,11 @@ Backsatter: the reflection of radar signals back to the radar antenna from the E
 •	Easier to implement in a machine learning model.
     o	Utilizing machine learning algorithms, such as supervised or unsupervised classification, can help automatically identify snow-covered areas based on training datasets.
     o	Algorithms examples: Random Forest, Support Vector Machines, or Convolutional Neural Networks (CNNs) for this purpose.
+
+• A common starting point for snow detection in SAR imagery is to use a threshold value in the range of -10 dB (decibels) to -15 dB for backscatter intensity. 
+However, this value can vary widely depending on the aforementioned factors and may require adjustment through empirical 
+testing and validation.
+
 """
 
 """ 
