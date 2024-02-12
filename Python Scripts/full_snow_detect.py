@@ -1,3 +1,16 @@
+"""
+Backscatter Intensity Analysis Method
+
+Backsatter: the reflection of radar signals back to the radar antenna from the Earth's surface or other targets.
+
+•	Snow-covered areas tend to exhibit higher backscatter intensity compared to other surfaces due to their relatively smooth and uniform texture.
+•	Analyzing the backscatter intensity can help identify regions with higher reflectivity, which may indicate the presence of snow.
+•	Quick and computationally efficient method for an initial assessment.
+•	Easier to implement in a machine learning model.
+    o	Utilizing machine learning algorithms, such as supervised or unsupervised classification, can help automatically identify snow-covered areas based on training datasets.
+    o	Algorithms examples: Random Forest, Support Vector Machines, or Convolutional Neural Networks (CNNs) for this purpose.
+"""
+
 """ 
 MY SEARCH
 
