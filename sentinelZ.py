@@ -39,12 +39,12 @@ bbox = gdf.total_bounds.tolist()
 
 # Define evalscript
 evalscript = """
-//VERSION=3\n\nfunction setup() {\n  return {\n    input: [\n      {\n        bands: [\"VV\",\"VH\"]\n      }\n    ],\n    output: [\n      {\n        id: \"default\",\n        bands: 2,\n        sampleType: \"AUTO\"\n      }\n    ],\n    mosaicking: \"SIMPLE\"\n  };\n}\n\nfunction evaluatePixel(samples) {\n  return [samples[0].VV, samples[0].VH];\n}\n
+//VERSION=3\n\nfunction setup() {\n  return {\n    input: [\n      {\n        bands: [\"VV\",\"VH\"]\n      }\n    ],\n    output: [\n      {\n        id: \"default\",\n        bands: 2,\n        sampleType: \"AUTO\"\n      }\n    ],\n    mosaicking: \"ORBIT\"\n  };\n}\n\nfunction evaluatePixel(samples) {\n  return [samples.VV, samples.VH];\n}\n
 """
 
 # Create BBox instance
 bbox_instance = BBox(bbox, crs=CRS.WGS84)
-
+size = bbox_to_dimensions(bbox_instance, resolution=10)
 request_image = SentinelHubRequest(
     evalscript=evalscript,
     input_data=[
@@ -55,8 +55,8 @@ request_image = SentinelHubRequest(
                 "processing": {
                     "speckleFilter": {
                         "type": "LEE",
-                        "windowSizeX": 3,
-                        "windowSizeY": 3
+                        "windowSizeX": 7,
+                        "windowSizeY": 7
                     },
                     },
                 }
@@ -66,7 +66,7 @@ request_image = SentinelHubRequest(
         SentinelHubRequest.output_response('default', MimeType.TIFF)
     ],
     bbox=bbox_instance,  # Use the BBox instance here
-    size=[512, 512],
+    size=size,
     data_folder='Outputs/SAR'  # Specify the data_folder parameter here
 )
 
