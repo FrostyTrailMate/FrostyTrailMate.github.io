@@ -20,12 +20,13 @@ import threading
 # Your client credentials
 client_id = 'cbd68adc-23e6-4bbe-8f88-f3c91ca41577'
 client_secret = '7HZvJmQ4jMlf6qWBDAHXzVa61KMURvYU'
-
+instance_id = 'b9f75161-ea60-44d4-879b-e848292c80a7'
 # Set up Sentinel Hub configuration
 print("Setting up Sentinel Hub configuration...")
 config = SHConfig()
 config.sh_client_id = client_id
 config.sh_client_secret = client_secret
+config.instance_id = instance_id
 
 # Create a session
 print("Creating OAuth session...")
