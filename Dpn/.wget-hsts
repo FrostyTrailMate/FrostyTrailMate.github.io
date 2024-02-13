@@ -1,0 +1,6 @@
+# HSTS 1.0 Known Hosts database for GNU Wget.
+# Edit at your own risk.
+# <hostname>	<port>	<incl. subdomains>	<created>	<max-age>
+urs.earthdata.nasa.gov	0	0	1707584480	31536000
+sentinel1.asf.alaska.edu	0	0	1707584483	31536000
+dy4owt9f80bz7.cloudfront.net	0	0	1707584484	31536000

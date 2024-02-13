@@ -1,3 +1,32 @@
+"""
+Backscatter Intensity Analysis Method
+
+Backsatter: the reflection of radar signals back to the radar antenna from the Earth's surface or other targets.
+
+• Snow-covered areas tend to exhibit higher backscatter intensity compared to other surfaces due to their relatively smooth and uniform texture.
+• Analyzing the backscatter intensity can help identify regions with higher reflectivity, which may indicate the presence of snow.
+• Quick and computationally efficient method for an initial assessment.
+• Easier to implement in a machine learning model.
+    o	Utilizing machine learning algorithms, such as supervised or unsupervised classification, can help automatically identify snow-covered areas based on training datasets.
+    o	Algorithms examples: Random Forest, Support Vector Machines, or Convolutional Neural Networks (CNNs) for this purpose.
+
+• A common starting point for snow detection in SAR imagery is to use a threshold value in the range of -10 dB (decibels) to -15 dB for backscatter intensity. 
+However, this value can vary widely depending on the aforementioned factors and may require adjustment through empirical 
+testing and validation.
+
+Sentinel-1 operates in C-Band and provides images in both Vertical-Vertical (VV) and Vertical-Horizontal (VH) polarizations.
+
+- VV Polarization is commonly used for snow detection in SAR imagery. 
+Snow-covered areas typically exhibit increased backscatter intensity in VV polarization compared to bare ground or other land cover types.
+
+- VH Polarization can also be useful for snow detection, particularly in discriminating between snow and other surface types. 
+Snow-covered areas may exhibit different backscatter characteristics compared to non-snow-covered areas in VH polarization.
+
+By analyzing the images in both VV and VH polarizations, it can provide complementary information and enhance the accuracy of snow detection, especially when explicit labels indicating snow presence are not available. 
+By doing this, we can effectively detect the presence of snow within the specified backscatter intensity range (-10 dB to -15 dB). 
+
+"""
+
 """ 
 MY SEARCH
 
