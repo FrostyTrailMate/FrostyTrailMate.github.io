@@ -16,16 +16,34 @@ import psycopg2
 import concurrent.futures
 import time
 import threading
+import signal
+
+interrupted = False
+
+# Function to make requests for a single sub-box with interruption check
+def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
+    global interrupted
+    sys.stdout.write(f"\rRequesting sub-box {index+1}/{len(sub_bbox_list)}...")
+    sys.stdout.flush()
+
+    # Check if the process is interrupted
+    if interrupted:
+        print("Process interrupted. Exiting...")
+        sys.exit(0)
 
 # Your client credentials
-client_id = '33054a13-b0b8-45c0-b2f5-bc9e9dc8db25'
-client_secret = 'qBwcx5AQtfsLZKxZUlCIcYRQVLtzXof5'
+client_id = 'cbd68adc-23e6-4bbe-8f88-f3c91ca41577'
+client_secret = '7HZvJmQ4jMlf6qWBDAHXzVa61KMURvYU'
+instance_id = 'b9f75161-ea60-44d4-879b-e848292c80a7'
 
 # Set up Sentinel Hub configuration
 print("Setting up Sentinel Hub configuration...")
 config = SHConfig()
 config.sh_client_id = client_id
 config.sh_client_secret = client_secret
+config.instance_id = instance_id
+config.save()
+print(config)
 
 # Create a session
 print("Creating OAuth session...")
@@ -37,6 +55,7 @@ print("Fetching OAuth token...")
 token = oauth.fetch_token(token_url='https://services.sentinel-hub.com/auth/realms/main/protocol/openid-connect/token',
                           client_secret=client_secret, include_client_id=True)
 
+print (token)
 # Use the obtained token in the headers for Sentinel Hub requests
 headers = {
     "Content-Type": "application/json",
@@ -85,7 +104,7 @@ resolution = 10  # Adjust the resolution as needed
 
 # Split bounding box into smaller sub-boxes with size limited to 2500 pixels
 split_size = (2500, 2500)
-print("Splitting bounding box into smaller sub-boxes...")
+print("Splitting bounding box into smaller sub-boxes... Press Ctrl+C to interrupt the download process.")
 bbox_splitter = BBoxSplitter([utm_bbox], utm_bbox.crs, split_size=split_size)
 sub_bbox_list = bbox_splitter.get_bbox_list()
 
@@ -97,6 +116,11 @@ def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
     sys.stdout.write(f"\rRequesting sub-box {index+1}/{len(sub_bbox_list)}...")
     sys.stdout.flush()
 
+    # Check if the process is interrupted
+    if interrupted:
+        print("\nProcess interrupted. Exiting...")
+        sys.exit(0)
+
     # Define the filename based on the bounding box coordinates
     filename = os.path.join(data_folder, f"image_{index}.tif")
     # Check if the file already exists locally
@@ -105,6 +129,7 @@ def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
     else:
         request_image = SentinelHubRequest(
             evalscript=evalscript,
+            config = config,
             input_data=[
                 SentinelHubRequest.input_data(
                     data_collection=DataCollection.SENTINEL1_IW,
@@ -132,20 +157,34 @@ def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
         # Introduce a delay to avoid rate limit
         time.sleep(.5)  # Adjust the delay as needed
 
-# Define function to download images for multiple sub-boxes using multithreading
+# Function to download images for multiple sub-boxes using multithreading with interruption check
 def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:  # Alter number of connections if needed. 4 works well
-        futures = []
-        for i, sub_bbox in enumerate(sub_bbox_list):
-            futures.append(executor.submit(request_images_for_sub_box, sub_bbox, evalscript, data_folder, i))
+    global interrupted
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+        futures = {executor.submit(request_images_for_sub_box, sub_bbox, evalscript, data_folder, i): i for i, sub_bbox in enumerate(sub_bbox_list)}
         for future in concurrent.futures.as_completed(futures):
             try:
                 future.result()
             except Exception as e:
                 print(f"Error occurred: {e}")
+                if interrupted:
+                    print("\nProcess interrupted. Exiting...")
+                    executor.shutdown(wait=False)  # Shut down executor immediately upon interruption
+                    sys.exit(0)
+
+# Signal handler function to handle interrupt signal (Ctrl+C)
+def signal_handler(sig, frame):
+    global interrupted
+    interrupted = True
+    print("Process interrupted. Cancelling pending tasks...")
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+
 
 # Make requests for each sub-box using multithreading
-data_folder = 'Outputs/SAR/temp'
+data_folder = 'Outputs/SARTEST/temp'
 download_images_multi_thread(sub_bbox_list, evalscript, data_folder)
 
 # Define the function to search for image files in all subdirectories
@@ -173,7 +212,7 @@ merged_image, out_trans = merge(image_files)
 date_of_image_capture = image_files[0].split('_')[-1].split('.')[0]
 
 # Save the merged image to 'Outputs/SAR'
-merged_image_path = os.path.join('Outputs/SAR', f'Yosemite_merged.tiff')
+merged_image_path = os.path.join('Outputs/SARTEST', f'Yosemite_merged.tiff')
 
 with rasterio.open(merged_image_path, 'w', driver='GTiff', 
                    height=merged_image.shape[1], width=merged_image.shape[2], 
@@ -184,6 +223,8 @@ with rasterio.open(merged_image_path, 'w', driver='GTiff',
     dst.write(merged_image)
 print(f"Merged image saved to: {merged_image_path}")
 
+
+""""
 # Function to insert data into PostgreSQL database
 def insert_data_into_database(image_path, time_collected):
     connection = psycopg2.connect(
@@ -197,7 +238,7 @@ def insert_data_into_database(image_path, time_collected):
     cursor = connection.cursor()
     
     # SQL query to insert data into the table
-    insert_query = """INSERT INTO sar_raw (path, time_collected) VALUES (%s, %s)"""
+    #insert_query = INSERT INTO sar_raw (path, time_collected) VALUES (%s, %s)
     
     # Data to be inserted
     record_to_insert = (image_path, time_collected)
@@ -227,3 +268,4 @@ insert_data_into_database(merged_image_path, datetime.now())
 import shutil
 shutil.rmtree('Outputs/SAR/temp', ignore_errors=True)
 print("Temporary raster files cleared.")
+"""
