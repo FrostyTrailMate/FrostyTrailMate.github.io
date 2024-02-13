@@ -1,15 +1,15 @@
 /* Styles for the container holding the table */
-.container {
+.tablecontainer {
     display: flex;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
-    padding: 30px;
+    padding: 40px;
     background-color: #242424; /* Dark background color */
   }
   
   /* Style for the table */
 .styled-table {
-    width: 70%;
+    width: 40%;
     border-collapse: collapse;
     background-color: #777777;
     border: 1px solid rgb(167, 167, 167);
