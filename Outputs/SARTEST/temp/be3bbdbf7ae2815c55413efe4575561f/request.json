@@ -1,0 +1,75 @@
+{
+    "request": {
+        "headers": {
+            "accept": "image/tiff",
+            "content-type": "application/json"
+        },
+        "payload": {
+            "evalscript": "\n//VERSION=3\nfunction setup() {\n  return {\n    input: [\n      {\n        bands: [\"VV\", \"VH\"]\n      }\n    ],\n    output: [\n      {\n        id: \"default\",\n        bands: 2,\n        sampleType: \"AUTO\"\n      }\n    ]\n  };\n}\n\nfunction evaluatePixel(samples) {\n  return [samples.VV, samples.VH];\n}\n",
+            "input": {
+                "bounds": {
+                    "bbox": [
+                        272326.1284951203,
+                        4188391.243876175,
+                        274826.1284951203,
+                        4190891.243876175
+                    ],
+                    "properties": {
+                        "crs": "http://www.opengis.net/def/crs/EPSG/0/32611"
+                    }
+                },
+                "data": [
+                    {
+                        "dataFilter": {
+                            "acquisitionMode": "IW",
+                            "polarization": "DV",
+                            "resolution": "HIGH",
+                            "timeRange": {
+                                "from": "2024-02-08T18:28:31.600350Z",
+                                "to": "2024-02-13T18:28:31.600350Z"
+                            }
+                        },
+                        "processing": {
+                            "speckleFilter": {
+                                "type": "LEE",
+                                "windowSizeX": 7,
+                                "windowSizeY": 7
+                            }
+                        },
+                        "type": "sentinel-1-grd"
+                    }
+                ]
+            },
+            "output": {
+                "height": 250,
+                "responses": [
+                    {
+                        "format": {
+                            "type": "image/tiff"
+                        },
+                        "identifier": "default"
+                    }
+                ],
+                "width": 250
+            }
+        },
+        "timestamp": "2024-02-13T18:30:30.717751",
+        "url": "https://services.sentinel-hub.com/api/v1/process"
+    },
+    "response": {
+        "elapsed": 0.797404,
+        "headers": {
+            "Connection": "keep-alive",
+            "Content-Type": "image/tiff",
+            "Date": "Tue, 13 Feb 2024 18:30:30 GMT",
+            "Transfer-Encoding": "chunked",
+            "access-control-allow-credentials": "true",
+            "access-control-allow-headers": "origin,content-type,accept,accept-crs,authorization,cache-control",
+            "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
+            "access-control-allow-origin": "*",
+            "access-control-max-age": "3600",
+            "x-processingunits-spent": "0.3178914482759865"
+        },
+        "status_code": 200
+    }
+}
