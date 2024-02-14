@@ -1,35 +1,27 @@
 from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
-import requests
 import os
-import json
 import geopandas as gpd
 from sentinelhub import SHConfig, CRS, BBox, DataCollection, SentinelHubRequest, MimeType, bbox_to_dimensions, BBoxSplitter
 from sentinelhub.geo_utils import bbox_to_dimensions, to_utm_bbox
 import rasterio
 from rasterio.merge import merge
-from rasterio.transform import Affine
-from rasterio.enums import Resampling
 import sys
 from datetime import datetime, timedelta, timezone
-import psycopg2
 import concurrent.futures
-import time
-import threading
 import signal
+import psycopg2 
 
 interrupted = False
 
-# Function to make requests for a single sub-box with interruption check
-def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
+# Signal handler function to handle interrupt signal (Ctrl+C)
+def signal_handler(sig, frame):
     global interrupted
-    sys.stdout.write(f"\rRequesting sub-box {index+1}/{len(sub_bbox_list)}...")
-    sys.stdout.flush()
+    interrupted = True
+    print("Process interrupted. Cancelling pending tasks...")
+    sys.exit(0)
 
-    # Check if the process is interrupted
-    if interrupted:
-        print("Process interrupted. Exiting...")
-        sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
 
 # Your client credentials
 client_id = 'cbd68adc-23e6-4bbe-8f88-f3c91ca41577'
@@ -55,7 +47,8 @@ print("Fetching OAuth token...")
 token = oauth.fetch_token(token_url='https://services.sentinel-hub.com/auth/realms/main/protocol/openid-connect/token',
                           client_secret=client_secret, include_client_id=True)
 
-print (token)
+print(token)
+
 # Use the obtained token in the headers for Sentinel Hub requests
 headers = {
     "Content-Type": "application/json",
@@ -111,14 +104,15 @@ sub_bbox_list = bbox_splitter.get_bbox_list()
 end_date = datetime.now(timezone.utc)
 start_date = end_date - timedelta(days=5)
 
-# Define function to make requests for a single sub-box
+# Function to make requests for a single sub-box with interruption check
 def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
+    global interrupted
     sys.stdout.write(f"\rRequesting sub-box {index+1}/{len(sub_bbox_list)}...")
     sys.stdout.flush()
 
     # Check if the process is interrupted
     if interrupted:
-        print("\nProcess interrupted. Exiting...")
+        print("Process interrupted. Exiting...")
         sys.exit(0)
 
     # Define the filename based on the bounding box coordinates
@@ -127,35 +121,35 @@ def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
     if os.path.exists(filename):
         print(f"File for sub-box {index+1} already exists locally. Skipping...")
     else:
-        request_image = SentinelHubRequest(
-            evalscript=evalscript,
-            config = config,
-            input_data=[
-                SentinelHubRequest.input_data(
-                    data_collection=DataCollection.SENTINEL1_IW,
-                    time_interval=(start_date, end_date),
-                    other_args={
-                        "processing": {
-                            "speckleFilter": {
-                                "type": "LEE",
-                                "windowSizeX": 7,
-                                "windowSizeY": 7
+        try:
+            request_image = SentinelHubRequest(
+                evalscript=evalscript,
+                config=config,
+                input_data=[
+                    SentinelHubRequest.input_data(
+                        data_collection=DataCollection.SENTINEL1_IW,
+                        time_interval=(start_date, end_date),
+                        other_args={
+                            "processing": {
+                                "speckleFilter": {
+                                    "type": "LEE",
+                                    "windowSizeX": 7,
+                                    "windowSizeY": 7
+                                },
                             },
-                        },
-                    }
-                )
-            ],
-            responses=[
-                SentinelHubRequest.output_response('default', MimeType.TIFF)
-            ],
-            bbox=sub_bbox,
-            size=bbox_to_dimensions(sub_bbox, resolution=resolution),
-            data_folder=data_folder
-        )
-        request_image.get_data(save_data=True)
-        
-        # Introduce a delay to avoid rate limit
-        time.sleep(.5)  # Adjust the delay as needed
+                        }
+                    )
+                ],
+                responses=[
+                    SentinelHubRequest.output_response('default', MimeType.TIFF)
+                ],
+                bbox=sub_bbox,
+                size=bbox_to_dimensions(sub_bbox, resolution=resolution),
+                data_folder=data_folder
+            )
+            request_image.get_data(save_data=True)
+        except Exception as e:
+            print(f"Error occurred while requesting sub-box {index+1}: {e}")
 
 # Function to download images for multiple sub-boxes using multithreading with interruption check
 def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
@@ -172,19 +166,8 @@ def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
                     executor.shutdown(wait=False)  # Shut down executor immediately upon interruption
                     sys.exit(0)
 
-# Signal handler function to handle interrupt signal (Ctrl+C)
-def signal_handler(sig, frame):
-    global interrupted
-    interrupted = True
-    print("Process interrupted. Cancelling pending tasks...")
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
-
-
-
 # Make requests for each sub-box using multithreading
-data_folder = 'Outputs/SARTEST/temp'
+data_folder = 'Outputs/SAR/temp'
 download_images_multi_thread(sub_bbox_list, evalscript, data_folder)
 
 # Define the function to search for image files in all subdirectories
@@ -223,8 +206,6 @@ with rasterio.open(merged_image_path, 'w', driver='GTiff',
     dst.write(merged_image)
 print(f"Merged image saved to: {merged_image_path}")
 
-
-""""
 # Function to insert data into PostgreSQL database
 def insert_data_into_database(image_path, time_collected):
     connection = psycopg2.connect(
@@ -238,7 +219,7 @@ def insert_data_into_database(image_path, time_collected):
     cursor = connection.cursor()
     
     # SQL query to insert data into the table
-    #insert_query = INSERT INTO sar_raw (path, time_collected) VALUES (%s, %s)
+    insert_query = "INSERT INTO sar_raw (path, time_collected) VALUES (%s, %s)"
     
     # Data to be inserted
     record_to_insert = (image_path, time_collected)
@@ -264,8 +245,8 @@ def insert_data_into_database(image_path, time_collected):
 # Insert data into PostgreSQL database
 insert_data_into_database(merged_image_path, datetime.now())
 
+
 # Clear the folder 'Outputs/SAR/temp' at the end of the script
 import shutil
-shutil.rmtree('Outputs/SAR/temp', ignore_errors=True)
+shutil.rmtree('Outputs/SARTEST/temp', ignore_errors=True)
 print("Temporary raster files cleared.")
-"""
