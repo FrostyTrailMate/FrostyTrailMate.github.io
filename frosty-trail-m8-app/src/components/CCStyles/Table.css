@@ -1,10 +1,10 @@
 /* Styles for the container holding the table */
 .tablecontainer {
     display: flex;
-    justify-content: left;
+    justify-content: center;
     align-items: center;
     padding: 40px;
-    background-color: #242424; /* Dark background color */
+    background-color: #49a65c; /* Dark background color */
   }
   
   /* Style for the table */
