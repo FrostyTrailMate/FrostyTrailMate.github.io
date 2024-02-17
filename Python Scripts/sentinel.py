@@ -18,7 +18,8 @@ interrupted = False
 def signal_handler(sig, frame):
     global interrupted
     interrupted = True
-    print("Process interrupted. Cancelling pending tasks...")
+    print("Process interrupted. Cancelling pending tasks and clearing temporary files...")
+    cleanup_temp_files()
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -151,6 +152,14 @@ def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
         except Exception as e:
             print(f"Error occurred while requesting sub-box {index+1}: {e}")
 
+# Function to clear temporary downloaded files
+def cleanup_temp_files():
+    data_folder = '../Outputs/SAR/temp'  # Adjust relative path
+    if os.path.exists(data_folder):
+        import shutil
+        shutil.rmtree(data_folder, ignore_errors=True)
+        print("Temporary downloaded files cleared.")
+
 # Function to download images for multiple sub-boxes using multithreading with interruption check
 def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
     global interrupted
@@ -162,12 +171,14 @@ def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
             except Exception as e:
                 print(f"Error occurred: {e}")
                 if interrupted:
-                    print("\nProcess interrupted. Exiting...")
+                    print("\nProcess interrupted. Exiting and clearing temporary files...")
                     executor.shutdown(wait=False)  # Shut down executor immediately upon interruption
+                    cleanup_temp_files()  # Clear temporary files before exiting
                     sys.exit(0)
 
+
 # Make requests for each sub-box using multithreading
-data_folder = 'Outputs/SAR/temp'
+data_folder = '../Outputs/SAR/temp'  # Adjust relative path
 download_images_multi_thread(sub_bbox_list, evalscript, data_folder)
 
 # Define the function to search for image files in all subdirectories
@@ -215,11 +226,9 @@ def insert_data_into_database(image_path, time_collected):
 
     cursor = connection.cursor()
     
-    # SQL query to insert data into the table
     insert_query = "INSERT INTO sar_raw (path, time_collected) VALUES (%s, %s)"
-    
-    # Data to be inserted
-    record_to_insert = (image_path, time_collected)
+    record_to_insert = (os.path.relpath(image_path, start='..'), time_collected)  # Adjust with os.path.relpath
+
 
     try:
         # Execute the SQL command
@@ -243,7 +252,5 @@ def insert_data_into_database(image_path, time_collected):
 insert_data_into_database(merged_image_path, datetime.now())
 
 
-# Clear the folder 'Outputs/SAR/temp' at the end of the script
-import shutil
-shutil.rmtree('Outputs/SAR/temp', ignore_errors=True)
-print("Temporary raster files cleared.")
+# Cleanup at the very end if the script reaches completion normally
+cleanup_temp_files() 
