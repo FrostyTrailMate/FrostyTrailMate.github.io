@@ -106,11 +106,13 @@ try:
         area = "Yosemite"
         shapefile_path = shapefile_path
         point_geom = f"POINT({point.x} {point.y})"
+        snowv= float(get_snow_value_for_point(point, sar_dataset, sar_dataset.crs))
+        
         
         # Insert the data into the database
         cur.execute(
-            "INSERT INTO samples (datetime, area, point_geom, elevation, shapefile_path) VALUES (%s, %s, %s, %s, %s, %s)",
-            (now, area, point_geom, elevation, shapefile_path)
+            "INSERT INTO samples (datetime, area, point_geom, elevation, shapefile_path,snowv) VALUES (%s, %s, %s, %s, %s, %s)",
+            (now, area, point_geom, elevation, shapefile_path, snowv)
         )
         print(f"Writing point {i+1}/{len(points)} to database.")
 except Exception as e:
