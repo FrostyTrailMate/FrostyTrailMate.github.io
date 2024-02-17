@@ -5,6 +5,16 @@ import rasterio
 from rasterio.mask import mask
 from zipfile import ZipFile
 
+
+# API token
+api_token = '8ff3b062b8621b8a71a957083bba09e0'
+
+# Input polygon zipfile
+polygon_zipfile = 'Shapefiles/Yosemite_Boundary_4326.zip'
+
+# Output folder
+output_folder = 'Outputs/DEM'
+
 # Function to download DEM data from OpenTopography
 def download_dem(api_token, polygon_zipfile, output_folder):
     try:
@@ -68,14 +78,6 @@ def download_dem(api_token, polygon_zipfile, output_folder):
     except Exception as e:
         print(f"Error occurred: {e}")
 
-# API token
-api_token = '8ff3b062b8621b8a71a957083bba09e0'
-
-# Input polygon zipfile
-polygon_zipfile = 'Shapefiles/Yosemite_Boundary_4326.zip'
-
-# Output folder
-output_folder = 'Outputs/DEM'
 
 # Create output folder if it doesn't exist
 os.makedirs(output_folder, exist_ok=True)
