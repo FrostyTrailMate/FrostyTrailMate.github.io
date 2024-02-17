@@ -3,13 +3,7 @@ import requests
 import geopandas as gpd
 import rasterio
 from rasterio.mask import mask
-from zipfile import ZipFile
-
-import os
-import requests
-import geopandas as gpd
-import rasterio
-from rasterio.mask import mask
+from rasterio.warp import calculate_default_transform, reproject, Resampling
 from zipfile import ZipFile
 
 def download_dem(api_token, polygon_zipfile, output_folder):
@@ -59,20 +53,31 @@ def download_dem(api_token, polygon_zipfile, output_folder):
                         f.write(chunk)
             print("DEM data downloaded successfully.")
 
+            # Reprojecting DEM data to EPSG:4326
+            dem_reprojected_file = os.path.join(output_folder, 'Yosemite_DEM_reprojected.tif')
             with rasterio.open(dem_file) as src:
-                out_image, out_transform = mask(src, boundary.geometry, crop=True)
-                out_meta = src.meta.copy()
+                transform, width, height = rasterio.warp.calculate_default_transform(
+                    src.crs, {'init': 'EPSG:4326'}, src.width, src.height, *src.bounds)
+                kwargs = src.meta.copy()
+                kwargs.update({
+                    'crs': 'EPSG:4326',
+                    'transform': transform,
+                    'width': width,
+                    'height': height
+                })
 
-            out_meta.update({"driver": "GTiff",
-                             "height": out_image.shape[1],
-                             "width": out_image.shape[2],
-                             "transform": out_transform})
+                with rasterio.open(dem_reprojected_file, 'w', **kwargs) as dst:
+                    for i in range(1, src.count + 1):
+                        reproject(
+                            source=rasterio.band(src, i),
+                            destination=rasterio.band(dst, i),
+                            src_transform=src.transform,
+                            src_crs=src.crs,
+                            dst_transform=transform,
+                            dst_crs={'init': 'EPSG:4326'},
+                            resampling=Resampling.nearest)
 
-            clipped_dem_file = os.path.join(output_folder, 'Yosemite_DEM_clipped.tif')
-            with rasterio.open(clipped_dem_file, "w", **out_meta) as dest:
-                dest.write(out_image)
-
-            print("Clipped DEM data saved successfully.")
+            print("DEM data reprojected and saved successfully.")
         else:
             print(f"Failed to download DEM data. Status code: {response.status_code}")
 
@@ -88,22 +93,6 @@ polygon_zipfile = 'Shapefiles/Yosemite_Boundary_4326.zip'
 # Output folder
 output_folder = 'Outputs/DEM'
 
-os.makedirs(output_folder, exist_ok=True)
-
-# Download DEM data
-download_dem(api_token, polygon_zipfile, output_folder)
-
-
-# API token
-api_token = '8ff3b062b8621b8a71a957083bba09e0'
-
-# Input polygon zipfile
-polygon_zipfile = 'Shapefiles/Yosemite_Boundary_4326.zip'
-
-# Output folder
-output_folder = 'Outputs/DEM'
-
-# Create output folder if it doesn't exist
 os.makedirs(output_folder, exist_ok=True)
 
 # Download DEM data
