@@ -12,6 +12,12 @@ import math
 
 # Connect to PostgreSQL
 def connect_to_postgres():
+    """
+    Connects to a PostgreSQL database.
+
+    Returns:
+        psycopg2.extensions.connection: A connection object to interact with the PostgreSQL database.
+    """
     try:
         conn = psycopg2.connect(
             host="DESKTOP-UIUIA2A",
@@ -25,8 +31,14 @@ def connect_to_postgres():
         print(f"Error connecting to PostgreSQL: {e}")
         return None
 
-# Create table if not exists
+# Create table if it does not exist
 def create_table(conn):
+    """
+    Creates a table in the PostgreSQL database if it does not exist.
+
+    Args:
+        conn (psycopg2.extensions.connection): A connection object to the PostgreSQL database.
+    """
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
@@ -42,6 +54,14 @@ def create_table(conn):
 
 # Function to insert polygons into the database
 def insert_polygon(conn, area_name, geometry):
+    """
+    Inserts a polygon into the PostgreSQL database.
+
+    Args:
+        conn (psycopg2.extensions.connection): A connection object to the PostgreSQL database.
+        area_name (str): Name of the area associated with the polygon.
+        geometry (shapely.geometry.Polygon): Polygon geometry to be inserted into the database.
+    """
     try:
         with conn.cursor() as cursor:
             insert_query = sql.SQL("INSERT INTO dem_p (area_name, vector) VALUES (%s, ST_GeomFromGeoJSON(%s::json))")
@@ -52,6 +72,14 @@ def insert_polygon(conn, area_name, geometry):
 
 # Function to generate polygons for each elevation band
 def generate_polygons(dem_file, conn, shapefile_dir):
+    """
+    Generates polygons for each elevation band from a digital elevation model (DEM) file.
+
+    Args:
+        dem_file (rasterio.io.DatasetReader): A rasterio dataset reader object representing the DEM file.
+        conn (psycopg2.extensions.connection): A connection object to the PostgreSQL database.
+        shapefile_dir (str): Directory path to save the generated shapefiles.
+    """
     try:
         print("Generating polygons for each elevation band...")
         
@@ -96,6 +124,13 @@ def generate_polygons(dem_file, conn, shapefile_dir):
 
 # Main function
 def main(dem_file_path):
+    """
+    Main function to connect to PostgreSQL, create table, generate polygons, and close the database connection.
+
+    Args:
+        dem_file_path (str): Path to the DEM file.
+
+    """
     try:
         print("Connecting to PostgreSQL...")
         

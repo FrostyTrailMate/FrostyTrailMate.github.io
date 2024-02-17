@@ -17,7 +17,17 @@ import time
 interrupted = False
 
 # Signal handler function to handle interrupt signal (Ctrl+C)
+
 def signal_handler(sig, frame):
+    """Signal handler function to handle interrupt signal (Ctrl+C) during the downloads process.
+
+    Args:
+        sig (int): Signal number.
+        frame (frame): Current stack frame.
+
+    Returns:
+        None
+    """
     global interrupted
     interrupted = True
     print("Process interrupted. Cancelling pending tasks...")
@@ -120,6 +130,17 @@ start_date = end_date - timedelta(days=5)
 
 # Function to make requests for a single sub-box with interruption check
 def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
+    """Requests images for a single sub-box with interruption check.
+
+    Args:
+        sub_bbox (sentinelhub.BBox): Bounding box of the sub-box.
+        evalscript (str): Evalscript to be used for the Sentinel Hub request.
+        data_folder (str): Path to the folder where the images will be saved.
+        index (int): Index of the sub-box.
+
+    Returns:
+        None
+    """
     global interrupted
     sys.stdout.write(f"\rRequesting sub-box {index+1}/{len(sub_bbox_list)}...")
     sys.stdout.flush()
@@ -167,6 +188,16 @@ def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
 
 # Function to download images for multiple sub-boxes using multithreading with interruption check
 def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
+    """Downloads images for multiple sub-boxes using multithreading with interruption check.
+
+    Args:
+        sub_bbox_list (list): List of sub-boxes.
+        evalscript (str): Evalscript to be used for the Sentinel Hub request.
+        data_folder (str): Path to the folder where the images will be saved.
+
+    Returns:
+        None
+    """
     global interrupted
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
         futures = {executor.submit(request_images_for_sub_box, sub_bbox, evalscript, data_folder, i): i for i, sub_bbox in enumerate(sub_bbox_list)}
@@ -186,6 +217,14 @@ download_images_multi_thread(sub_bbox_list, evalscript, data_folder)
 
 # Define the function to search for image files in all subdirectories
 def find_image_files(data_folder):
+    """Finds image files in all subdirectories. Necessary to merge the downloaded images.
+
+    Args:
+        data_folder (str): Path to the folder containing image files.
+
+    Returns:
+        list: List of paths to image files.
+    """
     image_files = []
     for root, dirs, files in os.walk(data_folder):
         for file in files:
@@ -219,6 +258,15 @@ print(f"Merged image saved to: {merged_image_path}")
 
 # Function to insert data into PostgreSQL database
 def insert_data_into_database(image_path, time_collected):
+    """Inserts data into PostgreSQL database.
+
+    Args:
+        image_path (str): Path to the image file.
+        time_collected (datetime): Timestamp indicating when the image was collected.
+
+    Returns:
+        None
+    """
     connection = psycopg2.connect(
         user="postgres",
         password="admin",
