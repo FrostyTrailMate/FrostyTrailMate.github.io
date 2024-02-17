@@ -260,6 +260,7 @@ import rasterio.warp
 
 # Reproject merged image from UTM11N to WGS84 (EPSG:4326)
 print("Reprojecting merged image to WGS84...")
+reprojected_image_path = 'Outputs/SAR/Yosemite_merged_WGS84.tiff'  # Define the path for the reprojected image
 with rasterio.open(merged_image_path) as src:
     transform, width, height = rasterio.warp.calculate_default_transform(
         src.crs, 'EPSG:4326', src.width, src.height, *src.bounds)
@@ -271,7 +272,7 @@ with rasterio.open(merged_image_path) as src:
         'height': height
     })
 
-    with rasterio.open('Outputs/SAR/Yosemite_merged_WGS84.tiff', 'w', **kwargs) as dst:
+    with rasterio.open(reprojected_image_path, 'w', **kwargs) as dst:
         for i in range(1, src.count + 1):
             rasterio.warp.reproject(
                 source=rasterio.band(src, i),
@@ -282,7 +283,6 @@ with rasterio.open(merged_image_path) as src:
                 dst_crs='EPSG:4326',
                 resampling=rasterio.enums.Resampling.nearest)
 print("Reprojection completed. Merged image saved in WGS84 (EPSG:4326) format.")
-
 
 # Function to insert data into PostgreSQL database
 def insert_data_into_database(image_path, time_collected):
@@ -330,7 +330,7 @@ def insert_data_into_database(image_path, time_collected):
             print("PostgreSQL connection is closed")
 
 # Insert data into PostgreSQL database
-insert_data_into_database(merged_image_path, datetime.now())
+insert_data_into_database(reprojected_image_path, datetime.now())
 
 
 # Clear the folder 'Outputs/SAR/temp' at the end of the script
