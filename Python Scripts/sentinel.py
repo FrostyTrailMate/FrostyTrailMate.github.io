@@ -81,14 +81,14 @@ function setup() {
       {
         id: "default",
         bands: 2,
-        sampleType: "AUTO"
+        sampleType: "FLOAT32"
       }
     ]
   };
 }
 
 function evaluatePixel(samples) {
-  return [samples.VV, samples.VH];
+  return [(10 * Math.log(samples.VV) / Math.LN10), (10 * Math.log(samples.VH) / Math.LN10)];
 }
 """
 
@@ -192,7 +192,7 @@ print("\nMerging downloaded images...")
 merged_image, out_trans = merge(image_files)
 
 # Save the merged image to 'Outputs/SAR'
-merged_image_path = os.path.join('Outputs/SARTEST', f'Yosemite_merged.tiff')
+merged_image_path = os.path.join('Outputs/SAR', f'Yosemite_merged.tiff')
 
 with rasterio.open(merged_image_path, 'w', driver='GTiff', 
                    height=merged_image.shape[1], width=merged_image.shape[2], 
@@ -245,5 +245,5 @@ insert_data_into_database(merged_image_path, datetime.now())
 
 # Clear the folder 'Outputs/SAR/temp' at the end of the script
 import shutil
-shutil.rmtree('Outputs/SARTEST/temp', ignore_errors=True)
+shutil.rmtree('Outputs/SAR/temp', ignore_errors=True)
 print("Temporary raster files cleared.")
