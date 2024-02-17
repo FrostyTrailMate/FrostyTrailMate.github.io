@@ -112,7 +112,7 @@ function setup() {
 }
 
 function evaluatePixel(samples) {
-  return [samples.VV, samples.VH];
+  return [Math.log(samples.VV) / Math.LN10, Math.log(samples.VH) / Math.LN10];
 }
 """
 
@@ -199,7 +199,7 @@ def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
         None
     """
     global interrupted
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         futures = {executor.submit(request_images_for_sub_box, sub_bbox, evalscript, data_folder, i): i for i, sub_bbox in enumerate(sub_bbox_list)}
         for future in concurrent.futures.as_completed(futures):
             try:
@@ -255,6 +255,34 @@ with rasterio.open(merged_image_path, 'w', driver='GTiff',
                    transform=out_trans) as dst:
     dst.write(merged_image)
 print(f"Merged image saved to: {merged_image_path}")
+
+import rasterio.warp
+
+# Reproject merged image from UTM11N to WGS84 (EPSG:4326)
+print("Reprojecting merged image to WGS84...")
+with rasterio.open(merged_image_path) as src:
+    transform, width, height = rasterio.warp.calculate_default_transform(
+        src.crs, 'EPSG:4326', src.width, src.height, *src.bounds)
+    kwargs = src.meta.copy()
+    kwargs.update({
+        'crs': 'EPSG:4326',
+        'transform': transform,
+        'width': width,
+        'height': height
+    })
+
+    with rasterio.open('Outputs/SAR/Yosemite_merged_WGS84.tiff', 'w', **kwargs) as dst:
+        for i in range(1, src.count + 1):
+            rasterio.warp.reproject(
+                source=rasterio.band(src, i),
+                destination=rasterio.band(dst, i),
+                src_transform=src.transform,
+                src_crs=src.crs,
+                dst_transform=transform,
+                dst_crs='EPSG:4326',
+                resampling=rasterio.enums.Resampling.nearest)
+print("Reprojection completed. Merged image saved in WGS84 (EPSG:4326) format.")
+
 
 # Function to insert data into PostgreSQL database
 def insert_data_into_database(image_path, time_collected):
