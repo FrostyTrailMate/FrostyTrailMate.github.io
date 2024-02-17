@@ -105,14 +105,14 @@ function setup() {
       {
         id: "default",
         bands: 2,
-        sampleType: "AUTO"
+        sampleType: "FLOAT32"
       }
     ]
   };
 }
 
 function evaluatePixel(samples) {
-  return [Math.log(samples.VV) / Math.LN10, Math.log(samples.VH) / Math.LN10];
+   return [10 * Math.log(samples.VV) / Math.LN10, 10 * Math.log(samples.VH) / Math.LN10];
 }
 """
 
@@ -335,5 +335,6 @@ insert_data_into_database(reprojected_image_path, datetime.now())
 
 # Clear the folder 'Outputs/SAR/temp' at the end of the script
 import shutil
-shutil.rmtree('Outputs/SARTEST/temp', ignore_errors=True)
+shutil.rmtree('Outputs/SAR/temp', ignore_errors=True)
+os.makedirs('Outputs/SAR/temp', exist_ok=True)
 print("Temporary raster files cleared.")
