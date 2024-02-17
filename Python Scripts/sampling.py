@@ -4,33 +4,19 @@ from shapely.geometry import Point
 import psycopg2
 from datetime import datetime
 import pyproj
+import signal
+import sys
 
-# Function to generate points at every 500 meters within the boundary polygon
-def generate_points_within_polygon(polygon, spacing):
-    """
-    Generate points at regular intervals within a polygon.
+# Define a signal handler for interrupt (Ctrl+C)
+def signal_handler(sig, frame):
+    print("\nWriting process interrupted. Rolling back changes...")
+    conn.rollback()  # Rollback the transaction to remove the added points
+    conn.close()  # Close the database connection
+    print("Changes rolled back. Exiting...")
+    sys.exit(0)
 
-    Parameters:
-    - polygon (shapely.geometry.Polygon): The polygon within which points will be generated.
-    - spacing (float): The distance between each generated point.
-
-    Returns:
-    - list: A list of Point objects representing the generated points.
-    """
-
-    minx, miny, maxx, maxy = polygon.bounds
-    points = []
-    x = minx
-    y = miny
-    while y < maxy:
-        while x < maxx:
-            point = Point(x, y)
-            if polygon.contains(point):
-                points.append(point)
-            x += spacing
-        y += spacing
-        x = minx
-    return points
+# Set the interrupt signal handler
+signal.signal(signal.SIGINT, signal_handler)
 
 # Function to get elevation from raster file for a given point
 def get_elevation_for_point(point, dem_dataset, dem_crs):
@@ -162,14 +148,16 @@ try:
             "INSERT INTO samples (datetime, area, point_geom, elevation, shapefile_path) VALUES (%s, %s, %s, %s, %s)",
             (now, area, point_geom, elevation, shapefile_path)
         )
-        print(f"Writing point {i+1}/{len(points)} to database.")
+        print(f"\rWriting point {i+1}/{len(points)} to database.", end='', flush=True)
 except Exception as e:
-    print(f"Error inserting point: {e}")
+    print(f"\nError inserting point: {e}")
     conn.rollback()  # Rollback the transaction in case of error
 else:
+    print("\nDatabase write completed.")  # Add a newline after completion
     conn.commit()  # Commit the transaction if no errors occurred
 finally:
     conn.close()  # Close the database connection regardless of the outcome
+
 
 
 # Create a GeoDataFrame from the points
