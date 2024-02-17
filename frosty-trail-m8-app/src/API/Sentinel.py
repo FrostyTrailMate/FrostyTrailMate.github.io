@@ -191,9 +191,6 @@ if not image_files:
 print("\nMerging downloaded images...")
 merged_image, out_trans = merge(image_files)
 
-# Extract date of image capture
-date_of_image_capture = image_files[0].split('_')[-1].split('.')[0]
-
 # Save the merged image to 'Outputs/SAR'
 merged_image_path = os.path.join('Outputs/SAR', f'Yosemite_merged.tiff')
 
