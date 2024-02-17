@@ -11,6 +11,8 @@ from datetime import datetime, timedelta, timezone
 import concurrent.futures
 import signal
 import psycopg2 
+import shutil
+import time
 
 interrupted = False
 
@@ -18,8 +20,19 @@ interrupted = False
 def signal_handler(sig, frame):
     global interrupted
     interrupted = True
-    print("Process interrupted. Cancelling pending tasks and clearing temporary files...")
-    cleanup_temp_files()
+    print("Process interrupted. Cancelling pending tasks...")
+    time.sleep(5)  # Wait for 5 seconds before clearing temporary files
+    # Clear the files within the 'Outputs/SAR/temp' folder
+    temp_folder = 'Outputs/SAR/temp'
+    try:
+        # Create an empty temporary directory
+        os.makedirs(temp_folder, exist_ok=True)
+        # Use shutil.rmtree() to delete the contents of the directory
+        shutil.rmtree(temp_folder)
+        print("Temporary raster files cleared.")
+        os.makedirs(temp_folder, exist_ok=True)  # Recreate the empty directory
+    except Exception as e:
+        print(f"Error clearing temporary files: {e}")
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -82,14 +95,14 @@ function setup() {
       {
         id: "default",
         bands: 2,
-        sampleType: "FLOAT32"
+        sampleType: "AUTO"
       }
     ]
   };
 }
 
 function evaluatePixel(samples) {
-  return [(10 * Math.log(samples.VV) / Math.LN10), (10 * Math.log(samples.VH) / Math.LN10)];
+  return [samples.VV, samples.VH];
 }
 """
 
@@ -152,14 +165,6 @@ def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
         except Exception as e:
             print(f"Error occurred while requesting sub-box {index+1}: {e}")
 
-# Function to clear temporary downloaded files
-def cleanup_temp_files():
-    data_folder = '../Outputs/SAR/temp'  # Adjust relative path
-    if os.path.exists(data_folder):
-        import shutil
-        shutil.rmtree(data_folder, ignore_errors=True)
-        print("Temporary downloaded files cleared.")
-
 # Function to download images for multiple sub-boxes using multithreading with interruption check
 def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
     global interrupted
@@ -171,14 +176,12 @@ def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
             except Exception as e:
                 print(f"Error occurred: {e}")
                 if interrupted:
-                    print("\nProcess interrupted. Exiting and clearing temporary files...")
+                    print("\nProcess interrupted. Exiting...")
                     executor.shutdown(wait=False)  # Shut down executor immediately upon interruption
-                    cleanup_temp_files()  # Clear temporary files before exiting
                     sys.exit(0)
 
-
 # Make requests for each sub-box using multithreading
-data_folder = '../Outputs/SAR/temp'  # Adjust relative path
+data_folder = 'Outputs/SAR/temp'
 download_images_multi_thread(sub_bbox_list, evalscript, data_folder)
 
 # Define the function to search for image files in all subdirectories
@@ -226,9 +229,11 @@ def insert_data_into_database(image_path, time_collected):
 
     cursor = connection.cursor()
     
+    # SQL query to insert data into the table
     insert_query = "INSERT INTO sar_raw (path, time_collected) VALUES (%s, %s)"
-    record_to_insert = (os.path.relpath(image_path, start='..'), time_collected)  # Adjust with os.path.relpath
-
+    
+    # Data to be inserted
+    record_to_insert = (image_path, time_collected)
 
     try:
         # Execute the SQL command
@@ -252,5 +257,7 @@ def insert_data_into_database(image_path, time_collected):
 insert_data_into_database(merged_image_path, datetime.now())
 
 
-# Cleanup at the very end if the script reaches completion normally
-cleanup_temp_files() 
+# Clear the folder 'Outputs/SAR/temp' at the end of the script
+import shutil
+shutil.rmtree('Outputs/SARTEST/temp', ignore_errors=True)
+print("Temporary raster files cleared.")
