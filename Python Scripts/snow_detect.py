@@ -1,6 +1,5 @@
 import psycopg2
 import rasterio
-from rasterstats import zonal_stats
 from shapely.wkb import loads
 from shapely.geometry import Point
 from math import ceil
@@ -58,6 +57,7 @@ def process_points_and_raster(conn):
                 sample_rows = cursor.fetchall()
                 num_samples = len(sample_rows)
                 sample_count = 0
+                print(f"Found {num_samples} sample points.")
 
                 max_elevation = max([row[1] for row in sample_rows])
                 print(f"Max elevation: {max_elevation}")
@@ -91,7 +91,7 @@ def process_points_and_raster(conn):
                     # Step 7: Write results to results table
                     print(f"Writing results for elevation interval {interval_start}-{interval_end}...", end='\r')
                     cursor.execute("INSERT INTO results (elevation, coverage_percentage, ddatetime, total_points, detected_points, area_name) VALUES (%s, %s, %s, %s, %s, %s)",
-                                   (f"{interval_start}-{interval_end}", round(coverage_percentage, 2), datetime.now(), total_points, detected_points, 'Yosemite'))
+                                   (f"{interval_start}-{interval_end}", round(coverage_percentage, 2), datetime.now().strftime("%Y/%m/%d %H:00"), total_points, detected_points, 'Yosemite'))
 
                     conn.commit()
 
