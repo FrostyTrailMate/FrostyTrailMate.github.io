@@ -53,11 +53,11 @@ import numpy as np
 
 # Connect to PostgreSQL
 conn = psycopg2.connect(
-    dbname="your_database_name",
-    user="your_username",
-    password="your_password",
-    host="your_host",
-    port="your_port"
+    dbname="FTM8",
+    user="postgres",
+    password="admin",
+    host="DESKTOP-UIUIA2A",
+    port="5432"
 )
 cur = conn.cursor()
 
@@ -70,7 +70,7 @@ def detect_snow(backscatter_intensity):
 # Check for new images in sar_raw table
 ## This SQL query selects all records from the sar_raw table where the processed field is false, indicating that the image has not been processed yet.
 
-cur.execute("SELECT * FROM sar_raw WHERE processed = false")
+cur.execute("SELECT path FROM sar_raw WHERE processed is null")
 new_images = cur.fetchall()
 
 for image in new_images:
