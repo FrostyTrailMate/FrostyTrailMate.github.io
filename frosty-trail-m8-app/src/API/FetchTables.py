@@ -29,22 +29,35 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 db = SQLAlchemy(app)
 
 # Define the SQLAlchemy model
-class resultstestapi(db.Model):
+class results(db.Model):
     
     # Table is implicitly called by the name of the class
     id_res = db.Column(db.Integer, primary_key=True)
-    altitude = db.Column(db.Float)
-    snowcover = db.Column(db.Integer)
-    darea = db.Column(db.String(30))
-    rdate = db.Column(db.Date)
+    area_name = db.Column(db.String(30))
+    elevation =  db.Column(db.String(30))
+    coverage_percentage = db.Column(db.Float)
+    ddatetime = db.Column(db.Date)
+    detected_points = db.Column(db.Integer)
+    total_points = db.Column(db.Integer)
+    
 
 # Route to fetch data
 # This function will be called when a request is made to the '/api/results' endpoint
 # Route to fetch sorted data by altitude
+
 @app.route('/api/results')   
 def get_results():
-    results = resultstestapi.query.order_by(resultstestapi.altitude).all()
-    data = [{'id_res': result.id_res, 'altitude': result.altitude, 'snowcover': result.snowcover, 'darea': result.darea, 'rdate': result.rdate} for result in results]
+    
+    resultftm8 = results.query.order_by(results.id_res).all()
+    
+    data = [{'id_res': result.id_res,
+             'area_name': result.area_name, 
+             'elevation': result.elevation, 
+             'coverage_percentage': result.coverage_percentage,
+             'ddatetime': result.ddatetime, 
+             'detected_points': result.detected_points, 
+             'total_points': result.total_points} for result in resultftm8]
+    
     return jsonify(data)
     
 if __name__ == '__main__':

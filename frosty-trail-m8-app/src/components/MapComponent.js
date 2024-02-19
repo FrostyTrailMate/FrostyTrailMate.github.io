@@ -2,29 +2,58 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './CCStyles/MapComponent.css'; // Import external CSS file
-import YosemiteBoundaries from './geojsons/YosemiteBoundaries.json'; // Import GeoJSON data file
+import YosemiteBoundary from './geojsons/YosemiteBoundary.json'; // Import GeoJSON data file
+import ElevationPolygons from './geojsons/ElevationPolygons.json'; // Import GeoJSON data file for ElevationPolygons
 
 const MapComponent = () => {
-  const [geojsonData, setGeojsonData] = useState(null);
+  const [showBoundary, setShowBoundary] = useState(true);
+  const [showElevation, setShowElevation] = useState(true);
 
-  useEffect(() => {
-    setGeojsonData(YosemiteBoundaries); // Set GeoJSON data when component mounts
-  }, []);
+  const handleBoundaryToggle = () => {
+    setShowBoundary(!showBoundary);
+  };
+
+  const handleElevationToggle = () => {
+    setShowElevation(!showElevation);
+  };
 
   return (
     <div className="map-container">
+      <div className="toggle-container">
+        <label className="toggle-label">
+          <input
+            type="checkbox"
+            checked={showBoundary}
+            onChange={handleBoundaryToggle}
+          />
+          <span className="toggle-text">Hiking Trails</span>
+        </label>
+        <label className="toggle-label">
+          <input
+            type="checkbox"
+            checked={showElevation}
+            onChange={handleElevationToggle}
+          />
+          <span className="toggle-text">Snow Coverage</span>
+        </label>
+      </div>
       <MapContainer
         center={[37.8451, -119.5383]}
         zoom={10}
-        className="leaflet-container">
-
+        className="leaflet-container"
+      >
         <TileLayer
           url="https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=749cd9dc6622478d9454b931ded7943d"
           subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-          attribution='© Thunderforest by Gravitystorm Limited.'/>
+          attribution="© Thunderforest by Gravitystorm Limited."
+        />
 
-        {geojsonData && (
-          <GeoJSON data={geojsonData} />
+        {showBoundary && (
+          <GeoJSON data={YosemiteBoundary} />
+        )}
+
+        {showElevation && (
+          <GeoJSON data={ElevationPolygons} />
         )}
       </MapContainer>
     </div>

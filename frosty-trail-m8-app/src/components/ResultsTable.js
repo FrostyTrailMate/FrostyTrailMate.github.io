@@ -16,29 +16,35 @@ const ResultsTable = () => {
 
     return (
         <div className="tablecontainer">
-            <table className="styled-table">
-                <thead>
-                    <tr>
-                        <th>ALTITUDE</th>
-                        <th>SNOW COVERAGE (%)</th>
-                        <th>AREA</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {results.map(result => (
-                        <tr 
-                        key={result.id_res}>
-                            <td>{result.altitude}</td>
-                            <td>{result.snowcover}</td>
-                            <td>{result.darea}</td>
+            <div className="scrollable-table">
+                <table className="styled-table">
+                    <thead>
+                        <tr>
+                            <th> AREA </th>
+                            <th> ELEVATION </th>
+                            <th> SNOW COVERAGE (%) </th>
+                            <th> DATE </th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {results.map(result => (
+                            <tr 
+                                key={result.id_res}>
+                                <td>{result.area_name}</td>
+                                <td>{result.elevation}</td>
+                                <td>{result.coverage_percentage}</td>
+                                <td>{result.ddatetime}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
 
 export default ResultsTable;
+
+
 
 
