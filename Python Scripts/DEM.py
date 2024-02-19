@@ -97,6 +97,10 @@ def download_dem(api_token, polygon_zipfile, output_folder):
 
     except Exception as e:
         print(f"Error occurred: {e}")
+    finally:
+        # Remove extracted shapefile and original ZIP file
+        os.remove(os.path.join(output_folder, shapefile_name))
+        os.remove(polygon_zipfile)
 
 # API token
 api_token = '8ff3b062b8621b8a71a957083bba09e0'
