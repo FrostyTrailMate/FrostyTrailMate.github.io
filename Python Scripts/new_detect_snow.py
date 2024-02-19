@@ -21,11 +21,11 @@ from snow_detection_algorithm import detect_snow  # Your snow detection algorith
 
 # Connect to your PostgreSQL database
 conn = psycopg2.connect(
-    dbname="your_dbname",
-    user="your_username",
-    password="your_password",
-    host="your_host",
-    port="your_port"
+    dbname="FTM8",
+    user="postgres",
+    password="admin",
+    host="DESKTOP-UIUIA2A",
+    port="5432"
 )
 cur = conn.cursor()
 
