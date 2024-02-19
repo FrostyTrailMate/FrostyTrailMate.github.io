@@ -2,8 +2,8 @@ import os
 import requests
 import geopandas as gpd
 import rasterio
+from rasterio.warp import reproject, calculate_default_transform, Resampling
 from rasterio.mask import mask
-from rasterio.warp import calculate_default_transform, reproject, Resampling
 from zipfile import ZipFile
 
 def download_dem(api_token, polygon_zipfile, output_folder):
@@ -40,7 +40,7 @@ def download_dem(api_token, polygon_zipfile, output_folder):
 
         xmin, ymin, xmax, ymax = envelope.total_bounds
 
-        url = f'https://portal.opentopography.org/API/usgsdem?datasetName=USGS30m&south={ymin}&north={ymax}&west={xmin}&east={xmax}&outputFormat=GTiff&API_Key={api_token}'
+        url = f'https://portal.opentopography.org/API/globaldem?demtype=NASADEM&south={ymin}&north={ymax}&west={xmin}&east={xmax}&outputFormat=GTiff&API_Key={api_token}'
 
         print("Downloading DEM data...")
         response = requests.get(url, stream=True)
@@ -56,7 +56,7 @@ def download_dem(api_token, polygon_zipfile, output_folder):
             # Reprojecting DEM data to EPSG:4326
             dem_reprojected_file = os.path.join(output_folder, 'Yosemite_DEM_reprojected.tif')
             with rasterio.open(dem_file) as src:
-                transform, width, height = rasterio.warp.calculate_default_transform(
+                transform, width, height = calculate_default_transform(
                     src.crs, {'init': 'EPSG:4326'}, src.width, src.height, *src.bounds)
                 kwargs = src.meta.copy()
                 kwargs.update({
@@ -77,12 +77,30 @@ def download_dem(api_token, polygon_zipfile, output_folder):
                             dst_crs={'init': 'EPSG:4326'},
                             resampling=Resampling.nearest)
 
-            print("DEM data reprojected and saved successfully.")
+            # Clip reprojected DEM to shapefile boundary
+            dem_clipped_file = os.path.join(output_folder, 'Yosemite_DEM_clipped.tif')
+            with rasterio.open(dem_reprojected_file) as src:
+                out_image, out_transform = mask(src, boundary.geometry, crop=True)
+                out_meta = src.meta.copy()
+
+                out_meta.update({"driver": "GTiff",
+                                 "height": out_image.shape[1],
+                                 "width": out_image.shape[2],
+                                 "transform": out_transform})
+
+                with rasterio.open(dem_clipped_file, "w", **out_meta) as dest:
+                    dest.write(out_image)
+
+            print("DEM data reprojected, clipped, and saved successfully.")
         else:
             print(f"Failed to download DEM data. Status code: {response.status_code}")
 
     except Exception as e:
         print(f"Error occurred: {e}")
+    finally:
+        # Remove extracted shapefile and original ZIP file
+        os.remove(os.path.join(output_folder, shapefile_name))
+        os.remove(polygon_zipfile)
 
 # API token
 api_token = '8ff3b062b8621b8a71a957083bba09e0'

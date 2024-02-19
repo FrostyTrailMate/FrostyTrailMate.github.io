@@ -4,7 +4,6 @@ import psycopg2
 from psycopg2 import sql
 import numpy as np
 import json
-from rasterio.mask import mask
 from shapely.ops import unary_union
 import os
 import geopandas as gpd
