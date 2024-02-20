@@ -35,6 +35,7 @@ class results(db.Model):
     id_res = db.Column(db.Integer, primary_key=True)
     area_name = db.Column(db.String(30))
     elevation =  db.Column(db.String(30))
+    min_elevation = db.Column(db.Integer)
     coverage_percentage = db.Column(db.Float)
     ddatetime = db.Column(db.Date)
     detected_points = db.Column(db.Integer)
@@ -48,11 +49,12 @@ class results(db.Model):
 @app.route('/api/results')   
 def get_results():
     
-    resultftm8 = results.query.order_by(results.id_res).all()
+    resultftm8 = results.query.order_by(results.min_elevation).all()
     
     data = [{'id_res': result.id_res,
              'area_name': result.area_name, 
-             'elevation': result.elevation, 
+             'elevation': result.elevation,
+             'min_elevation': result.min_elevation,
              'coverage_percentage': result.coverage_percentage,
              'ddatetime': result.ddatetime, 
              'detected_points': result.detected_points, 
