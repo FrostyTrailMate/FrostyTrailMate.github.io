@@ -1,5 +1,4 @@
-import psycopg2
-from psycopg2 import sql
+from sqlalchemy import create_engine, MetaData, text
 
 # Database connection parameters
 dbname = 'FTM8'
@@ -8,60 +7,33 @@ password = 'admin'
 host = 'DESKTOP-UIUIA2A'
 port = '5432'
 
-# Connect to default postgres database to create FTM8 database if it doesn't exist
-default_conn_params = {
-    'user': user,
-    'password': password,
-    'host': host,
-    'port': port
-}
+# Connection URL
+connection_url = f'postgresql://{user}:{password}@{host}:{port}/{dbname}'
 
 try:
-    conn = psycopg2.connect(**default_conn_params)
-    conn.autocommit = True
-    cursor = conn.cursor()
-    cursor.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(dbname)))
-    conn.close()
-except psycopg2.errors.DuplicateDatabase:
-    print("Database already exists. Proceeding to drop and create tables.")
-except Exception as e:
-    print("Error creating database:", e)
-
-# Connect to FTM8 database
-conn_params = {
-    'dbname': dbname,
-    'user': user,
-    'password': password,
-    'host': host,
-    'port': port
-}
-
-try:
-    conn = psycopg2.connect(**conn_params)
-    cursor = conn.cursor()
+    print("Connecting to FTM8 database...")
+    engine = create_engine(connection_url)
+    conn = engine.connect()
+    print("Connected to FTM8 database.")
 except Exception as e:
     print("Unable to connect to database:", e)
     exit()
 
-# Define table creation queries
+metadata = MetaData()
+
+# Define table dropping and creation queries
 table_queries = [
     """
-    DROP TABLE IF EXISTS sar_raw;
-    CREATE TABLE sar_raw (
-        id SERIAL PRIMARY KEY,
-        datetime TIMESTAMP,
-        time_collected TIMESTAMP NOT NULL,
-        sOrbit INT,
-        sSlice INT,
-        sArea varchar,
-        path varchar,
-        image varchar,
-        processed VARCHAR
-    );
+    DROP TABLE IF EXISTS public.sar_raw CASCADE;
     """,
     """
-    DROP TABLE IF EXISTS samples;
-    CREATE TABLE samples (
+    CREATE TABLE public.sar_raw (id SERIAL PRIMARY KEY, datetime TIMESTAMP, time_collected TIMESTAMP NOT NULL, sOrbit INT, sSlice INT, sArea VARCHAR, path VARCHAR, image VARCHAR, processed VARCHAR);
+    """,
+    """
+    DROP TABLE IF EXISTS public.samples CASCADE;
+    """,
+    """
+    CREATE TABLE public.samples (
         id SERIAL PRIMARY KEY,
         datetime TIMESTAMP NOT NULL,
         area VARCHAR NOT NULL,
@@ -71,8 +43,10 @@ table_queries = [
     );
     """,
     """
-    DROP TABLE IF EXISTS demraw;
-    CREATE TABLE demraw (
+    DROP TABLE IF EXISTS public.demraw CASCADE;
+    """,
+    """
+    CREATE TABLE public.demraw (
         id_dem SERIAL PRIMARY KEY,
         delevation FLOAT,
         darea VARCHAR(30),
@@ -81,16 +55,20 @@ table_queries = [
     );
     """,
     """
-    DROP TABLE IF EXISTS DEM_p;
-    CREATE TABLE DEM_p (
+    DROP TABLE IF EXISTS public.DEM_p CASCADE;
+    """,
+    """
+    CREATE TABLE public.DEM_p (
         id SERIAL PRIMARY KEY,
         vector GEOMETRY(MULTIPOLYGON, 4326),
         area_name VARCHAR(50) NOT NULL
     );
     """,
     """
-    DROP TABLE IF EXISTS results;
-    CREATE TABLE results (
+    DROP TABLE IF EXISTS public.results CASCADE;
+    """,
+    """
+    CREATE TABLE public.results (
         id_res SERIAL PRIMARY KEY NOT NULL,
         area_name VARCHAR,
         elevation VARCHAR NOT NULL,
@@ -102,14 +80,17 @@ table_queries = [
     """
 ]
 
-# Execute table creation queries
+# Execute table dropping and creation queries
 try:
+    print("Dropping and creating tables...")
     for query in table_queries:
-        cursor.execute(query)
-    print("Tables created successfully")
+        compiled_query = text(query)
+        print("Executing query:", compiled_query)
+        conn.execute(compiled_query)
+    print("Tables dropped and created successfully.")
 except Exception as e:
-    print("Error creating tables:", e)
+    print("Error dropping/creating tables:", e)
 
-# Close connections
-cursor.close()
+# Close connection
+conn.commit()
 conn.close()

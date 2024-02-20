@@ -32,7 +32,7 @@ def update_processed_timestamp(conn):
         cursor.execute("UPDATE sar_raw SET processed = %s WHERE processed IS NULL", (current_datetime,))
         conn.commit()
         cursor.close()
-        print("Processed timestamp updated in sar_raw table.")
+        print("Process completed. Exiting.")
     except psycopg2.Error as e:
         print("Error updating processed timestamp:", e)
 
