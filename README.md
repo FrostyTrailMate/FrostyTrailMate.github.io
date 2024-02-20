@@ -39,10 +39,11 @@ Project Overview (in the order of operation)
    - Results by elevation interval (results)
    - Spatial Reference Systems (spatial_ref_sys). Installed by PostGIS.
 7. Output
-   - Create a webpage for visual display
-   - Display results in a table
-   - Display results in a map
-   - Display results in a graph
+   - Create a webpage for visual display using JavaScript React and Node.js.
+   - Create a FLask web application that serves an API endpoint (/api/results) to fetch data from a PostgreSQL database table (results). The data is retrieved and returned as JSON format through the API endpoint when a GET request received.
+   - Create a table at the website that display the most relevant fields of the table served at the API endpoint.
+   - Display results in an interactive geojson map (Polygon Layer: Snow Coverage % per Altitude; Polyline Layer: Hiking Trails at Yosemite's)
+   - Create a graph to display the relation between the altitude and the % of snow coverage.
  
 
  
