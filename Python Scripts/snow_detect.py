@@ -29,7 +29,7 @@ def connect_to_db():
 def update_processed_timestamp(conn):
     try:
         cursor = conn.cursor()
-        cursor.execute("UPDATE sar_raw SET processed = %s", current_datetime)
+        cursor.execute("UPDATE sar_raw SET processed = %s WHERE processed IS NULL", (current_datetime,))
         conn.commit()
         cursor.close()
         print("Processed timestamp updated in sar_raw table.")
@@ -47,6 +47,10 @@ def process_points_and_raster(conn):
         rows = cursor.fetchall()
         num_rasters = len(rows)
         raster_count = 0
+
+        if not rows:
+            print("No raster images found to process.")
+            return
 
         for row in rows:
             raster_count += 1
