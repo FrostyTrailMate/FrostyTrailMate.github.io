@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './CCStyles/MapComponent.css'; // Import external CSS file
@@ -15,6 +15,12 @@ const MapComponent = () => {
 
   const handleElevationToggle = () => {
     setShowElevation(!showElevation);
+  };
+
+  const onEachFeature = (feature, layer) => {
+    if (feature.properties && feature.properties.popupContent) {
+      layer.bindPopup(feature.properties.popupContent);
+    }
   };
 
   return (
@@ -49,11 +55,11 @@ const MapComponent = () => {
         />
 
         {showBoundary && (
-          <GeoJSON data={YosemiteBoundary} />
+          <GeoJSON data={YosemiteBoundary} onEachFeature={onEachFeature} />
         )}
 
         {showElevation && (
-          <GeoJSON data={ElevationPolygons} />
+          <GeoJSON data={ElevationPolygons} onEachFeature={onEachFeature} />
         )}
       </MapContainer>
     </div>
