@@ -12,6 +12,9 @@ password = 'admin'
 host = 'DESKTOP-UIUIA2A'
 port = '5432'
 
+# Generate datetime for processed timestamp
+current_datetime = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+
 # Function to connect to PostgreSQL
 def connect_to_db():
     try:
@@ -26,7 +29,7 @@ def connect_to_db():
 def update_processed_timestamp(conn):
     try:
         cursor = conn.cursor()
-        cursor.execute("UPDATE sar_raw SET processed = %s", (datetime.now(),))
+        cursor.execute("UPDATE sar_raw SET processed = %s", current_datetime)
         conn.commit()
         cursor.close()
         print("Processed timestamp updated in sar_raw table.")
@@ -91,7 +94,7 @@ def process_points_and_raster(conn):
                     # Step 7: Write results to results table
                     print(f"Writing results for elevation interval {interval_start}-{interval_end}...", end='\r')
                     cursor.execute("INSERT INTO results (elevation, coverage_percentage, ddatetime, total_points, detected_points, area_name) VALUES (%s, %s, %s, %s, %s, %s)",
-                                   (f"{interval_start}-{interval_end}", round(coverage_percentage, 2), datetime.now().strftime("%Y/%m/%d %H:00"), total_points, detected_points, 'Yosemite'))
+                                   (f"{interval_start}-{interval_end}", round(coverage_percentage, 2), current_datetime, total_points, detected_points, 'Yosemite'))
 
                     conn.commit()
 
