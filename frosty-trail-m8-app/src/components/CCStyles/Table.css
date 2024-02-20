@@ -1,7 +1,7 @@
 /* Styles for the container holding the table */
 .tablecontainer {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
   padding: 40px;
   background-color: #333; /* Dark background color */
@@ -11,6 +11,9 @@
 .scrollable-table {
   max-height: 300px; /* Adjust the maximum height as needed */
   overflow-y: auto;
+  /* Customize scrollbar */
+  scrollbar-width: auto; 
+  scrollbar-color: #7a7a7a #2e2e2e; /* Darker color for thumb and track */
 }
 
 /* Style for the table */
@@ -47,6 +50,17 @@ td {
   border-left: 1px solid rgb(167, 167, 167);
   border-right: 1px solid rgb(167, 167, 167);
 }
+
+/* Style for the scrollbar thumb */
+.scrollable-table::-webkit-scrollbar-thumb {
+  background-color: #555; /* Darker color for the thumb */
+}
+
+/* Style for the scrollbar track */
+.scrollable-table::-webkit-scrollbar-track {
+  background-color: #333; /* Dark background color for the track */
+}
+
 
 
 
