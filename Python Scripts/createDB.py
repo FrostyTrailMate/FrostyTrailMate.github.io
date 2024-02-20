@@ -1,4 +1,8 @@
 from sqlalchemy import create_engine, MetaData, text
+import os
+import shutil
+
+print("Running createDB.py...")
 
 # Database connection parameters
 dbname = 'FTM8'
@@ -94,3 +98,26 @@ except Exception as e:
 # Close connection
 conn.commit()
 conn.close()
+print("Database connection closed.")
+
+# Clear contents of the 'Output' folder
+output_folder = 'Outputs'
+try:
+    shutil.rmtree(output_folder)
+    print(f"Contents of '{output_folder}' cleared successfully.")
+except FileNotFoundError:
+    pass
+except Exception as e:
+    print("Error clearing contents of 'Output' folder:", e)
+
+# Recreate subfolders
+subfolders = ['DEM', 'Samples', 'SAR', os.path.join('SAR', 'temp')]
+try:
+    os.makedirs(output_folder, exist_ok=True)
+    for folder in subfolders:
+        os.makedirs(os.path.join(output_folder, folder), exist_ok=True)
+    print("Output subfolders created successfully.")
+except Exception as e:
+    print("Error creating subfolders:", e)
+
+print("createDB.py completed.")

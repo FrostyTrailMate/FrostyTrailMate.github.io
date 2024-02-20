@@ -6,6 +6,8 @@ from rasterio.warp import reproject, calculate_default_transform, Resampling
 from rasterio.mask import mask
 from zipfile import ZipFile
 
+print("Running DEM.py...")
+
 def download_dem(api_token, polygon_zipfile, output_folder):
     """
     Download Digital Elevation Model (DEM) data from OpenTopography within the bounding box defined by the provided polygon.
@@ -115,3 +117,5 @@ os.makedirs(output_folder, exist_ok=True)
 
 # Download DEM data
 download_dem(api_token, polygon_zipfile, output_folder)
+
+print("DEM.py completed.")

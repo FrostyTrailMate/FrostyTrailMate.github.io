@@ -8,6 +8,9 @@ from shapely.ops import unary_union
 import os
 import geopandas as gpd
 import math
+import rasterio.features
+
+print("Running strata.py...")
 
 # Connect to PostgreSQL
 def connect_to_postgres():
@@ -164,3 +167,6 @@ if __name__ == "__main__":
 
     # Main function call
     main(dem_file_path)
+
+
+print("strata.py completed.")

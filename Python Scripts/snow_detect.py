@@ -5,6 +5,8 @@ from shapely.geometry import Point
 from math import ceil
 from datetime import datetime
 
+print("Running snow_detect.py...")
+
 # Database connection parameters
 dbname = 'FTM8'
 user = 'postgres'
@@ -126,3 +128,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+print("snow_detect.py completed.")

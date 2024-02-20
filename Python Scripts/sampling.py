@@ -7,6 +7,8 @@ import pyproj
 import signal
 import sys
 
+print("Running sampling.py...")
+
 # Define a signal handler for interrupt (Ctrl+C)
 def signal_handler(sig, frame):
     print("\nWriting process interrupted. Rolling back changes...")
@@ -173,3 +175,5 @@ try:
     print("Points saved to shapefile successfully.")
 except Exception as e:
     print(f"Error saving points to shapefile: {e}")
+
+print("sampling.py completed.")

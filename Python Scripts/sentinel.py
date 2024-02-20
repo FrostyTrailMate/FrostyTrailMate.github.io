@@ -14,10 +14,10 @@ import psycopg2
 import shutil
 import time
 
-interrupted = False
+print("Running sentinel.py...")
 
 # Signal handler function to handle interrupt signal (Ctrl+C)
-
+interrupted = False
 def signal_handler(sig, frame):
     """Signal handler function to handle interrupt signal (Ctrl+C) during the downloads process.
 
@@ -142,7 +142,7 @@ def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
         None
     """
     global interrupted
-    sys.stdout.write(f"\rRequesting sub-box {index+1}/{len(sub_bbox_list)}...")
+    sys.stdout.write(f"\rRequesting sub-box {index+1}/{len(sub_bbox_list)}..."), sys.stdout.flush()
     sys.stdout.flush()
 
     # Check if the process is interrupted
@@ -338,3 +338,5 @@ import shutil
 shutil.rmtree('Outputs/SAR/temp', ignore_errors=True)
 os.makedirs('Outputs/SAR/temp', exist_ok=True)
 print("Temporary raster files cleared.")
+
+print("sentinel.py completed.")
