@@ -12,6 +12,9 @@ password = 'admin'
 host = 'DESKTOP-UIUIA2A'
 port = '5432'
 
+# Generate datetime for processed timestamp
+current_datetime = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+
 # Function to connect to PostgreSQL
 def connect_to_db():
     try:
@@ -26,7 +29,7 @@ def connect_to_db():
 def update_processed_timestamp(conn):
     try:
         cursor = conn.cursor()
-        cursor.execute("UPDATE sar_raw SET processed = %s", (datetime.now(),))
+        cursor.execute("UPDATE sar_raw SET processed = %s", current_datetime)
         conn.commit()
         cursor.close()
         print("Processed timestamp updated in sar_raw table.")
@@ -38,7 +41,7 @@ def process_points_and_raster(conn):
     try:
         cursor = conn.cursor()
 
-        # Step 1: Iterate through rows in sar_raw table
+        # Iterate through rows in sar_raw table
         print("Finding raster images to process...")
         cursor.execute("SELECT path FROM sar_raw WHERE processed IS NULL")
         rows = cursor.fetchall()
@@ -52,7 +55,7 @@ def process_points_and_raster(conn):
 
             # Open raster file and project to EPSG:4326
             with rasterio.open(raster_path) as src:
-                # Step 2: Access sample points from samples table
+                # Access sample points from samples table
                 cursor.execute("SELECT point_geom, elevation FROM samples")
                 sample_rows = cursor.fetchall()
                 num_samples = len(sample_rows)
@@ -67,31 +70,31 @@ def process_points_and_raster(conn):
                     total_points = 0
                     detected_points = 0
 
-                    # Step 5: Count total points within elevation strata
+                    # Count total points within elevation strata
                     for sample_row in sample_rows:
                         sample_count += 1
                         point_geom = loads(sample_row[0], hex=True)
                         if interval_start <= sample_row[1] < interval_end:
                             total_points += 1
 
-                            # Step 3: Get corresponding value from raster
+                            # Get corresponding value from raster
                             row, col = src.index(point_geom.x, point_geom.y)
                             value = src.read(1, window=((row, row+1), (col, col+1)))
 
-                            # Step 5.1: Count points within pixel value range
+                            # Count points within pixel value range
                             if -15 <= value <= -10:
                                 detected_points += 1
 
-                    # Step 6: Calculate coverage percentage
+                    # Calculate coverage percentage
                     if total_points > 0:
                         coverage_percentage = (detected_points / total_points) * 100
                     else:
                         coverage_percentage = 0
 
-                    # Step 7: Write results to results table
+                    # Write results to results table
                     print(f"Writing results for elevation interval {interval_start}-{interval_end}...", end='\r')
                     cursor.execute("INSERT INTO results (elevation, coverage_percentage, ddatetime, total_points, detected_points, area_name) VALUES (%s, %s, %s, %s, %s, %s)",
-                                   (f"{interval_start}-{interval_end}", round(coverage_percentage, 2), datetime.now().strftime("%Y/%m/%d %H:00"), total_points, detected_points, 'Yosemite'))
+                                   (f"{interval_start}-{interval_end}", round(coverage_percentage, 2), current_datetime, total_points, detected_points, 'Yosemite'))
 
                     conn.commit()
 

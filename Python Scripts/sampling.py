@@ -159,7 +159,7 @@ finally:
     conn.close()  # Close the database connection regardless of the outcome
 
 
-
+# Create a shapefile for testing purposes
 # Create a GeoDataFrame from the points
 point_geoms = [Point(p.x, p.y) for p in points]
 points_gdf = gpd.GeoDataFrame(geometry=point_geoms, crs=gdf.crs)
