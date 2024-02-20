@@ -3,17 +3,19 @@
   display: flex;
   justify-content: left;
   align-items: center;
-  padding: 40px;
+  padding: 20px;
+  padding-left: 135px; /* Additional padding on the left side */
   background-color: #333; /* Dark background color */
 }
 
 /* Style for the scrollable table container */
 .scrollable-table {
-  max-height: 300px; /* Adjust the maximum height as needed */
+  max-height: 400px; /* Adjust the maximum height as needed */
   overflow-y: auto;
   /* Customize scrollbar */
   scrollbar-width: auto; 
   scrollbar-color: #7a7a7a #2e2e2e; /* Darker color for thumb and track */
+  border-radius: 20px; /* Add border-radius for rounded edges */
 }
 
 /* Style for the table */
@@ -31,6 +33,7 @@ th {
   text-align: center;
   border-left: 1px solid rgb(167, 167, 167);
   border-right: 1px solid rgb(167, 167, 167);
+  
 }
 
 tr:nth-child(even) {

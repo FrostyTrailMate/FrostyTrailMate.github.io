@@ -2,19 +2,31 @@ import React, { useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './CCStyles/MapComponent.css'; // Import external CSS file
-import YosemiteBoundary from './geojsons/YosemiteBoundary.json'; // Import GeoJSON data file
+import TrailsYosemite from './geojsons/trails.json'; // Import GeoJSON data file
 import ElevationPolygons from './geojsons/ElevationPolygons.json'; // Import GeoJSON data file for ElevationPolygons
 
 const MapComponent = () => {
-  const [showBoundary, setShowBoundary] = useState(true);
+  const [showTrails, setShowTrails] = useState(true);
   const [showElevation, setShowElevation] = useState(true);
 
-  const handleBoundaryToggle = () => {
-    setShowBoundary(!showBoundary);
+  const handleTrailsToggle = () => {
+    setShowTrails(!showTrails);
   };
 
   const handleElevationToggle = () => {
     setShowElevation(!showElevation);
+  };
+
+  const purpleTrailStyle = {
+    color: '#A348B2', // Light purple color
+    weight: 1.2, // Adjust the weight of the trail
+  };
+
+  const lightBluePolygonStyle = {
+    fillColor: '#add8e6', // Light blue color
+    color: '#555', // Grey color for contour lines
+    weight: 0.5, // Adjust the weight of the polygon
+    fillOpacity: 0.2,
   };
 
   const onEachFeature = (feature, layer) => {
@@ -29,8 +41,8 @@ const MapComponent = () => {
         <label className="toggle-label">
           <input
             type="checkbox"
-            checked={showBoundary}
-            onChange={handleBoundaryToggle}
+            checked={showTrails}
+            onChange={handleTrailsToggle}
           />
           <span className="toggle-text">Hiking Trails</span>
         </label>
@@ -54,12 +66,12 @@ const MapComponent = () => {
           attribution="© Thunderforest by Gravitystorm Limited."
         />
 
-        {showBoundary && (
-          <GeoJSON data={YosemiteBoundary} onEachFeature={onEachFeature} />
+        {showElevation && (
+          <GeoJSON data={ElevationPolygons} style={lightBluePolygonStyle} onEachFeature={onEachFeature} />
         )}
 
-        {showElevation && (
-          <GeoJSON data={ElevationPolygons} onEachFeature={onEachFeature} />
+        {showTrails && (
+          <GeoJSON data={TrailsYosemite} style={purpleTrailStyle} onEachFeature={onEachFeature} />
         )}
       </MapContainer>
     </div>
@@ -67,3 +79,8 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
+
+
+
+
+
