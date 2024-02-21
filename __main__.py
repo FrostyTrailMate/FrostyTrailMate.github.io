@@ -2,12 +2,12 @@ import multiprocessing
 import subprocess
 
 def run_script(script_path):
- """
-    Run a ordenated Python script.
+    """
+        Run a ordenated Python script.
 
-    Args:
-        script_path (str): The path to the Python script to be executed.
-"""
+        Args:
+            script_path (str): The path to the Python script to be executed.
+    """
     subprocess.run(["python", script_path])
 
 if __name__ == "__main__":

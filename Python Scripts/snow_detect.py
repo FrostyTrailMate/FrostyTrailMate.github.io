@@ -19,13 +19,13 @@ current_datetime = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
 # Function to connect to PostgreSQL
 def connect_to_db():
-"""
-    Connect to the PostgreSQL database.
+    """
+        Connect to the PostgreSQL database.
 
-    Returns:
-        psycopg2.connection: A connection object representing the connection to the database.
-        None: If connection cannot be established.
-"""
+        Returns:
+            psycopg2.connection: A connection object representing the connection to the database.
+            None: If connection cannot be established.
+    """
     try:
         print("Connecting to PostgreSQL database...")
         conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
@@ -36,12 +36,12 @@ def connect_to_db():
 
 # Function to update processed timestamp in sar_raw table
 def update_processed_timestamp(conn):
-"""
-    Update the processed timestamp in the sar_raw table.
+    """
+        Update the processed timestamp in the sar_raw table.
 
-    Args:
-        conn (psycopg2.connection): A connection object representing the connection to the database.
-"""
+        Args:
+            conn (psycopg2.connection): A connection object representing the connection to the database.
+    """
     try:
         cursor = conn.cursor()
         cursor.execute("UPDATE sar_raw SET processed = %s WHERE processed IS NULL", (current_datetime,))
@@ -53,12 +53,12 @@ def update_processed_timestamp(conn):
 
 # Function to process points and raster
 def process_points_and_raster(conn):
- """
-    Process points and raster images.
+    """
+        Process points and raster images.
 
-    Args:
-        conn (psycopg2.connection): A connection object representing the connection to the database.
-"""
+        Args:
+            conn (psycopg2.connection): A connection object representing the connection to the database.
+    """
     try:
         cursor = conn.cursor()
 
@@ -131,9 +131,9 @@ def process_points_and_raster(conn):
     cursor.close()
 
 def main():
-"""
-    Main function to execute the program.
-"""
+    """
+        Main function to execute the program.
+    """
     # Connect to PostgreSQL
     conn = connect_to_db()
     if conn is None:
