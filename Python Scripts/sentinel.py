@@ -48,9 +48,9 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 # Your client credentials
-client_id = 'cbd68adc-23e6-4bbe-8f88-f3c91ca41577'
-client_secret = '7HZvJmQ4jMlf6qWBDAHXzVa61KMURvYU'
-instance_id = 'b9f75161-ea60-44d4-879b-e848292c80a7'
+client_id = '067e0f22-16bb-4046-9a2d-ce59c7344beb' # Carolina's Client ID
+client_secret = '36769b45-a4b5-4172-9281-27e7dd69867a' # Carolina's Client Secret
+instance_id = 'h3cQpRZyfMiBZp8fsjpcdpLrR4dH8dPx' # Carolina's instance ID
 
 # Set up Sentinel Hub configuration
 print("Setting up Sentinel Hub configuration...")
