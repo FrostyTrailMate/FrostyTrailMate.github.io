@@ -11,13 +11,13 @@ print("Running sampling.py...")
 
 # Define a signal handler for interrupt (Ctrl+C)
 def signal_handler(sig, frame):
-"""
+    """
     Signal handler for interrupt (Ctrl+C).
 
     Args:
         sig: Signal number.
         frame: Current stack frame.
-"""
+    """
     print("\nWriting process interrupted. Rolling back changes...")
     conn.rollback()  # Rollback the transaction to remove the added points
     conn.close()  # Close the database connection
