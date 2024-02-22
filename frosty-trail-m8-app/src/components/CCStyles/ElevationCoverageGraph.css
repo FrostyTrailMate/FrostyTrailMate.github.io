@@ -1,0 +1,20 @@
+.graph-container {
+    padding: 20px;
+    background-color: #1a1a1a; /* Dark background color */
+    border: 1px solid #444; /* Dark border */
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
+  }
+  
+  .graph-title {
+    font-size: 1.5rem;
+    color: #fff; /* White text color */
+    margin-bottom: 20px;
+  }
+  
+  .graph {
+    width: 100%;
+    height: 400px; /* Adjust height as needed */
+    border-radius: 10px; /* Rounded corners */
+  }
+  

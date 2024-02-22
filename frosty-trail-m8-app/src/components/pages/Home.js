@@ -1,6 +1,7 @@
 import React from 'react';
 import MapComponent from '../MapComponent';
 import ResultsTable from '../ResultsTable';
+import ElevationCoverageGraph from '../ElevationCoverageGraph'; // Import the graph component
 
 import 'react-datepicker/dist/react-datepicker.css';
 import '../CCStyles/HomeCover.css';
@@ -15,10 +16,12 @@ function Home() {
       </div>
       <MapComponent />
       <ResultsTable />
+      <ElevationCoverageGraph />
     </>
   );
 }
 
 export default Home;
+
 
 
