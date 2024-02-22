@@ -40,7 +40,7 @@ table_queries = [
     """,
     """
     CREATE EXTENSION IF NOT EXISTS postgis_raster;
-    """
+    """,
     
     # Drop and create tables
     """

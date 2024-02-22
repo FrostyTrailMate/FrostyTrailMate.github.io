@@ -27,11 +27,25 @@ metadata = MetaData()
 
 # Define table dropping and creation queries
 table_queries = [
+    
+    # Enable PostGIS extensions
+    """
+    CREATE EXTENSION IF NOT EXISTS postgis;
+    """,
+    """
+    CREATE EXTENSION IF NOT EXISTS adminpack;
+    """,
+    """
+    CREATE EXTENSION IF NOT EXISTS plpgsql;
+    """,
+    """
+    CREATE EXTENSION IF NOT EXISTS postgis_raster;
+    """,
     """
     DROP TABLE IF EXISTS public.sar_raw CASCADE;
     """,
     """
-    CREATE TABLE public.sar_raw (
+    CREATE TABLE public.requests (
         id SERIAL PRIMARY KEY, 
         datetime TIMESTAMP, 
         time_collected TIMESTAMP NOT NULL, 
@@ -49,7 +63,7 @@ table_queries = [
     CREATE TABLE public.samples (
         id SERIAL PRIMARY KEY,
         datetime TIMESTAMP NOT NULL,
-        area VARCHAR NOT NULL,
+        area VARCHAR NOT NULL FOREIGN KEY REFERENCES public.sar_raw(sArea),
         point_geom GEOMETRY(POINT, 4326) NOT NULL,
         elevation FLOAT NOT NULL,
         shapefile_path VARCHAR NOT NULL
