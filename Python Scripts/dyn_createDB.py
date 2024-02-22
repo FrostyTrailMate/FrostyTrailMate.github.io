@@ -27,22 +27,6 @@ metadata = MetaData()
 
 # Define table dropping and creation queries
 table_queries = [
-    
-    # Enable PostGIS extensions
-    """
-    CREATE EXTENSION IF NOT EXISTS postgis;
-    """,
-    """
-    CREATE EXTENSION IF NOT EXISTS adminpack;
-    """,
-    """
-    CREATE EXTENSION IF NOT EXISTS plpgsql;
-    """,
-    """
-    CREATE EXTENSION IF NOT EXISTS postgis_raster;
-    """
-    
-    # Drop and create tables
     """
     DROP TABLE IF EXISTS public.sar_raw CASCADE;
     """,
@@ -105,17 +89,6 @@ table_queries = [
         ddatetime TIMESTAMP NOT NULL,
         detected_points INT NOT NULL,
         total_points INT NOT NULL
-    );
-    """,
-    """
-    DROP TABLE IF EXISTS public.userpolygon CASCADE;
-    """,
-    """
-    CREATE TABLE IF NOT EXISTS userpolygons (
-    ID_polygon SERIAL PRIMARY KEY,
-    geom GEOMETRY(POLYGON, 4326), -- 4326 is the SRID for WGS 84 coordinate system, adjust as per your requirements
-    name VARCHAR(20), -- New string field with max length of 20 characters
-    stampdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """
 ]
