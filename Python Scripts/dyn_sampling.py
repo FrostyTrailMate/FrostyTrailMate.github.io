@@ -70,6 +70,22 @@ def parse_args():
 # Load command-line arguments
 args = parse_args()
 
+# Connect to PostgreSQL database
+print("Connecting to PostgreSQL database...")
+try:
+    conn = psycopg2.connect(
+        dbname="FTM8_dyn",
+        user="postgres",
+        password="admin",
+        host="DESKTOP-UIUIA2A",
+        port="5432"
+    )
+    cur = conn.cursor()
+    print("Connected to PostgreSQL database.")
+except Exception as e:
+    print(f"Error connecting to PostgreSQL database: {e}")
+    sys.exit(1)
+
 # Load the shapefile or bounding box coordinates
 if args.shapefile:
     shapefile_path = args.shapefile
@@ -85,9 +101,22 @@ elif args.coordinates:
     gdf = gpd.GeoDataFrame(geometry=[polygon], crs='EPSG:4326')
     shapefile_path = None
 
+# Query database for DEM file path
+try:
+    cur.execute("SELECT dem_processed FROM userpolygons WHERE area_name = %s", (args.name,))
+    result = cur.fetchone()
+    if result:
+        dem_file_path = result[0]
+        print("DEM file path retrieved from the database:", dem_file_path)
+    else:
+        print("DEM file path not found in the database.")
+        sys.exit(1)
+except Exception as e:
+    print(f"Error querying database for DEM file path: {e}")
+    sys.exit(1)
+
 # Load the raster DEM
 print("Loading DEM...")
-dem_file_path = 'Outputs/DEM/Yosemite_DEM_clipped.tif'
 try:
     dem_dataset = rasterio.open(dem_file_path)
     print("DEM loaded successfully.")
@@ -112,7 +141,7 @@ def generate_points_within_polygon(polygon, spacing):
     Note:
     - The function iterates over the bounding box of the polygon and generates points within it at the specified spacing.
     - Points are included in the output list only if they fall within the polygon boundary.
-    - The generated points are evenly spaced within the polygon, but the actual distance between points may vary due to the irregular shape of the polygon.
+    - The generated points are evenly spaced within the polygon, but the actual distance between points may vary with irregular polygon shapes.
     """
     minx, miny, maxx, maxy = polygon.bounds
     points = []
@@ -138,22 +167,6 @@ for index, row in gdf.iterrows():
     points.extend(points_within_polygon)
 
 print(f"{len(points)} points generated.")
-
-# Connect to PostgreSQL database
-print("Connecting to PostgreSQL database...")
-try:
-    conn = psycopg2.connect(
-        dbname="FTM8",
-        user="postgres",
-        password="admin",
-        host="DESKTOP-UIUIA2A",
-        port="5432"
-    )
-    cur = conn.cursor()
-    print("Connected to PostgreSQL database.")
-except Exception as e:
-    print(f"Error connecting to PostgreSQL database: {e}")
-    sys.exit(1)
 
 # Insert data into the database
 print("Inserting data into the database...")

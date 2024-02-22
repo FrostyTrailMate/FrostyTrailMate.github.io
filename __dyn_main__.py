@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import multiprocessing
 import subprocess
 
@@ -17,12 +17,21 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--start-date', default=six_days_ago(), help='Start date for image collection (default: 6 days ago)')
     parser.add_argument('-e', '--end-date', default=now(), help='End date for image collection (default: now)')
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-c', '--coordinates', nargs=4, type=float, help='Coordinates for bounding box: xmin ymin xmax ymax')
-    group.add_argument('-p', '--shapefile-path', help='Path to a shapefile')
-    parser.add_argument('-n', '--search-area-name', required=True, help='Name of the search area')
-    parser.add_argument('-d', '--sampling-distance', type=float, default=0.005, help='Distance between sampling points (default: 0.005)')
+    group.add_argument('-c', '--coordinates', nargs=4, type=float, help='Coordinates for bounding box: xmin ymin xmax ymax. Must be in WGS84 (EPSG:4326).')
+    group.add_argument('-p', '--shapefile-path', help='Path to a shapefile of a study area. Must be in WGS84 (EPSG:4326).')
+    parser.add_argument('-n', '--search-area-name', required=True, help='Unique name to give the search area')
+    parser.add_argument('-d', '--sampling-distance', type=float, default=0.005, help='Distance between sampling points (default: 0.005 (~500 meters))')
 
     args = parser.parse_args()
+
+    # Date Handling
+    try:
+        start_date = datetime.strptime(args.start_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+        end_date = datetime.strptime(args.end_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+    except ValueError:
+        print("Error: Invalid date format. Please use YYYY-MM-DD")
+        exit(1)
+
 
     # Create the database and tables
     subprocess.run(["python", "Python Scripts/createDB.py"])

@@ -1,0 +1,156 @@
+import psycopg2
+import rasterio
+from shapely.wkb import loads
+from shapely.geometry import Point
+from math import ceil
+from datetime import datetime
+
+print("Running snow_detect.py...")
+
+# Database connection parameters
+dbname = 'FTM8_dyn'
+user = 'postgres'
+password = 'admin'
+host = 'DESKTOP-UIUIA2A'
+port = '5432'
+
+# Generate datetime for processed timestamp
+current_datetime = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+
+# Function to connect to PostgreSQL
+def connect_to_db():
+    """
+    Connect to the PostgreSQL database.
+
+    Returns:
+        psycopg2.connection: A connection object representing the connection to the database.
+        None: If connection cannot be established.
+    """
+    try:
+        print("Connecting to PostgreSQL database...")
+        conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
+        return conn
+    except psycopg2.Error as e:
+        print("Error connecting to PostgreSQL database:", e)
+        return None
+
+# Function to update processed timestamp in userpolygons table
+def update_processed_timestamp(conn):
+    """
+    Update the processed timestamp in the userpolygons table.
+
+    Args:
+        conn (psycopg2.connection): A connection object representing the connection to the database.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE userpolygons SET sar_processed = %s WHERE processed IS NULL", (current_datetime,))
+        conn.commit()
+        cursor.close()
+        print("Process completed. Exiting.")
+    except psycopg2.Error as e:
+        print("Error updating processed timestamp:", e)
+
+# Function to process points and raster
+def process_points_and_raster(conn):
+    """
+    Process points and raster images.
+
+    Args:
+        conn (psycopg2.connection): A connection object representing the connection to the database.
+    """
+    try:
+        cursor = conn.cursor()
+
+        # Iterate through rows in userpolygons table
+        print("Finding raster images to process...")
+        cursor.execute("SELECT sar_path FROM userpolygons WHERE sar_processed IS NULL")
+        rows = cursor.fetchall()
+        num_rasters = len(rows)
+        raster_count = 0
+
+        if not rows:
+            print("No raster images found to process.")
+            return
+
+        for row in rows:
+            raster_count += 1
+            raster_path = row[0]
+            print(f"Processing raster {raster_count}/{num_rasters}:", raster_path, end="\r")
+
+            # Open raster file and project to EPSG:4326
+            with rasterio.open(raster_path) as src:
+                # Access sample points from samples table
+                cursor.execute("SELECT point_geom, elevation FROM samples")
+                sample_rows = cursor.fetchall()
+                num_samples = len(sample_rows)
+                sample_count = 0
+                print(f"Found {num_samples} sample points.")
+
+                max_elevation = max([row[1] for row in sample_rows])
+                print(f"Max elevation: {max_elevation}")
+                elevation_intervals = list(range(0, ceil(max_elevation / 100) * 100, 100))
+
+                for interval_start, interval_end in zip(elevation_intervals, elevation_intervals[1:]):
+                    total_points = 0
+                    detected_points = 0
+
+                    # Count total points within elevation strata
+                    for sample_row in sample_rows:
+                        sample_count += 1
+                        point_geom = loads(sample_row[0], hex=True)
+                        if interval_start <= sample_row[1] < interval_end:
+                            total_points += 1
+
+                            # Get corresponding value from raster
+                            row, col = src.index(point_geom.x, point_geom.y)
+                            value = src.read(1, window=((row, row+1), (col, col+1)))
+
+                            # Count points within pixel value range
+                            if -15 <= value <= -10:
+                                detected_points += 1
+
+                    # Calculate coverage percentage
+                    if total_points > 0:
+                        coverage_percentage = (detected_points / total_points) * 100
+                    else:
+                        coverage_percentage = 0
+
+                    # Write results to results table
+                    print(f"Writing results for elevation interval {interval_start}-{interval_end}...", end='\r')
+                    cursor.execute("INSERT INTO results (elevation, coverage_percentage, ddatetime, total_points, detected_points, area_name) VALUES (%s, %s, %s, %s, %s, %s)",
+                                   (f"{interval_start}-{interval_end}", round(coverage_percentage, 2), current_datetime, total_points, detected_points, 'Yosemite'))
+
+                    conn.commit()
+
+                print(f"Processed {sample_count} sample points for raster {raster_count}/{num_rasters}.")
+            print(f"Raster {raster_count}/{num_rasters} processing complete.")
+    except psycopg2.Error as e:
+        print("Error processing points and raster:", e)
+
+    cursor.close()
+
+def main():
+    """
+    Main function to execute the program.
+    """
+    # Connect to PostgreSQL
+    conn = connect_to_db()
+    if conn is None:
+        return
+
+    # Process points and raster
+    process_points_and_raster(conn)
+
+    # Update processed timestamp
+    update_processed_timestamp(conn)
+
+    # Close database connection
+    conn.close()
+
+if __name__ == "__main__":
+    main()
+
+print("snow_detect.py completed.")
+
+

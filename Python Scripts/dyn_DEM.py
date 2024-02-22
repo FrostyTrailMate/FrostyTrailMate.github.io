@@ -6,8 +6,9 @@ from rasterio.warp import reproject, calculate_default_transform, Resampling
 from rasterio.mask import mask
 import argparse
 from shapely.geometry import Polygon
+import psycopg2
 
-def download_dem(api_token, envelope, output_folder):
+def download_dem(api_token, envelope, output_folder, area_name, conn):
     """
     Download Digital Elevation Model (DEM) data from OpenTopography within the bounding box defined by the provided envelope.
 
@@ -15,6 +16,8 @@ def download_dem(api_token, envelope, output_folder):
         api_token (str): The API token required to access OpenTopography services.
         envelope (GeoSeries): GeoSeries representing the envelope of the search area.
         output_folder (str): The directory where the downloaded DEM and clipped DEM files will be saved.
+        area_name (str): Name of the search area.
+        conn: psycopg2 connection object for database operations.
 
     Returns:
         None
@@ -31,52 +34,36 @@ def download_dem(api_token, envelope, output_folder):
         response = requests.get(url, stream=True)
 
         if response.status_code == 200:
-            dem_file = os.path.join(output_folder, 'Yosemite_DEM.tif')
-            with open(dem_file, 'wb') as f:
+            dem_downloaded_file = os.path.join(output_folder, f'{area_name}_DEM_raw.tif')
+            with open(dem_downloaded_file, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     if chunk:
                         f.write(chunk)
             print("DEM data downloaded successfully.")
 
-            # Reprojecting DEM data to EPSG:4326
-            dem_reprojected_file = os.path.join(output_folder, 'Yosemite_DEM_reprojected.tif')
-            with rasterio.open(dem_file) as src:
-                transform, width, height = calculate_default_transform(
-                    src.crs, {'init': 'EPSG:4326'}, src.width, src.height, *src.bounds)
-                kwargs = src.meta.copy()
-                kwargs.update({
-                    'crs': 'EPSG:4326',
-                    'transform': transform,
-                    'width': width,
-                    'height': height
-                })
-
-                with rasterio.open(dem_reprojected_file, 'w', **kwargs) as dst:
-                    for i in range(1, src.count + 1):
-                        reproject(
-                            source=rasterio.band(src, i),
-                            destination=rasterio.band(dst, i),
-                            src_transform=src.transform,
-                            src_crs=src.crs,
-                            dst_transform=transform,
-                            dst_crs={'init': 'EPSG:4326'},
-                            resampling=Resampling.nearest)
-
-            # Clip reprojected DEM to shapefile boundary
-            dem_clipped_file = os.path.join(output_folder, 'Yosemite_DEM_clipped.tif')
-            with rasterio.open(dem_reprojected_file) as src:
+            # Clip downloaded DEM to envelope boundary
+            dem_clipped_file = os.path.join(output_folder, f'{area_name}_DEM_4326.tif')
+            with rasterio.open(dem_downloaded_file) as src:
                 out_image, out_transform = mask(src, envelope.geometry, crop=True)
                 out_meta = src.meta.copy()
 
                 out_meta.update({"driver": "GTiff",
                                  "height": out_image.shape[1],
                                  "width": out_image.shape[2],
-                                 "transform": out_transform})
+                                 "transform": out_transform,
+                                 "crs": 'EPSG:4326'})
 
                 with rasterio.open(dem_clipped_file, "w", **out_meta) as dest:
                     dest.write(out_image)
 
-            print("DEM data reprojected, clipped, and saved successfully.")
+            print("DEM data clipped and saved successfully.")
+
+            # Save paths to database
+            with conn.cursor() as cur:
+                cur.execute("INSERT INTO userpolygons (area_name, dem_path, dem_processed) VALUES (%s, %s, %s)",
+                            (area_name, dem_downloaded_file, dem_clipped_file))
+                conn.commit()
+
         else:
             print(f"Failed to download DEM data. Status code: {response.status_code}")
 
@@ -84,32 +71,38 @@ def download_dem(api_token, envelope, output_folder):
         print(f"Error occurred: {e}")
 
 
-
 def main():
     parser = argparse.ArgumentParser(description='Download DEM data from OpenTopography.')
     parser.add_argument('-n', '--name', type=str, help='Name of the search area', required=True)
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-c', '--coordinates', type=float, nargs=4, help='Bounding box coordinates (xmin, ymin, xmax, ymax)')
-    group.add_argument('-p', '--path', type=str, help='Relative path to a shapefile')
-
+    parser.add_argument('-c', '--coordinates', type=float, nargs=4, help='Bounding box coordinates (xmin, ymin, xmax, ymax)')
     args = parser.parse_args()
 
     if args.coordinates:
         xmin, ymin, xmax, ymax = args.coordinates
         envelope = gpd.GeoSeries([Polygon([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])])
     else:
-        shapefile_path = args.path
-        boundary = gpd.read_file(shapefile_path)
-        envelope = boundary.envelope
+        raise ValueError("Bounding box coordinates are required")
 
-    output_folder = f'Outputs/DEM_{args.name}'
+    output_folder = 'Outputs/DEM'
     os.makedirs(output_folder, exist_ok=True)
+
+    # Connect to PostgreSQL database
+    conn = psycopg2.connect(
+        dbname="FTM8_dyn",
+        user="postgres",
+        password="admin",
+        host="DESKTOP-UIUIA2A",
+        port="5432"
+    )
 
     # API token
     api_token = '8ff3b062b8621b8a71a957083bba09e0'
 
     # Download DEM data
-    download_dem(api_token, envelope, output_folder)
+    download_dem(api_token, envelope, output_folder, args.name, conn)
+
+    # Close database connection
+    conn.close()
 
     print("DEM.py completed.")
 
