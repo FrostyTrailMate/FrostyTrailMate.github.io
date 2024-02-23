@@ -32,27 +32,37 @@ if __name__ == "__main__":
         print("Error: Invalid date format. Please use YYYY-MM-DD")
         exit(1)
 
+    # Define common script arguments
+    common_args = ['-n', args.search_area_name]
 
-    # Create the database and tables
-    subprocess.run(["python", "Python Scripts/createDB.py"])
-
-    # Define the scripts to run in parallel
-    scripts_parallel = ['Python Scripts/DEM.py', 'Python Scripts/sentinel.py']
-
-    # Arguments to pass to scripts
-    script_args = ['-n', args.search_area_name]
+    coord_args =[]
     if args.coordinates:
-        script_args.extend(['-c', *[str(coord) for coord in args.coordinates]])
+        coord_args.extend(['-c', *[str(coord) for coord in args.coordinates]])
     elif args.shapefile_path:
-        script_args.extend(['-p', args.shapefile_path])
-    script_args.extend(['-d', str(args.sampling_distance)])
+        coord_args.extend(['-p', args.shapefile_path])
 
     # Run scripts in parallel
     with multiprocessing.Pool() as pool:
-        pool.starmap(run_script, [(script, script_args) for script in scripts_parallel])
+        # Run dyn_DEM.py
+        dem_args = common_args[:] + coord_args[:]
+        dem_process = pool.apply_async(run_script, ['Python Scripts/dyn_DEM.py', dem_args])
 
-    # Run the script to generate sample points
-    subprocess.run(["python", "Python Scripts/sampling.py", *script_args])
+        # Run dyn_sentinel.py
+        sentinel_args = common_args[:] + coord_args[:] + ['-s', args.start_date, '-e', args.end_date]
+        sentinel_process = pool.apply_async(run_script, ['Python Scripts/dyn_sentinel.py', sentinel_args])
 
-    # Run the snow detection script
-    subprocess.run(["python", "Python Scripts/snow_detect_strata.py", *script_args])
+        # Wait for DEM and Sentinel processes to finish
+        dem_process.get()
+        sentinel_process.get()
+
+        # Run dyn_sampling.py after DEM and Sentinel
+        sampling_args = common_args[:] + ['-d', str(args.sampling_distance)]
+        pool.apply(run_script, ['Python Scripts/dyn_sampling.py', sampling_args])
+
+        # Run dyn_snow_detect.py after dyn_sampling.py
+        snow_args = common_args[:]
+        pool.apply(run_script, ['Python Scripts/dyn_snow_detect.py', snow_args])
+
+        # Ensure all processes are finished before exiting
+        pool.close()
+        pool.join()
