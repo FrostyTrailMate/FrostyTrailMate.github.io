@@ -103,7 +103,6 @@ def process_points_and_raster(conn, area_name):
                     continue
 
                 max_elevation = max([row[1] for row in sample_rows])
-                print(f"Max elevation: {max_elevation}")
                 elevation_intervals = list(range(0, ceil(max_elevation / 100) * 100, 100))
 
                 for interval_start, interval_end in zip(elevation_intervals, elevation_intervals[1:]):
@@ -137,7 +136,7 @@ def process_points_and_raster(conn, area_name):
                                    (f"{interval_start}-{interval_end}", round(coverage_percentage, 2), current_datetime, total_points, detected_points, area_name))
 
                     conn.commit()
-                    
+
                 print(f"Processed {sample_count} sample points for raster {raster_count}/{num_rasters}.")
             print(f"Raster {raster_count}/{num_rasters} processing complete.")
     except psycopg2.Error as e:
