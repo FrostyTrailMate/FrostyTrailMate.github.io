@@ -14,8 +14,16 @@ import signal
 import psycopg2 
 import shutil
 import time
+import rasterio.warp
 
 print("Running sentinel.py...")
+
+# Function to clear the folder 'Outputs/SAR/temp'
+def clear_temp_folder():
+    """Clears the folder 'Outputs/SAR/temp' at the end of the script."""
+    shutil.rmtree('Outputs/SAR/temp', ignore_errors=True)
+    os.makedirs('Outputs/SAR/temp', exist_ok=True)
+    print("Temporary raster files cleared.")
 
 # Set up default dates
 def six_days_ago():
@@ -41,14 +49,6 @@ group.add_argument('-p', '--shapefile', type=str,
 
 args = parser.parse_args()
 
-# --- Date Handling ---
-#try:
-#    start_date = datetime.strptime(args.start_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
-#    end_date = datetime.strptime(args.end_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
-#except ValueError:
-#    print("Error: Invalid date format. Please use YYYY-MM-DD")
-#    exit(1)
-
 # Signal handler function to handle interrupt signal (Ctrl+C)
 interrupted = False
 
@@ -61,9 +61,7 @@ def signal_handler(sig, frame):
     # Clear the files within the 'Outputs/SAR/temp' folder
     temp_folder = 'Outputs/SAR/temp'
     try:
-        shutil.rmtree(temp_folder)
-        print("Temporary raster files cleared.")
-        os.makedirs(temp_folder, exist_ok=True)  # Recreate the empty directory
+        clear_temp_folder
     except Exception as e:
         print(f"Error clearing temporary files: {e}")
     sys.exit(0)
@@ -71,9 +69,9 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 # Your client credentials
-client_id = '81df2eab-5abf-48d8-9cb1-d682d83c2d04' # Carolina's Client ID
-client_secret = 'MZI1MGRIwvyillNAAspvliPK0FQl3CUL' # Carolina's Client Secret 
-instance_id = 'h3cQpRZyfMiBZp8fsjpcdpLrR4dH8dPx' 
+client_id = '81df2eab-5abf-48d8-9cb1-d682d83c2d04'
+client_secret = 'MZI1MGRIwvyillNAAspvliPK0FQl3CUL'
+instance_id = 'h3cQpRZyfMiBZp8fsjpcdpLrR4dH8dPx'
 
 # Set up Sentinel Hub configuration
 print("Setting up Sentinel Hub configuration...")
@@ -102,7 +100,7 @@ headers = {
     "Authorization": f"Bearer {token['access_token']}"
 }
 
-# --- Bounding Box Handling ---
+# Bounding Box Handling
 if args.coordinates:
     try:
         coords = [float(x) for x in args.coordinates]
@@ -224,6 +222,7 @@ def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
             request_image.get_data(save_data=True)
         except Exception as e:
             print(f"Error occurred while requesting sub-box {index+1}: {e}")
+            clear_temp_folder()
 
 # Function to download images for multiple sub-boxes using multithreading with interruption check
 def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
@@ -287,8 +286,11 @@ merged_image, out_trans = merge(image_files)
 merged_image_path = os.path.join('Outputs/SAR', f'{args.name}_merged.tiff')
 
 # Define the CRS for the merged image
-utm_zone, utm_hemisphere = utm_bbox.crs.get_utm_zone_hemisphere()  
-crs_string = f'+proj=utm +zone={utm_zone}{utm_hemisphere} +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
+utm_zone = (utm_bbox.crs.epsg % 100) if (utm_bbox.crs.epsg % 100 != 0) else 60
+ogc_string = utm_bbox.crs.ogc_string()
+utm_hemisphere = 'N' if '+north' in ogc_string else 'S'
+crs_string = f'+proj=utm +zone={utm_zone} +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
+print(f"CRS for the merged image: {crs_string}")
 
 
 with rasterio.open(merged_image_path, 'w', driver='GTiff', 
@@ -324,60 +326,64 @@ with rasterio.open(merged_image_path) as src:
                 dst_transform=transform,
                 dst_crs='EPSG:4326',
                 resampling=rasterio.enums.Resampling.nearest)
+    time.sleep(5)
 print("Reprojection completed. Merged image saved in WGS84 (EPSG:4326) format.")
 
-# Function to insert data into PostgreSQL database
-def insert_data_into_database(image_path, time_collected):
-    """Inserts data into PostgreSQL database.
+def update_database(image_path, time_collected, area_name):
+    """Updates the PostgreSQL database.
 
     Args:
         image_path (str): Path to the image file.
         time_collected (datetime): Timestamp indicating when the image was collected.
+        area_name (str): Name of the search area.
 
     Returns:
         None
     """
-    connection = psycopg2.connect(
-        user="postgres",
-        password="admin",
-        host="DESKTOP-UIUIA2A",
-        port="5432",
-        database="FTM8_dyn"
-    )
-
-    cursor = connection.cursor()
-    
-    # SQL query to insert data into the table
-    insert_query = "INSERT INTO userpolygons (sar_path, datetime) VALUES (%s, %s)"
-    
-    # Data to be inserted
-    record_to_insert = (image_path, time_collected)
-
     try:
+        connection = psycopg2.connect(
+            user="postgres",
+            password="admin",
+            host="DESKTOP-UIUIA2A",
+            port="5432",
+            database="FTM8_dyn"
+        )
+
+        cursor = connection.cursor()
+        
+        print("Connecting to database...")
+        time.sleep(5)
+
+        # SQL query to update data in the table
+        update_query = "UPDATE userpolygons SET sar_path = %s, datetime = %s WHERE area_name = %s"
+        
+        # Data to be updated
+        record_to_update = (image_path, time_collected, area_name)
+
         # Execute the SQL command
-        cursor.execute(insert_query, record_to_insert)
+        cursor.execute(update_query, record_to_update)
 
         # Commit your changes in the database
         connection.commit()
-        print("Data inserted successfully into PostgreSQL")
+        print("Data updated successfully in PostgreSQL")
 
     except (Exception, psycopg2.Error) as error:
-        print("Error while inserting data into PostgreSQL", error)
+        print("Error while updating data in PostgreSQL:", error)
 
     finally:
         # Closing database connection
         if connection:
+            connection.commit()
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
 
-# Insert data into PostgreSQL database
-insert_data_into_database(reprojected_image_path, datetime.now())
-
+# Update data in PostgreSQL database
+time_now = datetime.now()
+update_database(reprojected_image_path, time_now, args.name)
 
 # Clear the folder 'Outputs/SAR/temp' at the end of the script
-shutil.rmtree('Outputs/SAR/temp', ignore_errors=True)
-os.makedirs('Outputs/SAR/temp', exist_ok=True)
-print("Temporary raster files cleared.")
+
+clear_temp_folder()
 
 print("sentinel.py completed.")
