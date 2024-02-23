@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { XYPlot, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, LineSeries } from 'react-vis';
-import 'react-vis/dist/style.css'; // Import the default react-vis styles
-import './CCStyles/ElevationCoverageGraph.css'; // Import your custom CSS file
+import 'react-vis/dist/style.css';
+import './CCStyles/ElevationCoverageGraph.css';
 
 const ElevationCoverageGraph = () => {
     const [results, setResults] = useState([]);
@@ -18,26 +18,25 @@ const ElevationCoverageGraph = () => {
             });
     }, []);
 
-    // Extract coverage_percentage as x values
-    const coveragePercentages = results.map(result => result.coverage_percentage);
-
-    // Extract elevation values and parse the first number as integers
+    // Extract elevation as x values
     const elevations = results.map(result => {
         const elevationRange = result.elevation.split('-'); // Split the elevation range by '-'
         return parseInt(elevationRange[0]); // Extract the first number and parse it as an integer
     });
 
+    // Extract coverage_percentage as y values
+    const coveragePercentages = results.map(result => result.coverage_percentage);
+
     // Prepare data in format accepted by react-vis
-    const data = coveragePercentages.map((value, index) => ({ x: value, y: elevations[index] }));
+    const data = elevations.map((value, index) => ({ x: value, y: coveragePercentages[index] }));
 
     return (
         <div className="graph-container">
-            <h2 className="graph-title">Coverage Percentage vs. Elevation</h2>
-            <XYPlot className="graph" xType="linear" yType="linear">
+            <XYPlot width={600} height={400} xType="linear" yType="linear">
                 <HorizontalGridLines />
                 <VerticalGridLines />
-                <XAxis title="Coverage Percentage" />
-                <YAxis title="Elevation" />
+                <XAxis title="Elevation" />
+                <YAxis title="Coverage Percentage" />
                 <LineSeries data={data} />
             </XYPlot>
         </div>
@@ -45,7 +44,6 @@ const ElevationCoverageGraph = () => {
 };
 
 export default ElevationCoverageGraph;
-
 
 
 
