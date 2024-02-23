@@ -108,7 +108,7 @@ table_queries = [
     );
     """,
     """
-    DROP TABLE IF EXISTS public.userpolygon CASCADE;
+    DROP TABLE IF EXISTS public.userpolygons CASCADE;
     """,
     """
     CREATE TABLE IF NOT EXISTS userpolygons (

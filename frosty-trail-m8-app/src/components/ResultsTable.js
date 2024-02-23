@@ -24,6 +24,8 @@ const ResultsTable = () => {
                             <th> ELEVATION </th>
                             <th> SNOW COVERAGE (%) </th>
                             <th> DATE </th>
+                            <th> DETECTED POINTS </th>
+                            <th> TOTAL POINTS </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,6 +36,8 @@ const ResultsTable = () => {
                                 <td>{result.elevation}</td>
                                 <td>{result.coverage_percentage}</td>
                                 <td>{result.ddatetime}</td>
+                                <td>{result.detected_points}</td>
+                                <td>{result.total_points}</td>
                             </tr>
                         ))}
                     </tbody>

@@ -1,16 +1,15 @@
 /* Styles for the container holding the table */
 .tablecontainer {
   display: flex;
-  justify-content: left;
+  justify-content: center;
   align-items: center;
   padding: 20px;
-  padding-left: 135px; /* Additional padding on the left side */
-  background-color: #333; /* Dark background color */
+  background-color: #272727; /* Dark background color */
 }
 
 /* Style for the scrollable table container */
 .scrollable-table {
-  max-height: 400px; /* Adjust the maximum height as needed */
+  max-height: 450px; /* Adjust the maximum height as needed */
   overflow-y: auto;
   /* Customize scrollbar */
   scrollbar-width: auto; 

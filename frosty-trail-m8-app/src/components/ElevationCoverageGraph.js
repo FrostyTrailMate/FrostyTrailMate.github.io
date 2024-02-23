@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { XYPlot, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, LineSeries } from 'react-vis';
-import 'react-vis/dist/style.css';
-import './CCStyles/ElevationCoverageGraph.css';
+import './CCStyles/ElevationCoverageGraph.css'; // Import CSS file for dark theme
 
 const ElevationCoverageGraph = () => {
     const [results, setResults] = useState([]);
@@ -30,20 +29,56 @@ const ElevationCoverageGraph = () => {
     // Prepare data in format accepted by react-vis
     const data = elevations.map((value, index) => ({ x: value, y: coveragePercentages[index] }));
 
+    // Calculate trend line
+    const trendLineData = calculateTrendLine(data);
+
     return (
-        <div className="graph-container">
-            <XYPlot width={600} height={400} xType="linear" yType="linear">
+        <div className="graph-container-dark">
+            <div className="graph-title-dark">Elevation VS Snow Coverage </div>
+            <XYPlot className="react-vis-xy-plot-dark" width={1000} height={400} xType="linear" yType="linear">
                 <HorizontalGridLines />
                 <VerticalGridLines />
                 <XAxis title="Elevation" />
                 <YAxis title="Coverage Percentage" />
-                <LineSeries data={data} />
+                <LineSeries data={data} stroke="rgba(0, 255, 255, 0.971)" strokeWidth={3} />
+                <LineSeries data={trendLineData} stroke="#fff" strokeWidth={2} strokeDasharray="5,5" />
             </XYPlot>
         </div>
     );
 };
 
+// Function to calculate trend line
+function calculateTrendLine(data) {
+    // Simple linear regression
+    let xSum = 0;
+    let ySum = 0;
+    let xySum = 0;
+    let xSquaredSum = 0;
+    const n = data.length;
+
+    for (let i = 0; i < n; i++) {
+        xSum += data[i].x;
+        ySum += data[i].y;
+        xySum += data[i].x * data[i].y;
+        xSquaredSum += Math.pow(data[i].x, 2);
+    }
+
+    const m = (n * xySum - xSum * ySum) / (n * xSquaredSum - Math.pow(xSum, 2));
+    const b = (ySum - m * xSum) / n;
+
+    // Generate trend line data
+    const trendLineData = [];
+    for (let i = 0; i < n; i++) {
+        trendLineData.push({ x: data[i].x, y: m * data[i].x + b });
+    }
+
+    return trendLineData;
+}
+
 export default ElevationCoverageGraph;
+
+
+
 
 
 

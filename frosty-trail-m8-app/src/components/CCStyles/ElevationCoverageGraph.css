@@ -1,18 +1,41 @@
-.graph-container {
-    padding: 20px;
-    background-color: #333; /* Dark background color */
-  }
-  
-  .graph-title {
-    font-size: 1.5rem;
-    color: #fff; /* White text color */
-    margin-bottom: 20px;
-  }
-  
-  .graph {
-    width: 100%;
-    height: 400px; /* Adjust height as needed */
-    border-radius: 10px; /* Rounded corners */
-    
-  }
+.graph-container-dark {
+  padding: 20px;
+  background-color: #272727; /* Dark background */
+  color: #fff; /* White text for high contrast */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.graph-container-dark .graph-title-dark {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #fff; /* White text for title */
+}
+
+.graph-container-dark .rv-xy-plot__axis__title {
+  fill: #fff; /* White text for axis titles */
+}
+
+.graph-container-dark .rv-xy-plot__axis__tick__text {
+  fill: #fff; /* White text for axis tick labels */
+}
+
+.react-vis-xy-plot-dark {
+  margin-top: 10px;
+}
+
+.react-vis-xy-plot-dark .rv-xy-plot__series--line {
+  stroke: rgba(0, 255, 255, 0.971); /* Cyan line color */
+  stroke-width: 3; /* Thicker line */
+}
+
+.react-vis-xy-plot-dark .rv-xy-plot__axis__line,
+.react-vis-xy-plot-dark .rv-xy-plot__grid-lines__line {
+  stroke: rgba(255, 255, 255, 0.2); /* Lighter grid lines */
+}
+
+
+
   

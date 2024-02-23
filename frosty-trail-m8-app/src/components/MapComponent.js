@@ -5,6 +5,7 @@ import './CCStyles/MapComponent.css'; // Import external CSS file
 import TrailsYosemite from './geojsons/trails.json'; // Import GeoJSON data file
 import ElevationPolygons from './geojsons/ElevationPolygons.json'; // Import GeoJSON data file for ElevationPolygons
 
+
 const MapComponent = () => {
   const [showTrails, setShowTrails] = useState(true);
   const [showElevation, setShowElevation] = useState(true);

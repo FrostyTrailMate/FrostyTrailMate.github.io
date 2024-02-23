@@ -6,6 +6,7 @@ import ElevationCoverageGraph from '../ElevationCoverageGraph'; // Import the gr
 import 'react-datepicker/dist/react-datepicker.css';
 import '../CCStyles/HomeCover.css';
 import '../CCStyles/Table.css';
+import '../CCStyles/ElevationCoverageGraph.css';
 
 function Home() {
   return (
