@@ -24,16 +24,8 @@
 
 .react-vis-xy-plot-dark {
   margin-top: 10px;
-}
-
-.react-vis-xy-plot-dark .rv-xy-plot__series--line {
-  stroke: rgba(0, 255, 255, 0.971); /* Cyan line color */
-  stroke-width: 3; /* Thicker line */
-}
-
-.react-vis-xy-plot-dark .rv-xy-plot__axis__line,
-.react-vis-xy-plot-dark .rv-xy-plot__grid-lines__line {
   stroke: rgba(255, 255, 255, 0.2); /* Lighter grid lines */
+  fill: false;
 }
 
 
