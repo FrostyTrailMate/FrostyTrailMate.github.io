@@ -3,18 +3,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 10px;
+  padding-top: 20px;
   background-color: #272727; /* Dark background color */
 }
 
 /* Style for the scrollable table container */
 .scrollable-table {
-  max-height: 450px; /* Adjust the maximum height as needed */
+  max-height: 350px; /* Adjust the maximum height as needed */
   overflow-y: auto;
-  /* Customize scrollbar */
-  scrollbar-width: auto; 
-  scrollbar-color: #7a7a7a #2e2e2e; /* Darker color for thumb and track */
-  border-radius: 20px; /* Add border-radius for rounded edges */
+  position: relative; /* Needed for positioning the header */
+  border-radius: 10px; /* Add border-radius for rounded edges */
 }
 
 /* Style for the table */
@@ -23,46 +22,63 @@
   border-collapse: collapse;
   background-color: #777777;
   border: 1px solid rgb(167, 167, 167);
+  border-radius: 10px;
+  font-size: 17px; /* Add your desired font size here */
 }
 
-th {
+/* Style for the table header */
+.styled-table th {
+  position: sticky;
+  top: 0;
   background-color: rgb(88, 88, 88); /* White background color */
   color: #fefff0; /* Dark text color */
-  padding: 10px;
+  padding: 15px;
   text-align: center;
-  border-left: 1px solid rgb(167, 167, 167);
-  border-right: 1px solid rgb(167, 167, 167);
-  
+  z-index: 1;
+  border: 2px solid rgb(167, 167, 167);
+  font-size: 17px; /* Add your desired font size here */
 }
 
-tr:nth-child(even) {
+/* Style for the table body */
+.styled-table tbody tr {
+  height: 50px; /* Adjust the row height as needed */
+}
+
+.styled-table tbody tr:nth-child(even) {
   background-color: #6a6a6a;
+  border: 1px solid rgb(164, 164, 164);
 }
 
 /* Hover effect on table rows*/
-tr:hover {
-  background-color: #444444; /* Darker gray background color on hover */
+.styled-table tbody tr:hover {
+  background-color: #1b6870;
 }
 
 /* Style for table data cells */
-td {
-  padding: 8px;
+.styled-table td {
+  padding: 5px;
+  padding-left: 20px; /* Adjust padding as needed */
+  padding-right: 20px; /* Adjust padding as needed */
   color: #ffffff;
   text-align: center;
   border-left: 1px solid rgb(167, 167, 167);
   border-right: 1px solid rgb(167, 167, 167);
 }
 
+/* Style for the scrollbar */
+.scrollable-table::-webkit-scrollbar {
+  width: 13px; /* Width of the scrollbar */
+}
+
 /* Style for the scrollbar thumb */
 .scrollable-table::-webkit-scrollbar-thumb {
-  background-color: #555; /* Darker color for the thumb */
+  background-color: #ffffffb7; /* Darker color for the thumb */
+  border-radius: 10px; /* Rounded corners for the thumb */
 }
 
 /* Style for the scrollbar track */
 .scrollable-table::-webkit-scrollbar-track {
-  background-color: #333; /* Dark background color for the track */
+  background-color: #494949;
 }
-
-
 
 

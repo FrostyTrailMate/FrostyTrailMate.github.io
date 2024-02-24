@@ -27,7 +27,7 @@ const MapComponent = () => {
     fillColor: '#add8e6', // Light blue color
     color: '#555', // Grey color for contour lines
     weight: 0.5, // Adjust the weight of the polygon
-    fillOpacity: 0.2,
+    fillOpacity: 0.5,
   };
 
   const onEachFeature = (feature, layer) => {
@@ -58,7 +58,7 @@ const MapComponent = () => {
       </div>
       <MapContainer
         center={[37.8451, -119.5383]}
-        zoom={10}
+        zoom={11}
         className="leaflet-container"
       >
         <TileLayer

@@ -14,6 +14,15 @@ const ResultsTable = () => {
             });
     }, []);
 
+    // Function to format date to only include day, month, and year of the date field
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.toLocaleString('default', { month: 'short' }).charAt(0).toUpperCase() + date.toLocaleString('default', { month: 'short' }).slice(1);
+        const year = date.getFullYear();
+        return `${day} ${month} ${year}`;
+    };
+
     return (
         <div className="tablecontainer">
             <div className="scrollable-table">
@@ -21,26 +30,35 @@ const ResultsTable = () => {
                     <thead>
                         <tr>
                             <th> AREA </th>
-                            <th> ELEVATION </th>
-                            <th> SNOW COVERAGE (%) </th>
+                            <th> ELEVATION (m) </th>
                             <th> DATE </th>
                             <th> DETECTED POINTS </th>
                             <th> TOTAL POINTS </th>
+                            <th> SNOW COVERAGE (%) </th>
                         </tr>
                     </thead>
                     <tbody>
-                        {results.map(result => (
-                            <tr 
-                                key={result.id_res}>
-                                <td>{result.area_name}</td>
-                                <td>{result.elevation}</td>
-                                <td>{result.coverage_percentage}</td>
-                                <td>{result.ddatetime}</td>
-                                <td>{result.detected_points}</td>
-                                <td>{result.total_points}</td>
-                            </tr>
-                        ))}
+                        {results
+                            .sort((a, b) => {
+                                // Extract the first number from the string value of elevation
+                                const firstNumberA = parseInt(a.elevation.match(/\d+/)[0]);
+                                const firstNumberB = parseInt(b.elevation.match(/\d+/)[0]);
+                                
+                                // Compare the first numbers in reverse order for sorting from higher to lower
+                                return firstNumberB - firstNumberA;
+                            })
+                            .map(result => (
+                                <tr key={result.id_res}>
+                                    <td>{result.area_name === 'Yosemite' ? result.area_name + ' National Park' : result.area_name}</td>
+                                    <td>{result.elevation}</td>
+                                    <td>{formatDate(result.ddatetime)}</td>
+                                    <td>{result.detected_points}</td>
+                                    <td>{result.total_points}</td>
+                                    <td>{result.coverage_percentage}</td>
+                                </tr>
+                            ))}
                     </tbody>
+
                 </table>
             </div>
         </div>
@@ -48,7 +66,3 @@ const ResultsTable = () => {
 };
 
 export default ResultsTable;
-
-
-
-

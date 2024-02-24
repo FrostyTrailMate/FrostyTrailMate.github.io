@@ -1,12 +1,12 @@
 import React from 'react';
 import MapComponent from '../MapComponent';
 import ResultsTable from '../ResultsTable';
-import ElevationCoverageGraph from '../ElevationCoverageGraph'; // Import the graph component
+import ElevationCoverageGraph from '../Graph'; // Import the graph component
 
 import 'react-datepicker/dist/react-datepicker.css';
 import '../CCStyles/HomeCover.css';
 import '../CCStyles/Table.css';
-import '../CCStyles/ElevationCoverageGraph.css';
+import '../CCStyles/Graph.css';
 
 function Home() {
   return (
