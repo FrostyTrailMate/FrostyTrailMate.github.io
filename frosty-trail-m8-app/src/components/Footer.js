@@ -2,30 +2,33 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function Footer() {
+  const handleClick = () => {
+    window.scrollTo(0, 0); // Scrolls to the top when the link is clicked
+  };
+
   return (
     <div className='footer-container'>
-      <div class='footer-links'>
-
+      <div className='footer-links'>
         <div className='footer-link-wrapper'>
-          <div class='footer-link-items'>
-            <Link to='/About'><h2>About Us</h2></Link>
+          <div className='footer-link-items'>
+            <Link to='/about' onClick={handleClick}><h2>About Us</h2></Link>
           </div>
         </div>
         <div className='footer-link-wrapper'>
-          <div class='footer-link-items'>
-            <Link to='https://www.youtube.com/watch?v=yBDHkveJUf4'><h2>Tutorial <i class='fab fa-youtube'/></h2></Link>
+          <div className='footer-link-items'>
+            <a href='https://www.youtube.com/watch?v=yBDHkveJUf4'><h2>Tutorial <i className='fab fa-youtube'/></h2></a>
           </div>
-          <div class='footer-link-items'>
-            <Link to='https://www.instagram.com/sbastiansuarezz/'><h2>Instagram <i class='fab fa-instagram'/> </h2></Link>
+          <div className='footer-link-items'>
+            <a href='https://www.instagram.com/sbastiansuarezz/'><h2>Instagram <i className='fab fa-instagram'/> </h2></a>
           </div>
         </div>
       </div>
-          <div class='footer-logo'>
-            <Link to='/' className='social-logo'> Frosty Trail M8 <i class=' fas fa-snowflake' /></Link>
-          </div>
-          <div>
-            <small class='website-rights'> FTM8 © 2024 </small>
-          </div>
+      <div className='footer-logo'>
+        <Link to='/' className='social-logo' onClick={handleClick}> Frosty Trail M8 <i className='fas fa-snowflake' /></Link>
+      </div>
+      <div>
+        <small className='website-rights'> FTM8 © 2024 </small>
+      </div>
     </div>
   );
 }

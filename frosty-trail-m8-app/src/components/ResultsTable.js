@@ -23,6 +23,35 @@ const ResultsTable = () => {
         return `${day} ${month} ${year}`;
     };
 
+    // Function to convert results data to CSV format
+    const convertToCSV = (data) => {
+        const csvRows = [];
+        const headers = Object.keys(data[0]);
+        csvRows.push(headers.join(','));
+
+        for (const row of data) {
+            const values = headers.map(header => {
+                const escaped = ('' + row[header]).replace(/"/g, '\\"');
+                return `"${escaped}"`;
+            });
+            csvRows.push(values.join(','));
+        }
+
+        return csvRows.join('\n');
+    };
+
+    // Function to trigger download of CSV file
+    const downloadCSV = () => {
+        const csvContent = convertToCSV(results);
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'results.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="tablecontainer">
             <div className="scrollable-table">
@@ -58,11 +87,14 @@ const ResultsTable = () => {
                                 </tr>
                             ))}
                     </tbody>
-
                 </table>
             </div>
+            <button className="download-btn" onClick={downloadCSV}>Download Table as CSV</button>
         </div>
     );
+    
 };
 
 export default ResultsTable;
+
+

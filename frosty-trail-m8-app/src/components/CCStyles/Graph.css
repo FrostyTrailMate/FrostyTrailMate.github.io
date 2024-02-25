@@ -1,11 +1,13 @@
 .graph-container-dark {
-  padding: 30px;
+  padding: 5px;
+  padding-bottom: 70px;
   background-color: #272727; /* Dark background */
   color: #fff; /* White text for high contrast */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  
 }
 
 .graph-container-dark .graph-title-dark {
@@ -14,20 +16,14 @@
   color: #fff; /* White text for title */
 }
 
-.graph-container-dark .rv-xy-plot__axis__title {
-  fill: #09d7f7; /* White text for axis titles */
-}
-
 .graph-container-dark .rv-xy-plot__axis__tick__text {
   fill: #ffffff; /* White text for axis tick labels */
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .react-vis-xy-plot-dark {
-  margin-top: 15px;
+  margin-top: 20px;
   fill: false;
+  display: flex;
 }
-
-
-
   

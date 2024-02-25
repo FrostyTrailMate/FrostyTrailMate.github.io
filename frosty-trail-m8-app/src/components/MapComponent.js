@@ -3,23 +3,23 @@ import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './CCStyles/MapComponent.css'; // Import external CSS file
 import TrailsYosemite from './geojsons/Trails.json'; // Import GeoJSON data file
-import BoundaryPolygon from './geojsons/YosemiteBoundary.json'; // Import GeoJSON data file
+import SnowCoverage from './geojsons/ElevationPolygons.json'; // Import GeoJSON data file
 
 const MapComponent = () => {
-  const [basemap, setBasemap] = useState('thunderforest');
+  const [basemap, setBasemap] = useState('stamenTerrain');
   const [showTrails, setShowTrails] = useState(true);
   const [showElevation, setShowElevation] = useState(true);
 
   const basemapUrls = {
+    stamenTerrain: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png',
     thunderforest: 'https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=749cd9dc6622478d9454b931ded7943d',
-    openStreetMap: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    stamenTerrain: 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png',
+    openStreetMap: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
   };
 
   const basemapAttributions = {
+    stamenTerrain: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.',
     thunderforest: '© Thunderforest by Gravitystorm Limited.',
     openStreetMap: '© OpenStreetMap contributors',
-    stamenTerrain: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.',
   };
 
   const handleBasemapChange = (newBasemap) => {
@@ -41,8 +41,10 @@ const MapComponent = () => {
 
   const lightBluePolygonStyle = {
     color: '#555', // Grey color for contour lines
-    weight: 2, // Adjust the weight of the polygon
-    fill: false, // Fill the polygon with color
+    weight: 0.3, // Adjust the weight of the polygon
+    fill: true, // Fill the polygon with color
+    fillColor: '#A6CEE3', // Light blue color
+    fillOpacity: 0.3, // Adjust the opacity of the fill
   };
 
   const onEachFeature = (feature, layer) => {
@@ -54,7 +56,7 @@ const MapComponent = () => {
   return (
     <div className="map-container">
       <div className="toggle-container">
-        <div className="basemap-toggles">
+        <div className="basemap-toggles" >
           {Object.keys(basemapUrls).map((key) => (
             <label key={key} className="basemap-toggle">
               <input
@@ -64,9 +66,10 @@ const MapComponent = () => {
                 checked={basemap === key}
                 onChange={() => handleBasemapChange(key)}
               />
-              {key === 'thunderforest' && 'Thunderforest'}
-              {key === 'openStreetMap' && 'OpenStreetMap'}
-              {key === 'stamenTerrain' && 'Stamen Terrain'}
+              {key === 'stamenTerrain' && '  Stamen Terrain  '}
+              {key === 'thunderforest' && '  Thunderforest  '}
+              {key === 'openStreetMap' && '  OpenStreetMap  '}
+
             </label>
           ))}
         </div>
@@ -85,7 +88,7 @@ const MapComponent = () => {
               checked={showElevation}
               onChange={handleElevationToggle}
             />
-            <span className="toggle-text">Boundary</span>
+            <span className="toggle-text">Snow Coverage</span>
           </label>
         </div>
       </div>
@@ -101,7 +104,7 @@ const MapComponent = () => {
         />
 
         {showElevation && (
-          <GeoJSON data={BoundaryPolygon} style={lightBluePolygonStyle} onEachFeature={onEachFeature} />
+          <GeoJSON data={SnowCoverage} style={lightBluePolygonStyle} onEachFeature={onEachFeature} />
         )}
 
         {showTrails && (
