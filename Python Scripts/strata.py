@@ -1,16 +1,25 @@
+import argparse
 import rasterio
-from shapely.geometry import Polygon, mapping
+from shapely.geometry import Polygon
 import psycopg2
 from psycopg2 import sql
 import numpy as np
-import json
 from shapely.ops import unary_union
-import os
 import geopandas as gpd
 import math
 import rasterio.features
+from psycopg2.extensions import Binary
+import time
 
-print("Running strata.py...")
+print("Taking a short rest. Please wait 3 seconds.")
+
+print("++++++++++ Running strata.py ++++++++++")
+
+
+time.sleep(3)
+
+# Output directory for shapefiles
+output_dir = 'Outputs/Shapefiles/ElevationStrata'
 
 # Connect to PostgreSQL
 def connect_to_postgres():
@@ -21,6 +30,7 @@ def connect_to_postgres():
         psycopg2.extensions.connection: A connection object to interact with the PostgreSQL database.
     """
     try:
+        print("Connecting to PostgreSQL...")
         conn = psycopg2.connect(
             host="DESKTOP-UIUIA2A",
             database="FTM8",
@@ -28,78 +38,61 @@ def connect_to_postgres():
             password="admin",
             port="5432"
         )
+        print("Connection successful!")
         return conn
     except psycopg2.Error as e:
         print(f"Error connecting to PostgreSQL: {e}")
         return None
 
-# Create table if it does not exist
-def create_table(conn):
-    """
-    Creates a table in the PostgreSQL database if it does not exist.
-
-    Args:
-        conn (psycopg2.extensions.connection): A connection object to the PostgreSQL database.
-    """
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS dem_p (
-                    id SERIAL PRIMARY KEY,
-                    area_name VARCHAR,
-                    vector GEOMETRY(POLYGON, 4326)
-                )
-            """)
-            conn.commit()
-    except psycopg2.Error as e:
-        print(f"Error creating table in PostgreSQL: {e}")
-
-# Function to insert polygons into the database
-def insert_polygon(conn, area_name, geometry):
-    """
-    Inserts a polygon into the PostgreSQL database.
-
-    Args:
-        conn (psycopg2.extensions.connection): A connection object to the PostgreSQL database.
-        area_name (str): Name of the area associated with the polygon.
-        geometry (shapely.geometry.Polygon): Polygon geometry to be inserted into the database.
-    """
-    try:
-        with conn.cursor() as cursor:
-            insert_query = sql.SQL("INSERT INTO dem_p (area_name, vector) VALUES (%s, ST_GeomFromGeoJSON(%s::json))")
-            cursor.execute(insert_query, (area_name, json.dumps(mapping(geometry))))
-            conn.commit()
-    except psycopg2.Error as e:
-        print(f"Error inserting polygon into PostgreSQL: {e}")
+from shapely.ops import cascaded_union
 
 # Function to generate polygons for each elevation band
-def generate_polygons(dem_file, conn, shapefile_dir):
+# Function to generate polygons for each elevation band
+def generate_polygons(dem_file, conn, area_name):
     """
-    Generates polygons for each elevation band from a digital elevation model (DEM) file.
+    Generates polygons for each elevation band from a digital elevation model (DEM) file and updates existing polygons in the database.
 
     Args:
         dem_file (rasterio.io.DatasetReader): A rasterio dataset reader object representing the DEM file.
         conn (psycopg2.extensions.connection): A connection object to the PostgreSQL database.
-        shapefile_dir (str): Directory path to save the generated shapefiles.
+        area_name (str): Name of the area associated with the polygon.
     """
     try:
-        print("Generating polygons for each elevation band...")
+        print("Generating polygons for each elevation band and updating existing polygons...")
         
-        data = dem_file.read(1, masked=True)
+        data = dem_file.read(1)
 
+        # Find minimum and maximum elevations in the raster
+        min_elevation = np.nanmin(data)
         max_elevation = np.nanmax(data)
-        max_elevation_ceiling = math.ceil(max_elevation / 100) * 100 if max_elevation % 100 != 0 else max_elevation
+        print(f"Min elevation: {min_elevation}. Max elevation: {max_elevation}")
 
-        elevation_ranges = np.arange(0, max_elevation_ceiling, 100)
+        # Round down the minimum elevation to the nearest 100 and round up the maximum elevation to the nearest 100 to create minimum and maximum elevation strata values
+        min_elevation_floor = math.floor(min_elevation / 100) * 100 if min_elevation % 100 != 0 else min_elevation
+        max_elevation_ceiling = math.ceil(max_elevation / 100) * 100 if max_elevation % 100 != 0 else max_elevation
+        print(f"Min elevation floor: {min_elevation_floor}. Max elevation ceiling: {max_elevation_ceiling}")
+
+        # Create elevation strata ranges. max_elevation_ceiling + 100 is used to include the maximum elevation in the range. Without it, max_elevation_ceiling will be excluded.
+        elevation_ranges = np.arange(min_elevation_floor, max_elevation_ceiling + 100, 100)
         total_strata = len(elevation_ranges) - 1
 
         print(f"Total elevation strata: {total_strata}")
 
-        for i in range(total_strata):
-            print(f"Processing elevation stratum {i+1}/{total_strata}", end='\r')
+        previous_multipolygon = None
 
-            lower_bound = elevation_ranges[i]
-            upper_bound = elevation_ranges[i+1]
+        # Iterate in reverse order
+        for i in range(total_strata - 1, -1, -1):
+            print(f"Processing elevation stratum {total_strata - i}/{total_strata}", end='\r')
+
+            if i == total_strata - 1:
+                lower_bound = elevation_ranges[i]
+                upper_bound = max_elevation_ceiling
+            else:
+                lower_bound = elevation_ranges[i]
+                upper_bound = elevation_ranges[i + 1]
+
+
+            print(f"Lower bound: {lower_bound}, Upper bound: {upper_bound}")
 
             mask = np.logical_and(data >= lower_bound, data < upper_bound)
 
@@ -107,31 +100,74 @@ def generate_polygons(dem_file, conn, shapefile_dir):
             for geom, val in rasterio.features.shapes(mask.astype('uint8'), transform=dem_file.transform):
                 if val != 0:
                     geom = rasterio.warp.transform_geom(dem_file.crs, 'EPSG:4326', geom, precision=6)
-                    polygons.append(Polygon(geom['coordinates'][0]))
+                    polygon = Polygon(geom['coordinates'][0])
+
+                    if previous_multipolygon:
+                        for higher_polygon in previous_multipolygon:
+                            polygon = polygon.difference(higher_polygon)
+
+                    polygons.append(polygon)
 
             if polygons:
                 multi_polygon = unary_union(polygons)
-                insert_polygon(conn, f"Elevation {int(lower_bound)}-{int(upper_bound)} meters", multi_polygon)
 
-                # Create GeoDataFrame and save shapefile
-                gdf = gpd.GeoDataFrame(geometry=[multi_polygon], crs='EPSG:4326')
-                shapefile_name = f"Elevation_{int(lower_bound)}_{int(upper_bound)}.shp"
-                shapefile_path = os.path.join(shapefile_dir, shapefile_name)
-                gdf.to_file(shapefile_path)
+                update_polygon(conn, area_name, lower_bound, upper_bound, multi_polygon)
+                
+                # Save polygons as shapefile with lower and upper bounds in the filename
+                output_filename = f'{output_dir}/{area_name}_stratum_{int(lower_bound)}_{int(upper_bound)}.shp'
+                gdf = gpd.GeoDataFrame({'geometry': [multi_polygon]}, crs='EPSG:4326')
+                gdf.to_file(output_filename)
+                print(f"Polygon saved as {output_filename}")
 
-        print("\nAll elevation strata processed successfully.")
+                # Update previous_multipolygon for next iteration
+                if previous_multipolygon:
+                    previous_multipolygon = [previous_multipolygon[0].union(multi_polygon)]
+                else:
+                    previous_multipolygon = [multi_polygon]
+
+        print("\nAll elevation strata processed and existing polygons updated successfully.")
     except Exception as e:
-        print(f"Error generating polygons: {e}")
+        print(f"Error generating and updating polygons: {e}")
 
 
-# Main function
-def main(dem_file_path):
+# Function to update polygons in the database
+def update_polygon(conn, area_name, lower_bound, upper_bound, geometry):
     """
-    Main function to connect to PostgreSQL, create table, generate polygons, and close the database connection.
+    Updates a polygon in the PostgreSQL database.
 
     Args:
-        dem_file_path (str): Path to the DEM file.
+        conn (psycopg2.extensions.connection): A connection object to the PostgreSQL database.
+        area_name (str): Name of the area associated with the polygon.
+        lower_bound (float): Lower bound of the elevation range.
+        upper_bound (float): Upper bound of the elevation range.
+        geometry (shapely.geometry.MultiPolygon): MultiPolygon geometry to be updated in the database.
+    """
+    try:
+        print("Updating polygons in the database...")
+        with conn.cursor() as cursor:
+            # Convert lower_bound and upper_bound to integers and format them as 'xxxx-yyyy'
+            elevation_range = f"{int(lower_bound)}-{int(upper_bound)}"
+            print(f"Elevation range: {elevation_range}")
+            
+            update_query = sql.SQL("""
+                UPDATE results 
+                SET strata = ST_SetSRID(ST_GeomFromWKB(%s), 4326) 
+                WHERE area_name = %s AND elevation = %s
+            """)
+            # Pass elevation_range as a string
+            cursor.execute(update_query, (Binary(geometry.wkb), area_name, elevation_range))
+            conn.commit()
+        print("Polygon updated successfully.")
+    except psycopg2.Error as e:
+        print(f"Error updating polygon in PostgreSQL: {e}")
 
+# Main function
+def main(area_name):
+    """
+    Main function to connect to PostgreSQL, generate polygons, and close the database connection.
+
+    Args:
+        area_name (str): Name of the area to retrieve DEM file path.
     """
     try:
         print("Connecting to PostgreSQL...")
@@ -141,18 +177,18 @@ def main(dem_file_path):
         if conn is None:
             return
 
-        print("Creating table if not exists...")
-        
-        # Create table if not exists
-        create_table(conn)
+        # Retrieve DEM file path based on area name (You need to implement this function)
+        dem_file_path = retrieve_dem_path(conn, area_name)
+        if dem_file_path is None:
+            print("DEM file path not found for the specified area. Please re-run DEM.py and use the same -n argument for both scripts. If the error persists, run createDB.py to reset the storage folders and the database.")
+            conn.close()
+            return
 
-        # Directory for saving shapefiles
-        shapefile_dir = '../Shapefiles/ElevationStrata'
-        os.makedirs(shapefile_dir, exist_ok=True)
+        print(f"DEM file path: {dem_file_path}")
 
-        # Generate polygons
+        # Generate and update polygons
         with rasterio.open(dem_file_path) as dem_file:
-            generate_polygons(dem_file, conn, shapefile_dir)
+            generate_polygons(dem_file, conn, area_name)
 
         # Close database connection
         conn.close()
@@ -160,13 +196,43 @@ def main(dem_file_path):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-# Push data to the databaseQ
+# Function to retrieve DEM file path based on area name
+def retrieve_dem_path(conn, area_name):
+    """
+    Retrieves DEM file path based on the specified area name from the PostgreSQL database.
+
+    Args:
+        conn (psycopg2.extensions.connection): A connection object to the PostgreSQL database.
+        area_name (str): Name of the area to retrieve DEM file path.
+
+    Returns:
+        str: DEM file path if found, otherwise None.
+    """
+    try:
+        print("Retrieving DEM file path from the database...")
+        with conn.cursor() as cursor:
+            select_query = sql.SQL("SELECT dem_path FROM userpolygons WHERE area_name = %s")
+            cursor.execute(select_query, (area_name,))
+            result = cursor.fetchone()
+            if result:
+                print("DEM file path found.")
+                return result[0]
+            else:
+                print("Error: No DEM file path found.")
+                return None
+    except psycopg2.Error as e:
+        print(f"Error retrieving DEM file path from PostgreSQL: {e}")
+        return None
+
 if __name__ == "__main__":
-    # Input DEM file path
-    dem_file_path = 'Outputs/DEM/Yosemite_DEM_clipped.tif'
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Generate elevation strata polygons")
+    parser.add_argument("-n", "--area_name", type=str, required=True, help="Name of the area")
+    args = parser.parse_args()
 
-    # Main function call
-    main(dem_file_path)
+    if args.area_name:
+        main(args.area_name)
+    else:
+        print("Please specify the area name using the -n option.")
 
-
-print("strata.py completed.")
+print("---------- strata.py completed ----------")

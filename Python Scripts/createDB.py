@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, MetaData, text
 import os
 import shutil
 
-print("Running createDB.py...")
+print("++++++++++ Running createDB.py ++++++++++")
 
 # Database connection parameters
 dbname = 'FTM8'
@@ -18,7 +18,7 @@ try:
     print("Connecting to FTM8 database...")
     engine = create_engine(connection_url)
     conn = engine.connect()
-    print("Connected to FTM8 database.")
+    print("Connected.")
 except Exception as e:
     print("Unable to connect to database:", e)
     exit()
@@ -27,7 +27,7 @@ metadata = MetaData()
 
 # Define table dropping and creation queries
 table_queries = [
-    
+        
     # Enable PostGIS extensions
     """
     CREATE EXTENSION IF NOT EXISTS postgis;
@@ -44,19 +44,19 @@ table_queries = [
     
     # Drop and create tables
     """
-    DROP TABLE IF EXISTS public.sar_raw CASCADE;
+    DROP TABLE IF EXISTS public.userpolygons CASCADE;
     """,
     """
-    CREATE TABLE public.sar_raw (
-        id SERIAL PRIMARY KEY, 
-        datetime TIMESTAMP, 
-        time_collected TIMESTAMP NOT NULL, 
-        sOrbit INT, 
-        sSlice INT, 
-        sArea VARCHAR, 
-        path VARCHAR, 
-        image VARCHAR, 
-        processed VARCHAR);
+    CREATE TABLE IF NOT EXISTS public.userpolygons (
+        id SERIAL,
+        area_name VARCHAR PRIMARY KEY,
+        datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        geom GEOMETRY(POLYGON, 4326),
+        dem_path VARCHAR,
+        dem_processed VARCHAR,
+        sar_path VARCHAR,
+        sar_processed VARCHAR
+    );
     """,
     """
     DROP TABLE IF EXISTS public.samples CASCADE;
@@ -65,32 +65,10 @@ table_queries = [
     CREATE TABLE public.samples (
         id SERIAL PRIMARY KEY,
         datetime TIMESTAMP NOT NULL,
-        area VARCHAR NOT NULL,
+        area_name VARCHAR NOT NULL,
+        FOREIGN KEY(area_name) REFERENCES public.userpolygons(area_name),
         point_geom GEOMETRY(POINT, 4326) NOT NULL,
-        elevation FLOAT NOT NULL,
-        shapefile_path VARCHAR NOT NULL
-    );
-    """,
-    """
-    DROP TABLE IF EXISTS public.demraw CASCADE;
-    """,
-    """
-    CREATE TABLE public.demraw (
-        id_dem SERIAL PRIMARY KEY,
-        delevation FLOAT,
-        darea VARCHAR(30),
-        ddatetime TIMESTAMP,
-        draster RASTER
-    );
-    """,
-    """
-    DROP TABLE IF EXISTS public.DEM_p CASCADE;
-    """,
-    """
-    CREATE TABLE public.DEM_p (
-        id SERIAL PRIMARY KEY,
-        vector GEOMETRY(MULTIPOLYGON, 4326),
-        area_name VARCHAR(50) NOT NULL
+        elevation FLOAT NOT NULL
     );
     """,
     """
@@ -99,23 +77,14 @@ table_queries = [
     """
     CREATE TABLE public.results (
         id_res SERIAL PRIMARY KEY NOT NULL,
-        area_name VARCHAR,
+        area_name VARCHAR NOT NULL,
+        FOREIGN KEY(area_name) REFERENCES public.userpolygons(area_name),
         elevation VARCHAR NOT NULL,
         coverage_percentage FLOAT NOT NULL,
-        ddatetime TIMESTAMP NOT NULL,
+        datetime TIMESTAMP NOT NULL,
         detected_points INT NOT NULL,
-        total_points INT NOT NULL
-    );
-    """,
-    """
-    DROP TABLE IF EXISTS public.userpolygons CASCADE;
-    """,
-    """
-    CREATE TABLE IF NOT EXISTS userpolygons (
-    ID_polygon SERIAL PRIMARY KEY,
-    geom GEOMETRY(POLYGON, 4326), -- 4326 is the SRID for WGS 84 coordinate system, adjust as per your requirements
-    name VARCHAR(20), -- New string field with max length of 20 characters
-    stampdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        total_points INT NOT NULL,
+        strata GEOMETRY(MULTIPOLYGON, 4326)
     );
     """
 ]
@@ -131,7 +100,7 @@ try:
 except Exception as e:
     print("Error dropping/creating tables:", e)
 
-# Close connection
+# Save changes and close connection
 conn.commit()
 conn.close()
 print("Database connection closed.")
@@ -147,7 +116,7 @@ except Exception as e:
     print("Error clearing contents of 'Output' folder:", e)
 
 # Recreate subfolders
-subfolders = ['DEM', 'Samples', 'SAR', os.path.join('SAR', 'temp')]
+subfolders = ['DEM', 'Samples', 'SAR', os.path.join('Shapefiles','ElevationStrata'), os.path.join('Shapefiles','SamplePoints'), os.path.join('SAR', 'temp')]
 try:
     os.makedirs(output_folder, exist_ok=True)
     for folder in subfolders:
@@ -156,4 +125,4 @@ try:
 except Exception as e:
     print("Error creating subfolders:", e)
 
-print("createDB.py completed.")
+print("---------- createDB.py completed -----------.")

@@ -30,6 +30,7 @@ Project Overview (in the order of operation)
    - Connect to the database table 'sar_raw' and pull the Sentinel-1 SAR image path where the 'processed' field is null
    - From the table 'samples', pull the sample points
    - Iterate through each sample point, and for each elevation strata of 100 meters, count the number of points which have a raster value between -15 and -10, the threshold values for snow detection
+   - Uses the band chosen by the user and provided as an argument in the __main__.py to detect the snow. By default it will use the VV polarization, but the user has the option to chose the VH polarization.
    - Save results, divided into elevation strata, to the database table 'results'
 6. Databases Utilized
    - Sentinel-1 file information (sar_raw)
