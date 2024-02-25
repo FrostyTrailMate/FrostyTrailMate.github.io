@@ -92,7 +92,11 @@ if __name__ == "__main__":
     # Insert new row into userpolygons table with provided area_name, current datetime, and band information
     try:
         with db_connection.cursor() as cursor:
-            cursor.execute("INSERT INTO userpolygons (area_name, datetime, band) VALUES (%s, %s, %s)", (args.search_area_name, datetime.now(), args.band))
+            if args.coordinates:
+                polygon_text = f"POLYGON(({args.coordinates[0]} {args.coordinates[1]}, {args.coordinates[2]} {args.coordinates[1]}, {args.coordinates[2]} {args.coordinates[3]}, {args.coordinates[0]} {args.coordinates[3]}, {args.coordinates[0]} {args.coordinates[1]}))"
+                cursor.execute("INSERT INTO userpolygons (area_name, datetime, arg_b, arg_s, arg_e, arg_d, geom) VALUES (%s, %s, %s, %s, %s, %s, ST_GeomFromText(%s, 4326))", (args.search_area_name, datetime.now(), args.band, args.start_date, args.end_date, args.sampling_distance, polygon_text))
+            else:
+                cursor.execute("INSERT INTO userpolygons (area_name, datetime, arg_b, arg_s, arg_e, arg_d) VALUES (%s, %s, %s, %s, %s, %s)", (args.search_area_name, datetime.now(), args.band, args.start_date, args.end_date, args.sample_distance))
         db_connection.commit()
         print("New row inserted into userpolygons table with band information.")
     except psycopg2.Error as e:
