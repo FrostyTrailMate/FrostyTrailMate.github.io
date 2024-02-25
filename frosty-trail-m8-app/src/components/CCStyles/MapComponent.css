@@ -18,9 +18,9 @@
   flex-direction: column;
   margin-bottom: 10px;
   font-family: 'Arial', sans-serif;
-  font-size: 16px;
+  font-size: 18px;
   color: #fff;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.2px;
 }
 
 .basemap-toggle,
@@ -76,9 +76,9 @@
 .basemap-toggle span,
 .geojson-toggle span {
   font-family: 'Arial', sans-serif;
-  font-size: 17px;
+  font-size: 18px;
   color: #fff;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.2px;
 }
 
 .leaflet-container {
