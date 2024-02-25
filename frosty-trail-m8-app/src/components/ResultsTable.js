@@ -13,7 +13,7 @@ const ResultsTable = () => {
                 console.error('Error fetching results:', error);
             });
     }, []);
-
+/*
     // Function to format date to only include day, month, and year of the date field
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -21,7 +21,7 @@ const ResultsTable = () => {
         const month = date.toLocaleString('default', { month: 'short' }).charAt(0).toUpperCase() + date.toLocaleString('default', { month: 'short' }).slice(1);
         const year = date.getFullYear();
         return `${day} ${month} ${year}`;
-    };
+    };*/
 
     // Function to convert results data to CSV format
     const convertToCSV = (data) => {

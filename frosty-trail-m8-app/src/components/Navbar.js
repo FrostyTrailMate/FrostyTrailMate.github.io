@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 function Navbar() {
@@ -13,17 +13,10 @@ function Navbar() {
   const handleLogoClick = () => {
     setClick(false); // Close mobile menu if logo is clicked
     window.scrollTo(0, 0); // Scrolls to the top when logo is clicked
-    if (location.pathname === '/') {
+    if (location.pathname === '/home') {
       window.location.reload(); // Reload the page if already on the home page
     }
   };
-
-  const closeMobileMenu = () => setClick(false);
-
-  useEffect(() => {
-    // Close mobile menu when the location changes (e.g., navigation)
-    setClick(false);
-  }, [location]);
 
   return (
     <>
@@ -49,7 +42,6 @@ function Navbar() {
                 About us
               </Link>
             </li>
-
           </ul>
         </div>
       </nav>
