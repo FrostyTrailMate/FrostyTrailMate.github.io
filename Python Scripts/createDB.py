@@ -52,6 +52,7 @@ table_queries = [
         area_name VARCHAR PRIMARY KEY,
         datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         geom GEOMETRY(POLYGON, 4326),
+        band VARCHAR(2) NOT NULL,
         dem_path VARCHAR,
         dem_processed VARCHAR,
         sar_path VARCHAR,

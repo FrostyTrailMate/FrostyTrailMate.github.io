@@ -73,7 +73,7 @@ def generate_polygons(dem_file, conn, area_name):
         print(f"Min elevation floor: {min_elevation_floor}. Max elevation ceiling: {max_elevation_ceiling}")
 
         # Create elevation strata ranges. max_elevation_ceiling + 100 is used to include the maximum elevation in the range. Without it, max_elevation_ceiling will be excluded.
-        elevation_ranges = np.arange(min_elevation_floor, max_elevation_ceiling + 100, 100)
+        elevation_ranges = np.arange(min_elevation_floor - 100, max_elevation_ceiling + 100, 100)
         total_strata = len(elevation_ranges) - 1
 
         print(f"Total elevation strata: {total_strata}")
@@ -90,9 +90,6 @@ def generate_polygons(dem_file, conn, area_name):
             else:
                 lower_bound = elevation_ranges[i]
                 upper_bound = elevation_ranges[i + 1]
-
-
-            print(f"Lower bound: {lower_bound}, Upper bound: {upper_bound}")
 
             mask = np.logical_and(data >= lower_bound, data < upper_bound)
 
@@ -117,7 +114,6 @@ def generate_polygons(dem_file, conn, area_name):
                 output_filename = f'{output_dir}/{area_name}_stratum_{int(lower_bound)}_{int(upper_bound)}.shp'
                 gdf = gpd.GeoDataFrame({'geometry': [multi_polygon]}, crs='EPSG:4326')
                 gdf.to_file(output_filename)
-                print(f"Polygon saved as {output_filename}")
 
                 # Update previous_multipolygon for next iteration
                 if previous_multipolygon:

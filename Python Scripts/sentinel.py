@@ -329,7 +329,7 @@ with rasterio.open(merged_image_path) as src:
                 dst_transform=transform,
                 dst_crs='EPSG:4326',
                 resampling=rasterio.enums.Resampling.nearest)
-    time.sleep(5)
+    time.sleep(3)
 print("Reprojection completed. Merged image saved in WGS84 (EPSG:4326) format: ", reprojected_image_path)
 
 def update_database(image_path, time_collected, area_name):

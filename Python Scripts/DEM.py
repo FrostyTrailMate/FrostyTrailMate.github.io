@@ -45,7 +45,8 @@ def download_dem(api_token, envelope, output_folder, area_name, conn):
                         f.write(chunk)
             print("DEM data downloaded successfully.")
 
-            # Clip downloaded DEM to envelope boundary. Primarily needed for the shapefile (-p) argument.
+            # Clip downloaded DEM to envelope boundary.
+            # Primarily needed for the shapefile (-p) argument.
             dem_clipped_file = os.path.join(output_folder, f'{area_name}_DEM_4326.tif')
             with rasterio.open(dem_downloaded_file) as src:
                 out_image, out_transform = mask(src, envelope.geometry, crop=True)
@@ -79,14 +80,22 @@ def main():
     # Process command-line arguments
     parser = argparse.ArgumentParser(description='Download DEM data from OpenTopography.')
     parser.add_argument('-n', '--name', type=str, help='Name of the search area', required=True)
-    parser.add_argument('-c', '--coordinates', type=float, nargs=4, help='Bounding box coordinates (xmin, ymin, xmax, ymax)')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-c', '--coordinates', type=str, nargs='+',
+                    help='Coordinates for bounding box (e.g., "-119.5 37.5 -119.0 37.0")')
+    group.add_argument('-p', '--shapefile', type=str,
+                    help='Relative path to a shapefile')
+
     args = parser.parse_args()
 
     if args.coordinates:
         xmin, ymin, xmax, ymax = args.coordinates
         envelope = gpd.GeoSeries([Polygon([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])])
+    elif args.shapefile_path:
+        shapefile = gpd.read_file(args.shapefile_path)
+        envelope = shapefile.envelope
     else:
-        raise ValueError("Bounding box coordinates are required")
+        raise ValueError("Bounding box coordinates or shapefile path are required")
 
     output_folder = 'Outputs/DEM'
 

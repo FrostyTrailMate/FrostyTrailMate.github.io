@@ -50,7 +50,6 @@ def prompt_reset():
         choice = input("Will proceed without resetting the database in 5 seconds. Do you want to reset the database and saved data? (y/n): ").lower()
         return choice
 
-    user_input = None
     input_thread = threading.Thread(target=lambda: setattr(input_thread, 'user_input', _input()))
     input_thread.daemon = True
     input_thread.start()
@@ -90,12 +89,12 @@ if __name__ == "__main__":
     if prompt_reset():
         run_script('Python Scripts/createDB.py', [])
 
-    # Insert new row into userpolygons table with provided area_name and current datetime
+    # Insert new row into userpolygons table with provided area_name, current datetime, and band information
     try:
         with db_connection.cursor() as cursor:
-            cursor.execute("INSERT INTO userpolygons (area_name, datetime) VALUES (%s, %s)", (args.search_area_name, datetime.now()))
+            cursor.execute("INSERT INTO userpolygons (area_name, datetime, band) VALUES (%s, %s, %s)", (args.search_area_name, datetime.now(), args.band))
         db_connection.commit()
-        print("New row inserted into userpolygons table.")
+        print("New row inserted into userpolygons table with band information.")
     except psycopg2.Error as e:
         print("Error inserting row into userpolygons table:", e)
         db_connection.rollback()

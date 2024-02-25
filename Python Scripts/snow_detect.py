@@ -112,7 +112,7 @@ def process_points_and_raster(conn, area_name, band):
                 min_floor = ceil(min_elevation / 100) * 100
                 max_ceiling = ceil(max_elevation / 100) * 100
 
-                elevation_intervals = list(range(min_floor, max_ceiling + 100, 100))
+                elevation_intervals = list(range(min_floor - 200, max_ceiling + 100, 100))
 
                 for interval_start, interval_end in zip(elevation_intervals, elevation_intervals[1:]):
                     total_points = 0
