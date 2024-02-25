@@ -1,23 +1,18 @@
+import argparse
 import geopandas as gpd
 import rasterio
-from shapely.geometry import Point
+from shapely.geometry import Point, box, mapping
 import psycopg2
 from datetime import datetime
 import pyproj
 import signal
 import sys
+import os
 
-print("Running sampling.py...")
+print("++++++++++ Running sampling.py ++++++++++")
 
 # Define a signal handler for interrupt (Ctrl+C)
 def signal_handler(sig, frame):
-    """
-    Signal handler for interrupt (Ctrl+C).
-
-    Args:
-        sig: Signal number.
-        frame: Current stack frame.
-    """
     print("\nWriting process interrupted. Rolling back changes...")
     conn.rollback()  # Rollback the transaction to remove the added points
     conn.close()  # Close the database connection
@@ -64,68 +59,18 @@ def transform_coords(lon, lat, src_crs, dst_crs):
     x, y = transformer.transform(lon, lat)
     return x, y
 
-# Load the shapefile
-print("Loading shapefile...")
-shapefile_path = 'Shapefiles/Yosemite_Boundary_4326.shp'
-try:
-    gdf = gpd.read_file(shapefile_path)
-    print("Shapefile loaded successfully.")
-except Exception as e:
-    print(f"Error loading shapefile: {e}")
+def parse_args():
+    parser = argparse.ArgumentParser(description='Generate sample points within a specified area.')
+    parser.add_argument('-n', '--name', required=True, help='Name of the search area')
+    parser.add_argument('-p', '--shapefile', type=str, help='Relative path to a shapefile')
+    parser.add_argument('-d', '--distance', type=float, default=0.005, help='Distance between sampling points (default: 0.005)')
+    return parser.parse_args()
 
-# Load the raster DEM
-print("Loading DEM...")
-dem_file_path = 'Outputs/DEM/Yosemite_DEM_clipped.tif'
-try:
-    dem_dataset = rasterio.open(dem_file_path)
-    print("DEM loaded successfully.")
-except Exception as e:
-    print(f"Error loading DEM: {e}")
+# Load command-line arguments
+args = parse_args()
 
-# Function to generate points at every 500 meters within the boundary polygon
-def generate_points_within_polygon(polygon, spacing):
-    """
-    Generate points at regular intervals within a polygon.
-
-    This function generates points within the specified polygon at a regular interval determined by the spacing parameter.
-    
-    Parameters:
-    - polygon (shapely.geometry.Polygon): The polygon within which points will be generated.
-    - spacing (float): The distance between each generated point, typically in the same units as the polygon coordinates.
-
-    Returns:
-    - list: A list of Point objects representing the generated points.
-
-    Note:
-    - The function iterates over the bounding box of the polygon and generates points within it at the specified spacing.
-    - Points are included in the output list only if they fall within the polygon boundary.
-    - The generated points are evenly spaced within the polygon, but the actual distance between points may vary due to the irregular shape of the polygon.
-    """
-    minx, miny, maxx, maxy = polygon.bounds
-    points = []
-    x = minx
-    while x < maxx:
-        y = miny
-        while y < maxy:
-            point = Point(x, y)
-            if polygon.contains(point):
-                points.append(point)
-            y += spacing
-        x += spacing
-    return points
-
-# Generate points within the boundary polygon
-print("Generating points within the boundary polygon...")
-spacing = 0.005  # in degrees (~500 meters)
-points = []
-for index, row in gdf.iterrows():
-    polygon = row['geometry']
-    polygon_crs = gdf.crs
-    points_within_polygon = generate_points_within_polygon(polygon, spacing)
-    points.extend(points_within_polygon)
-
-print(f"{len(points)} points generated.")
-
+# Set the datetime at the start of processing
+current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 # Connect to PostgreSQL database
 print("Connecting to PostgreSQL database...")
@@ -141,46 +86,77 @@ try:
     print("Connected to PostgreSQL database.")
 except Exception as e:
     print(f"Error connecting to PostgreSQL database: {e}")
+    sys.exit(1)
 
-# Insert data into the database
-print("Inserting data into the database...")
+# Query database for DEM file path
 try:
+    cur.execute("SELECT dem_processed FROM userpolygons WHERE area_name = %s", (args.name,))
+    result = cur.fetchone()
+    if result:
+        dem_file_path = result[0]
+        print("DEM file path retrieved from the database:", dem_file_path)
+    else:
+        print("DEM file path not found in the database.")
+        sys.exit(1)
+except Exception as e:
+    print(f"Error querying database for DEM file path: {e}")
+    sys.exit(1)
+
+# Load the raster DEM and get its bounding box coordinates
+print("Loading DEM and retrieving bounding box coordinates...")
+try:
+    dem_dataset = rasterio.open(dem_file_path)
+    minx, miny, maxx, maxy = dem_dataset.bounds
+    dem_crs = dem_dataset.crs
+    print("Bounding box coordinates retrieved from the DEM file.")
+    
+    # Generate points within the boundary box
+    print("Generating points within the boundary box...")
+    spacing = args.distance
+    boundary_box = box(minx, miny, maxx, maxy)
+    points = []
+
+    x = minx
+    while x < maxx:
+        y = miny
+        while y < maxy:
+            point = Point(x, y)
+            if boundary_box.contains(point):
+                points.append(point)
+            y += spacing
+        x += spacing
+
+    print(f"{len(points)} points generated.")
+
+    # Insert data into the database
+    print("Inserting data into the database...")
     for i, point in enumerate(points):
-        elevation = float(get_elevation_for_point(point, dem_dataset, dem_dataset.crs))
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        area = "Yosemite"
-        shapefile_path = shapefile_path
-        point_geom = f"POINT({point.x} {point.y})"
-        
+        elevation = float(get_elevation_for_point(point, dem_dataset, dem_crs))
+        area_name = args.name
+        point_geom = point.wkb_hex  # Convert Shapely geometry to WKB format
         # Insert the data into the database
         cur.execute(
-            "INSERT INTO samples (datetime, area, point_geom, elevation, shapefile_path) VALUES (%s, %s, %s, %s, %s)",
-            (now, area, point_geom, elevation, shapefile_path)
+            "INSERT INTO samples (datetime, area_name, point_geom, elevation) VALUES (%s, %s, ST_GeomFromWKB(%s::geometry), %s)",
+            (current_datetime, area_name, point_geom, elevation)
         )
         print(f"\rWriting point {i+1}/{len(points)} to database.", end='', flush=True)
+    
+    print("\nDatabase write completed.")  # Add a newline after completion
+    conn.commit()  # Commit the transaction if no errors occurred
+
+    # Export sample points to a shapefile
+    output_dir = 'Outputs/Shapefiles/SamplePoints'
+    os.makedirs(output_dir, exist_ok=True)
+    sample_points_gdf = gpd.GeoDataFrame(geometry=points, crs=dem_crs)
+    sample_points_gdf.to_file(os.path.join(output_dir, f'{args.name}_sample_points.shp'), driver='ESRI Shapefile')
+
 except Exception as e:
     print(f"\nError inserting point: {e}")
     conn.rollback()  # Rollback the transaction in case of error
-else:
-    print("\nDatabase write completed.")  # Add a newline after completion
-    conn.commit()  # Commit the transaction if no errors occurred
+
 finally:
+    if 'dem_dataset' in locals():
+        dem_dataset.close()  # Close the raster dataset if it was opened
     conn.close()  # Close the database connection regardless of the outcome
 
-
-# Create a shapefile for testing purposes
-# Create a GeoDataFrame from the points
-point_geoms = [Point(p.x, p.y) for p in points]
-points_gdf = gpd.GeoDataFrame(geometry=point_geoms, crs=gdf.crs)
-
-# Output shapefile path
-output_shapefile_path = 'Outputs/Samples/Yosemite_Points.shp'
-
-# Save the GeoDataFrame to a shapefile
-try:
-    points_gdf.to_file(output_shapefile_path)
-    print("Points saved to shapefile successfully.")
-except Exception as e:
-    print(f"Error saving points to shapefile: {e}")
-
-print("sampling.py completed.")
+print("---------- sampling.py completed ----------")
