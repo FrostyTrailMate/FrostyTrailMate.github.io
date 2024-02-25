@@ -87,7 +87,6 @@ table_queries = [
         strata GEOMETRY(MULTIPOLYGON, 4326)
     );
     """
-
 ]
 
 # Execute table dropping and creation queries

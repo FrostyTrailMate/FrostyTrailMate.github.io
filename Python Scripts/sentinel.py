@@ -68,7 +68,8 @@ def signal_handler(sig, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-# Your client credentials
+# SentinelHub client credentials. 
+print('Please change the client_id, client_secret, and instance_id in "Python Scripts/sentinel.py" to your own credentials.')
 client_id = '81df2eab-5abf-48d8-9cb1-d682d83c2d04'
 client_secret = 'MZI1MGRIwvyillNAAspvliPK0FQl3CUL'
 instance_id = 'h3cQpRZyfMiBZp8fsjpcdpLrR4dH8dPx'

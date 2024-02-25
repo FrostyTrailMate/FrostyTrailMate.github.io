@@ -100,6 +100,7 @@ def main():
     )
 
     # API token
+    print('Please change the API token in "Python Scripts/DEM.py" to your own OpenTopography API token. The current token is for demonstration purposes only.')
     api_token = '8ff3b062b8621b8a71a957083bba09e0'
 
     # Download DEM data

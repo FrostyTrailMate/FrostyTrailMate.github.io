@@ -1,14 +1,11 @@
-argparse
 psycopg2
 sqlalchemy
-shutil
 oauthlib
-requests_oauthlib
+requests
+requests-oauthlib
 geopandas
 sentinelhub
 rasterio
-concurrent
-signal
 pyproj
 shapely
 numpy
