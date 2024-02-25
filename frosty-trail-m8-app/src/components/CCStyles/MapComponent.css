@@ -12,14 +12,27 @@
   margin-bottom: 20px;
 }
 
-.toggle-label {
+.basemap-toggles,
+.geojson-toggles {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.basemap-toggle,
+.geojson-toggle {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
   cursor: pointer;
 }
 
-.toggle-label input[type="checkbox"] {
+.basemap-toggle input[type="radio"],
+.geojson-toggle input[type="checkbox"] {
   margin-right: 10px;
   appearance: none;
   width: 25px;
@@ -31,11 +44,16 @@
   transition: background-color 0.2s;
 }
 
-.toggle-label input[type="checkbox"]:checked {
-  background-color: #2196F3;
+.geojson-toggle input[type="checkbox"]:checked {
+  background-color: #21b8f3;
 }
 
-.toggle-label input[type="checkbox"]:after {
+.basemap-toggle input[type="radio"]:checked {
+  background-color: #18fb77;
+}
+
+.basemap-toggle input[type="radio"]:after,
+.geojson-toggle input[type="checkbox"]:after {
   content: '';
   position: absolute;
   top: 50%;
@@ -49,25 +67,24 @@
   transition: opacity 0.2s;
 }
 
-.toggle-label input[type="checkbox"]:checked:after {
+.basemap-toggle input[type="radio"]:checked:after,
+.geojson-toggle input[type="checkbox"]:checked:after {
   opacity: 1;
 }
 
 /* Font Styling */
-.toggle-label span {
+.basemap-toggle span,
+.geojson-toggle span {
   font-family: 'Arial', sans-serif;
-  font-size: 18px;
+  font-size: 17px;
   color: #fff;
   letter-spacing: 0.5px;
 }
 
 .leaflet-container {
-  height: 600px;
-  width: 85%;
-  margin: 0 auto;
+  width: 80%; /* Ensure the Leaflet map container takes full width */
+  height: 550px;
   border-radius: 10px;
   box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+  margin-bottom: 20px; /* Add margin-bottom to separate the map from toggles */
 }
-
-
-  
