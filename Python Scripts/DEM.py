@@ -2,7 +2,6 @@ import os
 import requests
 import geopandas as gpd
 import rasterio
-from rasterio.warp import reproject, calculate_default_transform, Resampling
 from rasterio.mask import mask
 import argparse
 from shapely.geometry import Polygon

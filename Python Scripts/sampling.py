@@ -1,7 +1,7 @@
 import argparse
 import geopandas as gpd
 import rasterio
-from shapely.geometry import Point, box, mapping
+from shapely.geometry import Point, box
 import psycopg2
 from datetime import datetime
 import pyproj

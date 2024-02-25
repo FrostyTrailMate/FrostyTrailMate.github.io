@@ -4,7 +4,6 @@ import multiprocessing
 import subprocess
 import threading
 import sys
-import time
 import psycopg2
 
 # Function to establish PostgreSQL connection

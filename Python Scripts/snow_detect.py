@@ -2,7 +2,6 @@ import argparse
 import psycopg2
 import rasterio
 from shapely.wkb import loads
-from shapely.geometry import Point
 from math import ceil
 from datetime import datetime
 import time

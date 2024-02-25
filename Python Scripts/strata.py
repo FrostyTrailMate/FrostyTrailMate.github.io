@@ -1,12 +1,10 @@
 import argparse
 import rasterio
-from shapely.geometry import Polygon, mapping
+from shapely.geometry import Polygon
 import psycopg2
 from psycopg2 import sql
 import numpy as np
-import json
 from shapely.ops import unary_union
-import os
 import geopandas as gpd
 import math
 import rasterio.features
