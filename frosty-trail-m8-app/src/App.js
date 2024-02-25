@@ -9,8 +9,6 @@ import './App.css';
 import './components/CCStyles/Navbar.css';
 import './components/CCStyles/Footer.css';
 
-
-
 function App() {
   return (
     <>
@@ -27,4 +25,3 @@ function App() {
 }
 
 export default App;
-
