@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 .Create{
     display: flex;
     height: 100vh;
@@ -20,3 +21,111 @@
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande','Lucida Sans', Arial, sans-serif;
   }
   
+=======
+.Create {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background-color: #272727;
+  background-image: url('../images/HikingAboutUs.png');
+  background-position: center;
+  background-size: cover;
+}
+
+.Create > p,
+.Create > div,
+.inputField,
+.radioGroup label,
+.submitButton,
+.mapContainer,
+.coordinates,
+.apiMessage {
+  margin: 5px;
+}
+
+.Create > p,
+.Create > div {
+  margin-top: -375px; /* Adjusted to account for the additional margin */
+  margin-left: 145px; /* Adjusted to account for the additional margin */
+  margin-right: 145px; /* Adjusted to account for the additional margin */
+  text-align: justify;
+  color: #fffef1;
+  font-size: 20px;
+  line-height: 1.4;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande','Lucida Sans', Arial, sans-serif;
+}
+
+.inputField {
+  width: calc(80% - 10px); /* Adjusted to account for the additional margin */
+  padding: 15px; /* Adjusted to account for the additional margin */
+  margin-bottom: 10px; /* Adjusted to account for the additional margin */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.inputFieldDist {
+  width: calc(10% - 10px); /* Adjusted to account for the additional margin */
+  padding: 15px; /* Adjusted to account for the additional margin */
+  margin-bottom: 10px; /* Adjusted to account for the additional margin */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.radioGroup label {
+  display: inline-block;
+  margin-right: 5px; /* Adjusted to account for the additional margin */
+  margin-bottom: 5px; /* Adjusted to account for the additional margin */
+  padding: 13px 21px; /* Adjusted to account for the additional margin */
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submitButton {
+  padding: 15px 15px 15px 25px; /* Adjusted to account for the additional margin */
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.mapContainer {
+  height: calc(300px - 10px); /* Adjusted to account for the additional margin */
+  width: calc(100% - 10px); /* Adjusted to account for the additional margin */
+  margin-bottom: 15px; /* Adjusted to account for the additional margin */
+}
+
+.coordinates {
+  margin-bottom: 25px; /* Adjusted to account for the additional margin */
+}
+
+.apiMessage {
+  padding: 15px; /* Adjusted to account for the additional margin */
+  border-radius: 5px;
+}
+
+.apiMessage.success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.apiMessage.error {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.leaflet-container {
+  height: 800px; /* Adjust as needed */
+  width: 80%; 
+  margin-bottom: 20px;
+}
+>>>>>>> Stashed changes

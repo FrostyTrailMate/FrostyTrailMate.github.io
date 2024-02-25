@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React from 'react';
 import '../CCStyles/Create.css';
 
@@ -25,96 +26,163 @@ p.textContent = 'Explore Trails with Confidence';
 homecoverContainer.appendChild(h1);
 homecoverContainer.appendChild(p);
 document.body.appendChild(homecoverContainer);
+=======
+import React, { useEffect, useState } from 'react';
+import '../CCStyles/Create.css';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import axios from 'axios';
+import { MapContainer, TileLayer, Rectangle, useMapEvents, FeatureGroup, DrawControl } from 'react-leaflet'; 
+import 'leaflet-draw';
+import 'leaflet-draw/dist/leaflet.draw.css';
+>>>>>>> Stashed changes
 
-const mapDiv = document.createElement('div');
-mapDiv.id = 'map';
-document.body.appendChild(mapDiv);
 
-const startDateLabel = document.createElement('label');
-startDateLabel.htmlFor = 'start_date';
-startDateLabel.textContent = 'Start Date:';
-const startDateInput = document.createElement('input');
-startDateInput.type = 'text';
-startDateInput.id = 'start_date';
-startDateInput.placeholder = 'Select Start Date';
-document.body.appendChild(startDateLabel);
-document.body.appendChild(startDateInput);
+function Create() {
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [areaName, setAreaName] = useState('');
+  const [distance, setDistance] = useState('');
+  const [rasterBand, setRasterBand] = useState('VV');
+  const [coordinates, setCoordinates] = useState(null);
+  const [apiStatus, setApiStatus] = useState({});
 
-const endDateLabel = document.createElement('label');
-endDateLabel.htmlFor = 'end_date';
-endDateLabel.textContent = 'End Date:';
-const endDateInput = document.createElement('input');
-endDateInput.type = 'text';
-endDateInput.id = 'end_date';
-endDateInput.placeholder = 'Select End Date';
-document.body.appendChild(endDateLabel);
-document.body.appendChild(endDateInput);
+  // State to store rectangle bounds
+  const [rectangleBounds, setRectangleBounds] = useState(null);
 
-const areaNameLabel = document.createElement('label');
-areaNameLabel.htmlFor = 'area_name';
-areaNameLabel.textContent = 'Area Name:';
-const areaNameInput = document.createElement('input');
-areaNameInput.type = 'text';
-areaNameInput.id = 'area_name';
-document.body.appendChild(areaNameLabel);
-document.body.appendChild(areaNameInput);
+  // Leaflet 'useMapEvents' hook to interact with map
+  function AddRectangleToMap() {
+    const map = useMapEvents({
+      click() {
+        setRectangleBounds(null); // Reset on click
+      },
+      draw: (event) => {
+        switch (event.layerType) {
+          case 'rectangle':
+            setRectangleBounds(event.layer.getBounds());
+            break;
+          default:
+            break; // Do nothing for other draw types
+        }
+      },
+    });
 
-const distanceLabel = document.createElement('label');
-distanceLabel.htmlFor = 'distance';
-distanceLabel.textContent = 'Distance:';
-const distanceInput = document.createElement('input');
-distanceInput.type = 'text';
-distanceInput.id = 'distance';
-document.body.appendChild(distanceLabel);
-document.body.appendChild(distanceInput);
+    return rectangleBounds ? (
+      <Rectangle bounds={rectangleBounds} pathOptions={{ color: 'blue' }} />
+    ) : null;
+  }
 
-const rasterBandLabel = document.createElement('label');
-rasterBandLabel.textContent = 'Choose Raster Band:';
-const vvInput = document.createElement('input');
-vvInput.type = 'radio';
-vvInput.id = 'vv';
-vvInput.name = 'raster_band';
-vvInput.value = 'VV';
-vvInput.checked = true;
-const vvInputLabel = document.createElement('label');
-vvInputLabel.htmlFor = 'vv';
-vvInputLabel.textContent = 'VV';
-const vhInput = document.createElement('input');
-vhInput.type = 'radio';
-vhInput.id = 'vh';
-vhInput.name = 'raster_band';
-vhInput.value = 'VH';
-const vhInputLabel = document.createElement('label');
-vhInputLabel.htmlFor = 'vh';
-vhInputLabel.textContent = 'VH';
-document.body.appendChild(rasterBandLabel);
-document.body.appendChild(vvInput);
-document.body.appendChild(vvInputLabel);
-document.body.appendChild(vhInput);
-document.body.appendChild(vhInputLabel);
+  const sendDataToAPI = () => {
+    const data = {
+      startDate: startDate,
+      endDate: endDate,
+      areaName: areaName,
+      distance: distance,
+      rasterBand: rasterBand,
+    };
 
-// Leaflet Map Initialization
-var map = L.map('map').setView([37.7749, -122.4194], 10); // San Francisco Coordinates
+    // Include coordinates from rectangleBounds
+    if (rectangleBounds) {
+      data.xmin = rectangleBounds.getSouthWest().lng;
+      data.ymin = rectangleBounds.getSouthWest().lat;
+      data.xmax = rectangleBounds.getNorthEast().lng;
+      data.ymax = rectangleBounds.getNorthEast().lat;
+    }
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
+    axios.post('http://127.0.0.1:5000/api/create', data)
+      .then(response => {
+        setApiStatus({ success: true, message: 'Data sent successfully' });
+      })
+      .catch(error => {
+        if (error.response) {
+          setApiStatus({ success: false, message: 'Server error: ' + error.response.status });
+        } else if (error.request) {
+          setApiStatus({ success: false, message: 'No response from server' });
+        } else {
+          setApiStatus({ success: false, message: 'Error: ' + error.message });
+        }
+      });
+  };
 
-// Initialize date pickers
-flatpickr("#start_date", {dateFormat: "Y-m-d"});
-flatpickr("#end_date", {dateFormat: "Y-m-d"});
+  return (
+    <>
+      <div className='Create'>
+        <p>
+          <strong>Create a new study area below!</strong>
+        </p>
+      </div>
+      <div>
+        <label htmlFor='start_date'>Start Date:</label>
+        <DatePicker
+          id='start_date'
+          selected={startDate}
+          onChange={date => setStartDate(date)}
+          dateFormat='yyyy-MM-dd'
+          placeholderText='Select Start Date'
+          className='inputField'
+        />
+        <label htmlFor='end_date'>End Date:</label>
+        <DatePicker
+          id='end_date'
+          selected={endDate}
+          onChange={date => setEndDate(date)}
+          dateFormat='yyyy-MM-dd'
+          placeholderText='Select End Date'
+          className='inputField'
+        />
+      </div>
+      <div>
+        <label htmlFor='area_name'>Area Name: </label>
+        <input type='text' id='area_name' value={areaName} onChange={e => setAreaName(e.target.value)} className='inputField' />
+      </div>
+      <div>
+        <label htmlFor='distance'>Distance between sampling points (.005 = 500 meters): </label>
+        <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
+      </div>
+      <div>
+        <label>Choose Raster Band:</label>
+      </div>
+      <div className='radioGroup'>
+        <input type='radio' id='vv' name='raster_band' value='VV' checked={rasterBand === 'VV'} onChange={() => setRasterBand('VV')} />
+        <label htmlFor='vv'>VV</label>
+        <input type='radio' id='vh' name='raster_band' value='VH' checked={rasterBand === 'VH'} onChange={() => setRasterBand('VH')} />
+        <label htmlFor='vh'>VH</label> 
+      </div>
 
-// Get values from user inputs
-document.getElementById('start_date').addEventListener('change', function() {
-  const startDate = this.value;
-  console.log("Start Date:", startDate);
-});
+      {/* Leaflet Map Section */}
+      <div className='leaflet-container'>
+      <MapContainer center={[51.505, -0.09]} zoom={13}> 
+        <TileLayer
+          // ... your tile layer setup
+        />
+        <FeatureGroup> {/* A FeatureGroup is needed for Draw controls */}
+          <DrawControl 
+            position='topright'
+            onCreated={(e) => {
+              const type = e.layerType;
+              if (type === 'rectangle') {
+                setRectangleBounds(e.layer.getBounds());
+              }
+            }} 
+            draw={{
+              rectangle: true, // Enable rectangle drawing (you can add more options if needed)
+              circle: false,  // Disable other drawing tools here 
+              polyline: false,
+              // ... etc 
+            }}
+          />
+        </FeatureGroup>
+        <AddRectangleToMap /> 
+      </MapContainer>
+      </div>
 
-document.getElementById('end_date').addEventListener('change', function() {
-  const endDate = this.value;
-  console.log("End Date:", endDate);
-});
+      <button onClick={sendDataToAPI} className='submitButton'>Send Data to API</button>
+      {/* ... (the rest of your component: coordinates display, apiStatus message) */}
+    </>
+  );
+}
 
+<<<<<<< Updated upstream
 document.getElementById('area_name').addEventListener('input', function() {
   const areaName = this.value;
   console.log("Area Name:", areaName);
@@ -132,3 +200,6 @@ document.querySelectorAll('input[name="raster_band"]').forEach(function(radio) {
   });
 });
 */
+=======
+export default Create;
+>>>>>>> Stashed changes
