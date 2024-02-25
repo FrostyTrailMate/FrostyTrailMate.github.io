@@ -1,30 +1,46 @@
-import React, { useState} from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 function Navbar() {
   const [click, setClick] = useState(false);
-  const handleClick = () => setClick(!click);
+  const location = useLocation();
+
+  const handleClick = () => {
+    setClick(!click);
+    window.scrollTo(0, 0); // Scrolls to the top when a link is clicked
+  };
+
+  const handleLogoClick = () => {
+    setClick(false); // Close mobile menu if logo is clicked
+    window.scrollTo(0, 0); // Scrolls to the top when logo is clicked
+    if (location.pathname === '/') {
+      window.location.reload(); // Reload the page if already on the home page
+    }
+  };
+
   const closeMobileMenu = () => setClick(false);
+
+  useEffect(() => {
+    // Close mobile menu when the location changes (e.g., navigation)
+    setClick(false);
+  }, [location]);
 
   return (
     <>
       <nav className='navbar'>
         <div className='navbar-container'>
-          <Link to='/' className='navbar-logo' onClick={closeMobileMenu}> FTM8 <i class='fas fa-snowflake' /></Link>
+          <Link to='/' className='navbar-logo' onClick={handleLogoClick}> FTM8 <i className='fas fa-snowflake' /></Link>
           <div className='menu-icon' onClick={handleClick}>
             <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
           </div>
           <ul className={click ? 'nav-menu active' : 'nav-menu'}>
             <li className='nav-item'>
-              <Link to='/' className='nav-links' onClick={closeMobileMenu}>
+              <Link to='/' className='nav-links' onClick={handleClick}>
                 Home
               </Link>
             </li>
             <li className='nav-item'>
-              <Link
-                to='/About'
-                className='nav-links'
-                onClick={closeMobileMenu}>
+              <Link to='/about' className='nav-links' onClick={handleClick}>
                 About us
               </Link>
             </li>
@@ -36,3 +52,5 @@ function Navbar() {
 }
 
 export default Navbar;
+
+
