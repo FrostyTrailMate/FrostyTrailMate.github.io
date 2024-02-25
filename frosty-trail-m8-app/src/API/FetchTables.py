@@ -36,7 +36,7 @@ class results(db.Model):
     area_name = db.Column(db.String(30))
     elevation =  db.Column(db.String(30))
     coverage_percentage = db.Column(db.Float)
-    ddatetime = db.Column(db.Date)
+    datetime = db.Column(db.Date)
     detected_points = db.Column(db.Integer)
     total_points = db.Column(db.Integer)
     
@@ -54,7 +54,7 @@ def get_results():
              'area_name': result.area_name, 
              'elevation': result.elevation,
              'coverage_percentage': result.coverage_percentage,
-             'ddatetime': result.ddatetime, 
+             'ddatetime': result.datetime, 
              'detected_points': result.detected_points, 
              'total_points': result.total_points} for result in resultftm8]
     

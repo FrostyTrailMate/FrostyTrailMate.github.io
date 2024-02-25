@@ -51,7 +51,7 @@ const ResultsTable = () => {
                                 <tr key={result.id_res}>
                                     <td>{result.area_name === 'Yosemite' ? result.area_name + ' National Park' : result.area_name}</td>
                                     <td>{result.elevation}</td>
-                                    <td>{formatDate(result.ddatetime)}</td>
+                                    <td>{formatDate(result.datetime)}</td>
                                     <td>{result.detected_points}</td>
                                     <td>{result.total_points}</td>
                                     <td>{result.coverage_percentage}</td>
