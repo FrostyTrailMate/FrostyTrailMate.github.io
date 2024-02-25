@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Home from './components/pages/Home';
 import About from './components/pages/About';
 import Footer from './components/Footer';
+import Create from './components/pages/Create';
 
 import './App.css';
 import './components/CCStyles/Navbar.css';
@@ -15,8 +16,9 @@ function App() {
       <Router>
       <Navbar />
         <Routes>
-          <Route exact path='/' element={<Home />} />
+          <Route exact path='/Home' element={<Home />} />
           <Route path='/About' element={<About />} />
+          <Route path='/Create' element={<Create />} />
         </Routes>
         <Footer />
       </Router>

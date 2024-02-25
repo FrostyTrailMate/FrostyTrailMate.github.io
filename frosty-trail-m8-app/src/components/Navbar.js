@@ -29,14 +29,19 @@ function Navbar() {
     <>
       <nav className='navbar'>
         <div className='navbar-container'>
-          <Link to='/' className='navbar-logo' onClick={handleLogoClick}> FTM8 <i className='fas fa-snowflake' /></Link>
+          <Link to='/home' className='navbar-logo' onClick={handleLogoClick}> FTM8 <i className='fas fa-snowflake' /></Link>
           <div className='menu-icon' onClick={handleClick}>
             <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
           </div>
           <ul className={click ? 'nav-menu active' : 'nav-menu'}>
             <li className='nav-item'>
-              <Link to='/' className='nav-links' onClick={handleClick}>
+              <Link to='/home' className='nav-links' onClick={handleClick}>
                 Home
+              </Link>
+            </li>
+            <li className='nav-item'>
+              <Link to='/create' className='nav-links' onClick={handleClick}>
+                Create
               </Link>
             </li>
             <li className='nav-item'>
@@ -44,6 +49,7 @@ function Navbar() {
                 About us
               </Link>
             </li>
+
           </ul>
         </div>
       </nav>
