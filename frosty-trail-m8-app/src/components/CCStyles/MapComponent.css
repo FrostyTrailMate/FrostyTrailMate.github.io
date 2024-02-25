@@ -1,6 +1,6 @@
 .map-container {
   background-color: #272727;
-  padding: 30px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -9,26 +9,35 @@
 .toggle-container {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
-.basemap-toggles,
 .geojson-toggles {
+  align-items: center;
   display: flex;
-  flex-direction: column;
   margin-bottom: 10px;
   font-family: 'Arial', sans-serif;
   font-size: 18px;
   color: #fff;
   letter-spacing: 0.2px;
+  margin: auto
 }
 
+.basemap-toggles{
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-family: 'Arial', sans-serif;
+  font-size: 18px;
+  color: #fff;
+  margin: auto
+}
 .basemap-toggle,
 .geojson-toggle {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
   cursor: pointer;
+  padding: 10px;
 }
 
 .basemap-toggle input[type="radio"],
@@ -83,7 +92,7 @@
 
 .leaflet-container {
   width: 80%; /* Ensure the Leaflet map container takes full width */
-  height: 550px;
+  height: 530px;
   border-radius: 10px;
   box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
   margin-bottom: 20px; /* Add margin-bottom to separate the map from toggles */

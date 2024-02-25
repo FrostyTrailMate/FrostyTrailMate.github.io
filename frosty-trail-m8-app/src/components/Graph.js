@@ -87,8 +87,8 @@ const ElevationCoverageGraph = () => {
                     title="Coverage Percentage (%)" style={{ title: { fill: '#fff', fontFamily: 'Arial, sans-serif', fontSize: '16px' },
                     line: { stroke: '#fff', strokeWidth: 1}}} />
                 <LineSeries data={data} stroke="rgba(0, 255, 255, 0.971)" strokeWidth={4} onNearestX={onNearestX} />
-                <LineSeries data={trendLineData} stroke="#e9e9e9" strokeWidth={2} strokeDasharray="5,5" />
-                <MarkSeries data={data} size={5} color="rgba(0, 255, 255, 0.971)" stroke="#fff" strokeWidth={2}/>
+                <LineSeries data={trendLineData} stroke="#e9e9e9" strokeWidth={2} strokeDasharray="10" />
+                <MarkSeries data={data} size={6} color="rgba(0, 255, 255, 0.971)" stroke="#fff" strokeWidth={2}/>
                 <Crosshair 
                     values={crosshairValues} 
                     titleFormat={(values) => {

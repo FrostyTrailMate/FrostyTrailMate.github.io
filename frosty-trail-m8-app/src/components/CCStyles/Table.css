@@ -6,6 +6,7 @@
   padding: 10px;
   padding-top: 20px;
   background-color: #272727; /* Dark background color */
+  flex-direction: column;
 }
 
 /* Style for the scrollable table container */
@@ -51,7 +52,7 @@
 
 /* Hover effect on table rows*/
 .styled-table tbody tr:hover {
-  background-color: #1b6870;
+  background-color: rgba(0, 255, 255, 0.273);
 }
 
 /* Style for table data cells */
@@ -79,6 +80,22 @@
 /* Style for the scrollbar track */
 .scrollable-table::-webkit-scrollbar-track {
   background-color: #494949;
+}
+
+/* Add this CSS to your existing stylesheet or create a new one */
+
+.download-btn {
+  background-color: rgba(2, 229, 254, 0.707); /* Green */
+  color: white;
+  border: none;
+  padding: 13px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 17px;
+  margin: 30px 10px;
+  cursor: pointer;
+  border-radius: 15px;
 }
 
 
