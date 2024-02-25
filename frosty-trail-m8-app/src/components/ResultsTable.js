@@ -77,7 +77,7 @@ const ResultsTable = () => {
                             })
                             .map(result => (
                                 <tr key={result.id_res}>
-                                    <td>{result.area_name === 'Yosemite' ? result.area_name + ' National Park' : result.area_name}</td>
+                                    <td>{result.area_name}</td>
                                     <td>{result.elevation}</td>
                                     <td>{result.detected_points}</td>
                                     <td>{result.total_points}</td>
