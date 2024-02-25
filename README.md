@@ -1,5 +1,5 @@
 The purpose of this project is to utilize Sentinel-1 SAR data to detect snow coverage on the ground in popular hiking areas.
-The project was built and tested using Yosemite National Park in California in the United States.
+The project was built and tested using Yosemite National Park in California in the United States, but it is usable worldwide.
  
 Project Overview (in the order of operation)
 1. Run all scripts (__main__.py)
@@ -13,6 +13,8 @@ Project Overview (in the order of operation)
       -p: the relative path to a shapefile. Either this argument or -c is required. Used in DEM.py and sentinel.py.
       -d: the distance between sampling points. Default: .005 (about 500 meters). Used in sampling.py.
       -b: the SAR band to process for snow. Used in snow_detect.py. Can be either 'VV' or 'VH'. Default: VV
+   - Example (for a rectangular bounding box around Yosemite National Park):
+         python __main__.py -c -119.9 37.5 -119.1 38.2 -s 2024-02-02 -e 2024-02-24 -b VV -d .005 -n Yosemite 
 2. Collect and process DEM imagery ('Python Scripts/DEM.py'). Runs concurrently with sentinel.py.
    - Connect to the OpenTopography API and authenticate. It downloads updated NASA SRTM information at a 30m spatial resolution. Maximum 500 requests per day.
    - Uses -c or -p to get a bounding box, which it downloads the contents of.
