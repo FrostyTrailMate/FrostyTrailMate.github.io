@@ -1,4 +1,21 @@
-// Create elements
+import React from 'react';
+import '../CCStyles/Create.css';
+
+function Create() {
+  return (
+    <>
+      <div className='Create'>
+        <p><strong></strong>
+        </p>
+      </div>
+    </>
+  );
+}
+
+export default Create;
+
+
+/*// Create elements
 const homecoverContainer = document.createElement('div');
 homecoverContainer.className = 'homecover-container';
 const h1 = document.createElement('h1');
@@ -114,3 +131,4 @@ document.querySelectorAll('input[name="raster_band"]').forEach(function(radio) {
     console.log("Raster Band:", rasterBand);
   });
 });
+*/
