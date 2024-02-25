@@ -50,7 +50,6 @@ def prompt_reset():
         choice = input("Will proceed without resetting the database in 5 seconds. Do you want to reset the database and saved data? (y/n): ").lower()
         return choice
 
-    user_input = None
     input_thread = threading.Thread(target=lambda: setattr(input_thread, 'user_input', _input()))
     input_thread.daemon = True
     input_thread.start()
@@ -90,12 +89,16 @@ if __name__ == "__main__":
     if prompt_reset():
         run_script('Python Scripts/createDB.py', [])
 
-    # Insert new row into userpolygons table with provided area_name and current datetime
+    # Insert new row into userpolygons table with provided area_name, current datetime, and band information
     try:
         with db_connection.cursor() as cursor:
-            cursor.execute("INSERT INTO userpolygons (area_name, datetime) VALUES (%s, %s)", (args.search_area_name, datetime.now()))
+            if args.coordinates:
+                polygon_text = f"POLYGON(({args.coordinates[0]} {args.coordinates[1]}, {args.coordinates[2]} {args.coordinates[1]}, {args.coordinates[2]} {args.coordinates[3]}, {args.coordinates[0]} {args.coordinates[3]}, {args.coordinates[0]} {args.coordinates[1]}))"
+                cursor.execute("INSERT INTO userpolygons (area_name, datetime, arg_b, arg_s, arg_e, arg_d, geom) VALUES (%s, %s, %s, %s, %s, %s, ST_GeomFromText(%s, 4326))", (args.search_area_name, datetime.now(), args.band, args.start_date, args.end_date, args.sampling_distance, polygon_text))
+            else:
+                cursor.execute("INSERT INTO userpolygons (area_name, datetime, arg_b, arg_s, arg_e, arg_d) VALUES (%s, %s, %s, %s, %s, %s)", (args.search_area_name, datetime.now(), args.band, args.start_date, args.end_date, args.sample_distance))
         db_connection.commit()
-        print("New row inserted into userpolygons table.")
+        print("New row inserted into userpolygons table with band information.")
     except psycopg2.Error as e:
         print("Error inserting row into userpolygons table:", e)
         db_connection.rollback()
