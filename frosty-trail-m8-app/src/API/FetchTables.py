@@ -11,7 +11,7 @@ DB_CONFIG = {
 
 # Create a flask application
 app = Flask(__name__)
-  # Enable CORS for all routes
+# Enable CORS for all routes
 CORS(app)
 # Set the database connection URI in the app configuration
 
