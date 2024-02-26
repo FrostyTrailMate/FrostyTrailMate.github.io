@@ -1,11 +1,10 @@
-.Create {
+.Createvdiv {
   display: flex;
-  height: 100vh;
+  height: 50vh;
   align-items: center;
   justify-content: center;
   width: 100%;
-  background-color: #272727;
-  background-image: url('../images/HikingAboutUs.png');
+  background-color: #484848;
   background-position: center;
   background-size: cover;
 }

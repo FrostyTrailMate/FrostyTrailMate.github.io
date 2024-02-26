@@ -1,0 +1,99 @@
+.map-container-c {
+    background-color: #272727;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .toggle-container-c {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+  
+  .geojson-toggles-c {
+    align-items: center;
+    display: flex;
+    margin-bottom: 10px;
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    color: #fff;
+    letter-spacing: 0.2px;
+    margin: auto
+  }
+  
+  .basemap-toggles-c{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    color: #fff;
+    margin: auto
+  }
+  .basemap-toggle-c,
+  .geojson-toggle-c {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+  }
+  
+  .basemap-toggle-c input[type="radio"],
+  .geojson-toggle-c input[type="checkbox"] {
+    margin-right: 10px;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: #555;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .geojson-toggle-c input[type="checkbox"]:checked {
+    background-color: #21b8f3;
+  }
+  
+  .basemap-toggle-c input[type="radio"]:checked {
+    background-color: #18fb77;
+  }
+  
+  .basemap-toggle-c input[type="radio"]:after,
+  .geojson-toggle-c input[type="checkbox"]:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  .basemap-toggle-c input[type="radio"]:checked:after,
+  .geojson-toggle-c input[type="checkbox"]:checked:after {
+    opacity: 1;
+  }
+  
+  /* Font Styling */
+  .basemap-toggle-c span,
+  .geojson-toggle-c span {
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    color: #fff;
+    letter-spacing: 0.2px;
+  }
+  
+  .leaflet-container-c {
+    width: 80%; /* Ensure the Leaflet map container takes full width */
+    height: 530px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+    margin-bottom: 20px; /* Add margin-bottom to separate the map from toggles */
+  }
