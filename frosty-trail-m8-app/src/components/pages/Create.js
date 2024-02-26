@@ -1,32 +1,3 @@
-<<<<<<< Updated upstream
-import React from 'react';
-import '../CCStyles/Create.css';
-
-function Create() {
-  return (
-    <>
-      <div className='Create'>
-        <p><strong></strong>
-        </p>
-      </div>
-    </>
-  );
-}
-
-export default Create;
-
-
-/*// Create elements
-const homecoverContainer = document.createElement('div');
-homecoverContainer.className = 'homecover-container';
-const h1 = document.createElement('h1');
-h1.textContent = 'FROSTY TRAIL MATE';
-const p = document.createElement('p');
-p.textContent = 'Explore Trails with Confidence';
-homecoverContainer.appendChild(h1);
-homecoverContainer.appendChild(p);
-document.body.appendChild(homecoverContainer);
-=======
 import React, { useEffect, useState } from 'react';
 import '../CCStyles/Create.css';
 import DatePicker from 'react-datepicker';
@@ -35,7 +6,6 @@ import axios from 'axios';
 import { MapContainer, TileLayer, Rectangle, useMapEvents, FeatureGroup, DrawControl } from 'react-leaflet'; 
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
->>>>>>> Stashed changes
 
 
 function Create() {
