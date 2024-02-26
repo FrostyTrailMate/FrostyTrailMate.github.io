@@ -7,9 +7,8 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import { EditControl } from 'react-leaflet-draw';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import './CCStyles/MapCreate.css';
 import './CCStyles/Create.css';
-import './CCStyles/MapCreate.css';
+import './CCStyles/CreateMenu.css';
 import TrailsYosemite from './geojsons/Trails.json';
 
 function CreateMenu() {
@@ -117,7 +116,7 @@ function CreateMenu() {
   
     const apiUrl = 'http://127.0.0.1:5000/api/create';
   
-    setApiStatus({ success: true, message: `Sending data to: ${apiUrl}` });
+    setApiStatus({ success: true, message: `Sending data to API...` });
   
     setTimeout(() => {
       fetch(apiUrl, {
@@ -129,7 +128,7 @@ function CreateMenu() {
       })
         .then(response => {
           if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error('Network response was not successful: Please ensure all the parameters are filled out correctly');
           }
           return response.json();
         })
@@ -144,6 +143,15 @@ function CreateMenu() {
 
   return (
     <>
+    <div style={{background: '#272727', fontSize: '25px',
+                fontFamily: 'Arial', display:'flex', 
+                justifyContent:'center', paddingTop: '30px',
+                paddingBottom: '15px', color: 'white'
+                }}>
+      <p>
+        <strong>Create a new study area below!</strong>
+      </p>
+    </div>
     <div className="map-container-c">
       <div className="toggle-container-c">
         <div className="basemap-toggles-c" >
@@ -208,24 +216,14 @@ function CreateMenu() {
           />
         </FeatureGroup>
       </MapContainer>
-      <div>
-        <ul>
-          {drawnItems.map((item, index) => (
-            <li key={index}>
-              Rectangle {index + 1}: {JSON.stringify(item.getBounds())}
-            </li>
-          ))}
-        </ul>
-      </div>
+
     </div>
-      <div className='Creatediv'>
-        <p>
-          <strong>Create a new study area below!</strong>
-        </p>
+    <div className='container-menu-full'>
+      <div className='create-text'>
       </div>
-      <div>
-        <label htmlFor='start_date'>Start Date:</label>
-        <DatePicker
+      <div style={{paddingBottom:'15px'}}>
+        <label style={{paddingRight:'15px'}} htmlFor='start_date'>Start Date:</label>
+        <DatePicker 
           id='start_date'
           selected={startDate}
           onChange={date => setStartDate(date)}
@@ -234,7 +232,7 @@ function CreateMenu() {
           className='inputField'
         />
         <label htmlFor='end_date'>End Date:</label>
-        <DatePicker
+        <DatePicker 
           id='end_date'
           selected={endDate}
           onChange={date => setEndDate(date)}
@@ -247,20 +245,17 @@ function CreateMenu() {
         <label htmlFor='area_name'>Area Name: </label>
         <input type='text' id='area_name' value={areaName} onChange={e => setAreaName(e.target.value)} className='inputField' />
       </div>
-      <div>
+      <div style={{paddingTop:'20px'}}>
         <label htmlFor='distance'>Distance between sampling (.005 = 500 meters): </label>
         <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
-        <div>
-          <label>Choose Raster Band:</label>
-        </div>
+        <div style={{paddingTop:'15px'}}>
         <div className='radioGroup'>
+          <label1 htmlFor='distance'>Choose Raster Band:</label1>
           <input type='radio' id='vv' name='raster_band' value='VV' checked={rasterBand === 'VV'} onChange={() => setRasterBand('VV')} />
           <label htmlFor='vv'>VV</label>
           <input type='radio' id='vh' name='raster_band' value='VH' checked={rasterBand === 'VH'} onChange={() => setRasterBand('VH')} />
           <label htmlFor='vh'>VH</label>
         </div>
-        <div>
-          <label>Enter Coordinates:</label>
         </div>
         <div>
           <div className='inputFieldCoordinateContainer'>
@@ -282,8 +277,6 @@ function CreateMenu() {
                 className='inputFieldCoordinate' 
               />
             </div>
-          </div>
-          <div className='inputFieldCoordinateContainer'>
             <div className='inputFieldCoordinateWrapper'>
               <label className='inputFieldCoordinateLabel'>Ymin</label>
               <input 
@@ -304,24 +297,20 @@ function CreateMenu() {
             </div>
           </div>
         </div>
-
-
-        <button onClick={sendDataToAPI} className='submitButton'>Send Data to API</button>
-
       </div>
-      {coordinates && (
-        <div className='coordinates'>
-          <p>xmin: {coordinates.xmin}</p>
-          <p>ymin: {coordinates.ymin}</p>
-          <p>xmax: {coordinates.xmax}</p>
-          <p>ymax: {coordinates.ymax}</p>
-        </div>
-      )}
-      {apiStatus.message && (
+      </div>
+      <div style={{display:'flex', justifyContent:'center', backgroundColor:'#272727'}}>
+
+        <button onClick={sendDataToAPI} className='submitButton'>Submit to API</button>
+      </div>
+
+      <div style={{backgroundColor:'#272727',paddingBottom: '30px', paddingTop:'25px'}}>   
+        {apiStatus.message && (
         <div className={`apiMessage ${apiStatus.success ? 'success' : 'error'}`}>
-          {apiStatus.message}
+            {apiStatus.message}
         </div>
-      )}
+        )}
+      </div>
     </>
   );
 }

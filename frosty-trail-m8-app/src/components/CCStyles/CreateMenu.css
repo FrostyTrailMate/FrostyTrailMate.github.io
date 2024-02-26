@@ -1,0 +1,217 @@
+/* Map Container */
+.map-container-c {
+    background-color: #272727;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Toggle Container */
+  .toggle-container-c {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+  
+  /* GeoJSON Toggles */
+  .geojson-toggles-c {
+    align-items: center;
+    display: flex;
+    margin-bottom: 10px;
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    color: #fff;
+    letter-spacing: 0.2px;
+    margin: auto;
+  }
+  
+  /* Basemap Toggles */
+  .basemap-toggles-c {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    margin: auto;
+  }
+  
+  /* Basemap and GeoJSON Toggle Styling */
+  .basemap-toggle-c,
+  .geojson-toggle-c {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    color: #fff;
+  }
+  
+  /* Radio and Checkbox Styling */
+  .basemap-toggle-c input[type="radio"],
+  .geojson-toggle-c input[type="checkbox"] {
+    margin-right: 10px;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: #555;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  /* Checked State Styling for GeoJSON Toggle */
+  .geojson-toggle-c input[type="checkbox"]:checked {
+    background-color: #21b8f3;
+  }
+  
+  /* Checked State Styling for Basemap Toggle */
+  .basemap-toggle-c input[type="radio"]:checked {
+    background-color: #18fb77;
+  }
+  
+  /* Styling for After State of Radio and Checkbox */
+  .basemap-toggle-c input[type="radio"]:after,
+  .geojson-toggle-c input[type="checkbox"]:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  /* Checked State Styling for After of Radio and Checkbox */
+  .basemap-toggle-c input[type="radio"]:checked:after,
+  .geojson-toggle-c input[type="checkbox"]:checked:after {
+    opacity: 1;
+  }
+  
+  /* Font Styling for Basemap and GeoJSON Toggle Text */
+  .basemap-toggle-c span,
+  .geojson-toggle-c span {
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    color: #fff;
+    letter-spacing: 0.2px;
+  }
+  
+  /* Leaflet Map Container */
+  .leaflet-container-c {
+    width: 80%; /* Ensure the Leaflet map container takes full width */
+    height: 530px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+    margin-bottom: 10px; /* Add margin-bottom to separate the map from toggles */
+  }
+
+  .container-menu-full {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #272727;
+    padding-left: 140px;
+    padding-top: 25px;
+
+  }
+  
+  label,.inputFieldCoordinateLabel {
+    color: #ffffff;
+    margin-right: 10px;
+    margin-left: 20px;
+    font-size: 18px;
+    font-family: 'Arial', sans-serif;
+  }
+
+.inputFieldCoordinateContainer{
+    padding-top: 15px;
+    padding-left: 22px;
+  }
+
+  .inputFieldCoordinateWrapper{
+    display: flex;
+    align-items: center;
+    padding-right: 30px;
+  }
+
+  .inputField,
+  .inputFieldDist,
+  .inputFieldCoordinate {
+    width: 250px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #000000;
+    background-color: #f7f7f7;
+    color: #000000;
+    font-size: 18px;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .radioGroup input[type='radio'] {
+    margin-right: 5px;
+  }
+  
+  .radioGroup label {
+    color: #000000;
+    background-color: #f7f7f7;
+  }
+  .radioGroup label1 {
+    color: #ffffff;
+    margin-right: 10px;
+    margin-left: 20px;
+    font-size: 18px;
+    font-family: 'Arial', sans-serif;;
+  }
+  
+  .submitButton {
+    background-color:rgba(4, 147, 160, 0.795);
+    color: white;
+    border: none;
+    padding: 13px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 17px;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 15px;
+  }
+  
+  .coordinates {
+    color: #ffffff;
+    background-color: #272727;
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 5px;
+  }
+  
+  .apiMessage {
+    font-size: 18px;
+    margin: 0;
+    border-radius: 0px;
+    background-color: #272727;
+    margin-left: 500px;
+    margin-right: 500px;
+    border-radius: 30px;
+    line-height: 1.5;
+  }
+  
+  .apiMessage.success {
+    background-color: rgb(0, 210, 116);
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .apiMessage.error {
+    background-color: rgb(255, 53, 53);
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  
