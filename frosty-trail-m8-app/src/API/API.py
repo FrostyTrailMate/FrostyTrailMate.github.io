@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+import subprocess
+from geoalchemy2 import Geometry
 
 DB_CONFIG = {
     "database": "FTM8",
@@ -40,7 +42,6 @@ class results(db.Model):
     detected_points = db.Column(db.Integer)
     total_points = db.Column(db.Integer)
     
-
 # Route to fetch data
 # This function will be called when a request is made to the '/api/results' endpoint
 # Route to fetch sorted data by altitude
@@ -59,8 +60,31 @@ def get_results():
              'total_points': result.total_points} for result in resultftm8]
     
     return jsonify(data)
-    
+
+
+# Route to handle POST request for '/api/Create'
+@app.route('/api/create', methods=['POST'])
+def create_entry():
+    # Example of handling POST data
+    if request.method == 'POST':
+        # Assuming the POST request contains JSON data
+        data = request.json
+        # Process the data as needed
+        # For example, if the JSON contains 'area_name', 'elevation', 'coverage_percentage', etc.
+        # You can extract these values from the 'data' dictionary
+        startDate = data.get('startDate')
+        endDate = data.get('endDate')
+        coordinates = data.get('coordinates')
+        areaName = data.get('areaName')
+        distance = data.get('distance')
+        rasterBand = data.get('rasterBand')
+        try:
+            subprocess.run(["python", "__main__.py", "-s", startDate, "-e", endDate, "-c", coordinates, "-n", areaName, "-d", distance, "-b", rasterBand])
+            return jsonify({'message': 'Script executed successfully'}), 201
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    else:
+        return jsonify({'error': 'Method not allowed'}), 405
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-
