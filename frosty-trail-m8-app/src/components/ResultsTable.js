@@ -58,7 +58,6 @@ const ResultsTable = ({ selectedArea }) => {
                 <table className="styled-table">
                     <thead>
                         <tr>
-                            <th> AREA </th>
                             <th> ELEVATION (m) </th>
                             <th> DETECTED POINTS </th>
                             <th> TOTAL POINTS </th>
@@ -72,12 +71,11 @@ const ResultsTable = ({ selectedArea }) => {
                                 const firstNumberA = parseInt(a.elevation.match(/\d+/)[0]);
                                 const firstNumberB = parseInt(b.elevation.match(/\d+/)[0]);
                                 
-                                // Compare the first numbers in reverse order for sorting from higher to lower
-                                return firstNumberB - firstNumberA;
+                                // Compare the first numbers in reverse order for sorting from lower to higher
+                                return firstNumberA - firstNumberB;
                             })
                             .map(result => (
                                 <tr key={result.id_res}>
-                                    <td>{result.area_name}</td>
                                     <td>{result.elevation}</td>
                                     <td>{result.detected_points}</td>
                                     <td>{result.total_points}</td>
@@ -89,7 +87,7 @@ const ResultsTable = ({ selectedArea }) => {
             </div>
             {areaGeneratedDateTime && (
                 <div className = "message-container">
-                    Custom area {selectedArea} was generated on {areaGeneratedDateTime}.
+                    Custom area "{selectedArea}" was generated on {areaGeneratedDateTime}.
                 </div>
             )}
             <button className="download-btn" onClick={downloadCSV}>Download Table as CSV</button>

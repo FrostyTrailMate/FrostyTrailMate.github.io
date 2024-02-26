@@ -16,7 +16,8 @@ function Home() {
   useEffect(() => {
     axios.get('http://127.0.0.1:5000/api/results')
       .then(response => {
-        const areas = response.data.map(result => result.area_name);
+        const sortedData = response.data.sort((a, b) => a.id - b.id); // Sort by id
+        const areas = sortedData.map(result => result.area_name);
         const uniqueAreas = [...new Set(areas)];
         setUniqueAreaNames(uniqueAreas);
         if (uniqueAreas.length > 0) {
@@ -27,6 +28,7 @@ function Home() {
         console.error('Error fetching results:', error);
       });
   }, []);
+  
 
   return (
     <>
