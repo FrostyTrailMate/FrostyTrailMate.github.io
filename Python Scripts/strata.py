@@ -6,20 +6,24 @@ from psycopg2 import sql
 import numpy as np
 from shapely.ops import unary_union
 import geopandas as gpd
+import pandas as pd
 import math
 import rasterio.features
 from psycopg2.extensions import Binary
 import time
+import os
+import shutil
 
 print("Taking a short rest. Please wait 3 seconds.")
 
-print("++++++++++ Running strata.py ++++++++++")
-
-
 time.sleep(3)
+
+print("++++++++++ Running strata.py ++++++++++")
 
 # Output directory for shapefiles
 output_dir = 'Outputs/Shapefiles/ElevationStrata'
+output_geojson_dir = 'frosty-trail-m8-app/src/components/geojsons'  
+temp_geojson_dir = 'frosty-trail-m8-app/src/components/geojsons/temp'  # Temporary directory for individual GeoJSON files
 
 # Connect to PostgreSQL
 def connect_to_postgres():
@@ -46,7 +50,6 @@ def connect_to_postgres():
 
 from shapely.ops import cascaded_union
 
-# Function to generate polygons for each elevation band
 # Function to generate polygons for each elevation band
 def generate_polygons(dem_file, conn, area_name):
     """
@@ -78,9 +81,11 @@ def generate_polygons(dem_file, conn, area_name):
 
         print(f"Total elevation strata: {total_strata}")
 
+        polygons_all_strata = []  # List to store polygons for all strata layers
+
         previous_multipolygon = None
 
-        # Iterate in reverse order
+        # Iterate through elevation strata
         for i in range(total_strata - 1, -1, -1):
             print(f"Processing elevation stratum {total_strata - i}/{total_strata}", end='\r')
 
@@ -106,25 +111,64 @@ def generate_polygons(dem_file, conn, area_name):
                     polygons.append(polygon)
 
             if polygons:
-                multi_polygon = unary_union(polygons)
+                polygons_all_strata.extend(polygons)
 
-                update_polygon(conn, area_name, lower_bound, upper_bound, multi_polygon)
-                
                 # Save polygons as shapefile with lower and upper bounds in the filename
                 output_filename = f'{output_dir}/{area_name}_stratum_{int(lower_bound)}_{int(upper_bound)}.shp'
-                gdf = gpd.GeoDataFrame({'geometry': [multi_polygon]}, crs='EPSG:4326')
+                gdf = gpd.GeoDataFrame({'geometry': polygons}, crs='EPSG:4326')
                 gdf.to_file(output_filename)
+                
+                # Save polygons as GeoJSON in the temporary directory with area_name as the filename
+                temp_geojson_filename = f'{temp_geojson_dir}/{area_name}_stratum_{int(lower_bound)}_{int(upper_bound)}.geojson'
+                gdf['elevation'] = f"{int(lower_bound)}-{int(upper_bound)}"  # Add elevation range as a property
+                
+                # Retrieve coverage percentage from the database
+                coverage_percentage = retrieve_coverage_percentage(conn, area_name, lower_bound, upper_bound)
+                if coverage_percentage is not None:
+                    gdf['coverage_percentage'] = coverage_percentage
 
-                # Update previous_multipolygon for next iteration
-                if previous_multipolygon:
-                    previous_multipolygon = [previous_multipolygon[0].union(multi_polygon)]
-                else:
-                    previous_multipolygon = [multi_polygon]
+                gdf.to_file(temp_geojson_filename, driver='GeoJSON')
+
+        # After iterating through all strata, merge all polygons into one multipolygon
+        multi_polygon = unary_union(polygons_all_strata)
+
+        # Update the database with the multipolygon
+        update_polygon(conn, area_name, min_elevation_floor, max_elevation_ceiling, multi_polygon)
+
+        # Merge all GeoJSON files into a single GeoJSON file
+        merge_geojson_files(area_name)
+        print("Merged all GeoJSON files successfully.")
 
         print("\nAll elevation strata processed and existing polygons updated successfully.")
     except Exception as e:
         print(f"Error generating and updating polygons: {e}")
 
+# Function to retrieve coverage percentage from the database
+def retrieve_coverage_percentage(conn, area_name, lower_bound, upper_bound):
+    """
+    Retrieves coverage percentage from the 'results' table in the PostgreSQL database based on the specified area name and elevation range.
+
+    Args:
+        conn (psycopg2.extensions.connection): A connection object to the PostgreSQL database.
+        area_name (str): Name of the area.
+        lower_bound (float): Lower bound of the elevation range.
+        upper_bound (float): Upper bound of the elevation range.
+
+    Returns:
+        float: Coverage percentage if found, otherwise None.
+    """
+    try:
+        with conn.cursor() as cursor:
+            select_query = sql.SQL("SELECT coverage_percentage FROM results WHERE area_name = %s AND elevation = %s")
+            cursor.execute(select_query, (area_name, f"{int(lower_bound)}-{int(upper_bound)}"))
+            result = cursor.fetchone()
+            if result:
+                return result[0]
+            else:
+                return None
+    except psycopg2.Error as e:
+        print(f"Error retrieving coverage percentage from PostgreSQL: {e}")
+        return None
 
 # Function to update polygons in the database
 def update_polygon(conn, area_name, lower_bound, upper_bound, geometry):
@@ -156,6 +200,41 @@ def update_polygon(conn, area_name, lower_bound, upper_bound, geometry):
         print("Polygon updated successfully.")
     except psycopg2.Error as e:
         print(f"Error updating polygon in PostgreSQL: {e}")
+
+# Function to merge all GeoJSON files into a single GeoJSON file
+def merge_geojson_files(area_name):
+    """
+    Merges all GeoJSON files corresponding to the specified area into a single GeoJSON file.
+
+    Args:
+        area_name (str): Name of the area.
+    """
+    try:
+        print("Merging GeoJSON files into a single GeoJSON file...")
+        
+        # Get all GeoJSON files corresponding to the specified area
+        geojson_files = [file for file in os.listdir(temp_geojson_dir) if file.startswith(area_name) and file.endswith(".geojson")]
+        
+        # Read all GeoJSON files
+        dfs = []
+        for geojson_file in geojson_files:
+            gdf = gpd.read_file(os.path.join(temp_geojson_dir, geojson_file))
+            dfs.append(gdf)
+        
+        # Concatenate GeoDataFrame objects
+        merged_gdf = gpd.GeoDataFrame(pd.concat(dfs, ignore_index=True), crs='EPSG:4326')
+        
+        # Save merged GeoJSON file without '_merged' in the filename
+        merged_output_geojson_filename = f'{output_geojson_dir}/{area_name}.geojson'
+        merged_gdf.to_file(merged_output_geojson_filename, driver='GeoJSON')
+
+        # Remove temporary GeoJSON files. Short rest to make sure all processes are finished before removing files.
+        time.sleep(2)
+        shutil.rmtree(temp_geojson_dir)
+        os.makedirs(temp_geojson_dir)
+
+    except Exception as e:
+        print(f"Error merging GeoJSON files: {e}")
 
 # Main function
 def main(area_name):
@@ -189,6 +268,7 @@ def main(area_name):
         # Close database connection
         conn.close()
         print("Database connection closed.")
+
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 

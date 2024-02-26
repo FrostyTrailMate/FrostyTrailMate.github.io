@@ -1,24 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, GeoJSON, FeatureGroup} from 'react-leaflet';
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-draw/dist/leaflet.draw.css';
-import { EditControl } from 'react-leaflet-draw';
 import './CCStyles/MapComponent.css'; // Import external CSS file
-import TrailsYosemite from './geojsons/Trails.json'; // Import GeoJSON data file
-import SnowCoverage from './geojsons/ElevationPolygons.json'; // Import GeoJSON data file
 
-const MapComponent = () => {
+const MapComponent = ({ selectedArea }) => {
   const [basemap, setBasemap] = useState('stamenTerrain');
-  const [showTrails, setShowTrails] = useState(true);
   const [showElevation, setShowElevation] = useState(true);
-  const [drawnItems, setDrawnItems] = useState([]);
-  const drawControlRef = useRef(null);
-
-  useEffect(() => {
-    if (drawControlRef.current) {
-      drawControlRef.current.leafletElement.options.edit.featureGroup.clearLayers();
-    }
-  }, [showElevation, showTrails]);
+  const [geojsonData, setGeojsonData] = useState(null);
+  const [refreshMap, setRefreshMap] = useState(false); // State to trigger map refresh
+  const [mapCenter, setMapCenter] = useState([37.8451, -119.5383]); // Default center
 
   const basemapUrls = {
     stamenTerrain: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png',
@@ -32,50 +23,50 @@ const MapComponent = () => {
     openStreetMap: '© OpenStreetMap contributors',
   };
 
+  useEffect(() => {
+    if (selectedArea) {
+      // Load GeoJSON data for the selected area from Flask server
+      axios.get(`http://127.0.0.1:5000/api/geojson/${selectedArea}`)
+        .then(response => {
+          setGeojsonData(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching GeoJSON data:', error);
+        });
+    }
+  }, [selectedArea]);
+
+  useEffect(() => {
+    // Set map center when geojsonData is updated
+    if (geojsonData && geojsonData.features.length > 0) {
+      const coordinates = geojsonData.features[0].geometry.coordinates[0][0];
+      setMapCenter([coordinates[1], coordinates[0]]);
+    }
+  }, [geojsonData]);
+
   const handleBasemapChange = (newBasemap) => {
     setBasemap(newBasemap);
-  };
-
-  const handleTrailsToggle = () => {
-    setShowTrails(!showTrails);
   };
 
   const handleElevationToggle = () => {
     setShowElevation(!showElevation);
   };
 
-  const purpleTrailStyle = {
-    color: '#A348B2', // Light purple color
-    weight: 1.2, // Adjust the weight of the trail
+  const handleRefreshMap = () => {
+    setRefreshMap(prev => !prev); // Toggle refreshMap state to trigger map refresh
   };
 
-  const lightBluePolygonStyle = {
-    color: '#555', // Grey color for contour lines
-    weight: 0.3, // Adjust the weight of the polygon
-    fill: true, // Fill the polygon with color
-    fillColor: '#A6CEE3', // Light blue color
-    fillOpacity: 0.3, // Adjust the opacity of the fill
-  };
-
-  const onEachFeature = (feature, layer) => {
-    if (feature.properties && feature.properties.popupContent) {
-      layer.bindPopup(feature.properties.popupContent);
-    }
-  };
-
-  const handleDrawCreated = (e) => {
-    const layer = e.layer;
-    setDrawnItems([...drawnItems, layer]);
-  };
-
-  const handleDrawDeleted = () => {
-    setDrawnItems([]);
-  };
-
-  const handleDrawEdited = (e) => {
-    const layers = e.layers;
-    const editedItems = layers.getLayers();
-    setDrawnItems([...editedItems]);
+  const polygonStyle = (feature) => {
+    const coveragePercentage = feature.properties.coverage_percentage;
+    const opacity = coveragePercentage ? coveragePercentage / 100 : 1; // Assuming coverage_percentage is a percentage value
+    
+    return {
+      color: '#555',
+      weight: 1.5,
+      fill: true,
+      fillColor: '#006688',
+      fillOpacity: opacity,
+    };
   };
 
   return (
@@ -101,81 +92,37 @@ const MapComponent = () => {
           <label className="geojson-toggle">
             <input
               type="checkbox"
-              checked={showTrails}
-              onChange={handleTrailsToggle}
-            />
-            <span className="toggle-text">Hiking Trails</span>
-          </label>
-          <label className="geojson-toggle">
-            <input
-              type="checkbox"
               checked={showElevation}
               onChange={handleElevationToggle}
             />
             <span className="toggle-text">Snow Coverage</span>
           </label>
         </div>
+        <button className="refresh-button" onClick={handleRefreshMap}>
+          Refresh Map
+        </button>
       </div>
       <MapContainer
-        center={[37.8451, -119.5383]}
+        center={mapCenter}
         zoom={10}
         className="leaflet-container"
+        key={refreshMap} // Key attribute forces re-render when refreshMap changes
       >
         <TileLayer
           url={basemapUrls[basemap]}
           subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
           attribution={basemapAttributions[basemap]}
         />
-
-        {showElevation && (
-          <GeoJSON data={SnowCoverage} style={lightBluePolygonStyle} onEachFeature={onEachFeature} />
-        )}
-
-        {showTrails && (
-          <GeoJSON data={TrailsYosemite} style={purpleTrailStyle} onEachFeature={onEachFeature} />
-        )}
-
-        <FeatureGroup>
-          <EditControl
-            position="topright"
-            onCreated={handleDrawCreated}
-            onEdited={handleDrawEdited}
-            onDeleted={handleDrawDeleted}
-            draw={{
-              rectangle: {
-                allowIntersection: false,
-                /*shapeOptions: {color: '#426980'},*/
-              },
-              circle: false,
-              circlemarker: false,
-              marker: false,
-              polyline: false,
-              polygon: false,
-                /*allowIntersection: false,
-                drawError: {
-                  color: '#e1e100',
-                  message: '<strong>Error<strong> polygons cannot contain intersecting lines.',
-                },
-                shapeOptions: {
-                  color: '#6b8fb0',
-                },*/
-        
+        {showElevation && geojsonData && (
+          <GeoJSON
+            data={geojsonData}
+            style={polygonStyle}
+            onEachFeature={(feature, layer) => {
+              layer.bindPopup(`Elevation: ${feature.properties.elevation}<br>Coverage Percentage: ${feature.properties.coverage_percentage}%`);
             }}
-            ref={drawControlRef}
           />
-        </FeatureGroup>
+        )}
       </MapContainer>
-      <div>
-        <h4>Drawn Areas</h4>
-        <ul>
-          {drawnItems.map((item, index) => (
-            <li key={index}>
-              Rectangle {index + 1}: {JSON.stringify(item.getBounds())}
-              <button onClick={() => setDrawnItems(drawnItems.filter((_, i) => i !== index))}>Remove</button>
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };
