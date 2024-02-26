@@ -1,6 +1,5 @@
-/Outputs
 /Outputs/SAR
-Outputs
-/Outputs/GeoJSON
+/Outputs/DEM
+/Outputs/Shapefiles
 /flask.log
 flask.log
