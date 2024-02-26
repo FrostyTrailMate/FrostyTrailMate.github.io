@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import subprocess
 import json
-from geoalchemy2 import Geometry
+#from geoalchemy2 import Geometry
 
 # Database configuration
 DB_CONFIG = {

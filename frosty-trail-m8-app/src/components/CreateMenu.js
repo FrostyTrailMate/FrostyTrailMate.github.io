@@ -1,32 +1,47 @@
-import './CCStyles/Create.css';
-import './CCStyles/MapCreate.css';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { format } from 'date-fns';
-import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, GeoJSON, FeatureGroup} from 'react-leaflet';
+import React, { useState, useEffect, useRef } from 'react';
+import DatePicker from 'react-datepicker';
+import { format } from 'date-fns';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { EditControl } from 'react-leaflet-draw';
+
+import 'react-datepicker/dist/react-datepicker.css';
 import './CCStyles/MapCreate.css';
-import TrailsYosemite from './geojsons/Trails.json'; // Import GeoJSON data file
-import SnowCoverage from './geojsons/ElevationPolygons.json'; // Import GeoJSON data file
+import './CCStyles/Create.css';
+import './CCStyles/MapCreate.css';
+import TrailsYosemite from './geojsons/Trails.json';
 
 function CreateMenu() {
 
-  // Map Constants
-
   const [basemap, setBasemap] = useState('stamenTerrain');
   const [showTrails, setShowTrails] = useState(true);
-  const [showElevation, setShowElevation] = useState(true);
   const [drawnItems, setDrawnItems] = useState([]);
   const drawControlRef = useRef(null);
+
+  const updateCoordinates = (key, value) => {
+    setCoordinates(prevCoordinates => ({
+      ...prevCoordinates,
+      [key]: value
+    }));
+  };
+
+  useEffect(() => {
+    if (drawnItems.length > 0) {
+      const bounds = drawnItems[0].getBounds();
+      updateCoordinates('ymax', bounds._northEast.lat);
+      updateCoordinates('xmin', bounds._southWest.lng);
+      updateCoordinates('ymin', bounds._southWest.lat);
+      updateCoordinates('xmax', bounds._northEast.lng);
+    }
+  }, [drawnItems]);
+
 
   useEffect(() => {
     if (drawControlRef.current) {
       drawControlRef.current.leafletElement.options.edit.featureGroup.clearLayers();
     }
-  }, [showElevation, showTrails]);
+  }, [showTrails]);
 
   const basemapUrls = {
     stamenTerrain: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png',
@@ -48,21 +63,9 @@ function CreateMenu() {
     setShowTrails(!showTrails);
   };
 
-  const handleElevationToggle = () => {
-    setShowElevation(!showElevation);
-  };
-
   const purpleTrailStyle = {
     color: '#A348B2', // Light purple color
     weight: 1.2, // Adjust the weight of the trail
-  };
-
-  const lightBluePolygonStyle = {
-    color: '#555', // Grey color for contour lines
-    weight: 0.3, // Adjust the weight of the polygon
-    fill: true, // Fill the polygon with color
-    fillColor: '#A6CEE3', // Light blue color
-    fillOpacity: 0.3, // Adjust the opacity of the fill
   };
 
   const onEachFeature = (feature, layer) => {
@@ -85,8 +88,6 @@ function CreateMenu() {
     const editedItems = layers.getLayers();
     setDrawnItems([...editedItems]);
   };
-
-  //Menu Constants
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -140,14 +141,6 @@ function CreateMenu() {
         });
     }, 2000);
   };
-  
-
-  const updateCoordinates = (key, value) => {
-    setCoordinates(prevCoordinates => ({
-      ...prevCoordinates,
-      [key]: value
-    }));
-  };
 
   return (
     <>
@@ -178,14 +171,6 @@ function CreateMenu() {
             />
             <span className="toggle-text-c">Hiking Trails</span>
           </label>
-          <label className="geojson-toggle-c">
-            <input
-              type="checkbox"
-              checked={showElevation}
-              onChange={handleElevationToggle}
-            />
-            <span className="toggle-text-c">Snow Coverage</span>
-          </label>
         </div>
       </div>
       <MapContainer
@@ -198,11 +183,6 @@ function CreateMenu() {
           subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
           attribution={basemapAttributions[basemap]}
         />
-
-        {showElevation && (
-          <GeoJSON data={SnowCoverage} style={lightBluePolygonStyle} onEachFeature={onEachFeature} />
-        )}
-
         {showTrails && (
           <GeoJSON data={TrailsYosemite} style={purpleTrailStyle} onEachFeature={onEachFeature} />
         )}
@@ -285,7 +265,7 @@ function CreateMenu() {
         <div>
           <div className='inputFieldCoordinateContainer'>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>N Latitude</label>
+              <label className='inputFieldCoordinateLabel'>Ymax</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._northEast.lat : ''} 
@@ -294,7 +274,7 @@ function CreateMenu() {
               />
             </div>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>W Longitude</label>
+              <label className='inputFieldCoordinateLabel'>Xmin</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._southWest.lng : ''} 
@@ -305,7 +285,7 @@ function CreateMenu() {
           </div>
           <div className='inputFieldCoordinateContainer'>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>S Latitude</label>
+              <label className='inputFieldCoordinateLabel'>Ymin</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._southWest.lat : ''} 
@@ -314,7 +294,7 @@ function CreateMenu() {
               />
             </div>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>E Longitude</label>
+              <label className='inputFieldCoordinateLabel'>Xmax</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._northEast.lng : ''} 

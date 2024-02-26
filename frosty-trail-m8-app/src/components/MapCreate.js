@@ -1,16 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, GeoJSON, FeatureGroup} from 'react-leaflet';
+import React, { useState, useEffect, useRef,createContext} from 'react';
+
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { EditControl } from 'react-leaflet-draw';
-import './CCStyles/MapCreate.css';
 import TrailsYosemite from './geojsons/Trails.json'; // Import GeoJSON data file
-import SnowCoverage from './geojsons/ElevationPolygons.json'; // Import GeoJSON data file
 
-const MapCreate = () => {
+import 'react-datepicker/dist/react-datepicker.css';
+import './CCStyles/MapCreate.css';
+import './CCStyles/Create.css';
+
+
+export const DrawnItemsContext = createContext([]);
+
+function MapCreate() {
+
+  // Map Constants
+
   const [basemap, setBasemap] = useState('stamenTerrain');
   const [showTrails, setShowTrails] = useState(true);
-  const [showElevation, setShowElevation] = useState(true);
   const [drawnItems, setDrawnItems] = useState([]);
   const drawControlRef = useRef(null);
 
@@ -18,7 +26,7 @@ const MapCreate = () => {
     if (drawControlRef.current) {
       drawControlRef.current.leafletElement.options.edit.featureGroup.clearLayers();
     }
-  }, [showElevation, showTrails]);
+  }, [showTrails]);
 
   const basemapUrls = {
     stamenTerrain: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png',
@@ -40,21 +48,9 @@ const MapCreate = () => {
     setShowTrails(!showTrails);
   };
 
-  const handleElevationToggle = () => {
-    setShowElevation(!showElevation);
-  };
-
   const purpleTrailStyle = {
     color: '#A348B2', // Light purple color
     weight: 1.2, // Adjust the weight of the trail
-  };
-
-  const lightBluePolygonStyle = {
-    color: '#555', // Grey color for contour lines
-    weight: 0.3, // Adjust the weight of the polygon
-    fill: true, // Fill the polygon with color
-    fillColor: '#A6CEE3', // Light blue color
-    fillOpacity: 0.3, // Adjust the opacity of the fill
   };
 
   const onEachFeature = (feature, layer) => {
@@ -79,6 +75,9 @@ const MapCreate = () => {
   };
 
   return (
+    <>
+   <DrawnItemsContext.Provider value={[drawnItems, setDrawnItems]}>
+
     <div className="map-container-c">
       <div className="toggle-container-c">
         <div className="basemap-toggles-c" >
@@ -106,14 +105,6 @@ const MapCreate = () => {
             />
             <span className="toggle-text-c">Hiking Trails</span>
           </label>
-          <label className="geojson-toggle-c">
-            <input
-              type="checkbox"
-              checked={showElevation}
-              onChange={handleElevationToggle}
-            />
-            <span className="toggle-text-c">Snow Coverage</span>
-          </label>
         </div>
       </div>
       <MapContainer
@@ -126,11 +117,6 @@ const MapCreate = () => {
           subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
           attribution={basemapAttributions[basemap]}
         />
-
-        {showElevation && (
-          <GeoJSON data={SnowCoverage} style={lightBluePolygonStyle} onEachFeature={onEachFeature} />
-        )}
-
         {showTrails && (
           <GeoJSON data={TrailsYosemite} style={purpleTrailStyle} onEachFeature={onEachFeature} />
         )}
@@ -161,14 +147,20 @@ const MapCreate = () => {
           {drawnItems.map((item, index) => (
             <li key={index}>
               Rectangle {index + 1}: {JSON.stringify(item.getBounds())}
-              <button onClick={() => setDrawnItems(drawnItems.filter((_, i) => i !== index))}>Remove</button>
             </li>
           ))}
         </ul>
       </div>
     </div>
+    </DrawnItemsContext.Provider>
+    </>
   );
-};
+}
+
+export const drawnItems = [/* Your drawn items */];
+
+export function getDrawnItemsLength() {
+  return drawnItems.length;
+}
 
 export default MapCreate;
-
