@@ -5,7 +5,6 @@ import Home from './components/pages/Home';
 import Create from './components/pages/Create';
 import About from './components/pages/About';
 import Footer from './components/Footer';
-import Create from './components/pages/Create';
 
 import './App.css';
 import './components/CCStyles/Navbar.css';

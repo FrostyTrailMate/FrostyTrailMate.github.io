@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import '../CCStyles/Create.css';
+import '../CCStyles/Create.css'; // Assuming your styles are here
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
-import { MapContainer, TileLayer, Rectangle, useMapEvents, FeatureGroup, DrawControl } from 'react-leaflet'; 
+import { MapContainer, TileLayer, Rectangle, useMapEvents } from 'react-leaflet';
 import 'leaflet-draw';
-import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet-draw/dist/leaflet.draw.css'; // CSS for draw controls
 
 
 function Create() {
@@ -21,21 +21,19 @@ function Create() {
   const [rectangleBounds, setRectangleBounds] = useState(null);
 
   // Leaflet 'useMapEvents' hook to interact with map
-function AddRectangleToMap() {
-  const map = useMapEvents({
-    click() {
-      setRectangleBounds(null); // Reset on click
-    },
-    draw: (event) => {
-      switch (event.layerType) {
-        case 'rectangle':
+  function AddRectangleToMap() {
+    const map = useMapEvents({
+      click() { 
+        // Reset rectangle on each new click
+        setRectangleBounds(null); 
+      },
+      draw: (event) => {
+        // On 'drawcreated' event, get rectangle details
+        if (event.layerType === 'rectangle') {
           setRectangleBounds(event.layer.getBounds());
-          break;
-        default:
-          break; // Do nothing for other draw types
-      }
-    },
-  });
+        }
+      },
+    });
 
     return rectangleBounds ? (
       <Rectangle bounds={rectangleBounds} pathOptions={{ color: 'blue' }} />
@@ -121,29 +119,13 @@ function AddRectangleToMap() {
 
       {/* Leaflet Map Section */}
       <div className='leaflet-container'>
-      <MapContainer center={[51.505, -0.09]} zoom={13}> 
-        <TileLayer
-          // ... your tile layer setup
-        />
-        <FeatureGroup> {/* A FeatureGroup is needed for Draw controls */}
-          <DrawControl 
-            position='topright'
-            onCreated={(e) => {
-              const type = e.layerType;
-              if (type === 'rectangle') {
-                setRectangleBounds(e.layer.getBounds());
-              }
-            }} 
-            draw={{
-              rectangle: true, // Enable rectangle drawing (you can add more options if needed)
-              circle: false,  // Disable other drawing tools here 
-              polyline: false,
-              // ... etc 
-            }}
+        <MapContainer center={[0, 0]} zoom={2}> 
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-        </FeatureGroup>
-        <AddRectangleToMap /> 
-      </MapContainer>
+          <AddRectangleToMap /> 
+        </MapContainer>
       </div>
 
       <button onClick={sendDataToAPI} className='submitButton'>Send Data to API</button>
