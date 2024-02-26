@@ -1,2 +1,6 @@
 /Outputs
+/Outputs/SAR
+Outputs
+/Outputs/GeoJSON
+/flask.log
 flask.log
