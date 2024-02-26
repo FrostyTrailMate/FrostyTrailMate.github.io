@@ -379,3 +379,5 @@ INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 22:36:52] "[36mGET /api/geojson/whatth
 INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 22:37:03] "[36mGET /api/geojson/whatthefuckmanitsworking HTTP/1.1[0m" 304 -
 INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 22:37:09] "[36mGET /api/geojson/whatthefuckmanitsworking HTTP/1.1[0m" 304 -
 INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 22:37:17] "[36mGET /api/geojson/whatthefuckmanitsworking HTTP/1.1[0m" 304 -
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 231-404-771
