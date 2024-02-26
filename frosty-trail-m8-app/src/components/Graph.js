@@ -4,7 +4,7 @@ import { XYPlot, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, LineSerie
 import "react-vis/dist/style.css";
 import './CCStyles/Graph.css'; // Import the graph component
 
-const ElevationCoverageGraph = () => {
+const ElevationCoverageGraph = ({ selectedArea }) => {
     const [results, setResults] = useState([]);
     const [crosshairValues, setCrosshairValues] = useState([]);
 
@@ -19,14 +19,17 @@ const ElevationCoverageGraph = () => {
             });
     }, []);
 
+    // Filter results based on selected area
+    const filteredResults = selectedArea ? results.filter(result => result.area_name === selectedArea) : results;
+
     // Extract elevation as x values
-    const elevations = results.map(result => {
+    const elevations = filteredResults.map(result => {
         const elevationRange = result.elevation.split('-'); // Split the elevation range by '-'
         return parseInt(elevationRange[0]); // Extract the first number and parse it as an integer
     });
 
     // Extract coverage_percentage as y values
-    const coveragePercentages = results.map(result => result.coverage_percentage);
+    const coveragePercentages = filteredResults.map(result => result.coverage_percentage);
 
     // Prepare data in format accepted by react-vis
     const data = elevations.map((value, index) => ({ x: value, y: coveragePercentages[index] }));
@@ -113,20 +116,3 @@ const ElevationCoverageGraph = () => {
 };
 
 export default ElevationCoverageGraph;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

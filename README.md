@@ -48,10 +48,12 @@ Project Overview (in the order of operation)
    - Generate contour intervals (100 meters) and save them to a shapefile (for testing purposes) and to the database table 'results' (for website visualization).
 7. Output
    - Create a webpage for visual display using JavaScript React and Node.js.
-   - Create a FLask web application that serves an API endpoint (/api/results) to fetch data from a PostgreSQL database table (results). The data is retrieved and returned as JSON format through the API endpoint when a GET request received.
-   - Create a table at the website that display the most relevant fields of the table served at the API endpoint.
+   - Create a Flask web application that serves an API endpoint (/api/results) to fetch data from a PostgreSQL database table (results). The data is retrieved and returned as JSON format through the API endpoint when a GET request received.
+   - Create a Flask web application that serves an API endpoint (/api/create) to allow users to input the required arguments and run the snow detection process (via __main__.py). 
+   - Create a table at the website that display the most relevant fields of the table served at the API endpoint. 
    - Display results in an interactive geojson map (Polygon Layer: Snow Coverage % per Altitude; Polyline Layer: Hiking Trails at Yosemite's)
    - Create a graph to display the relation between the altitude and the % of snow coverage.
+   - Create a filter which allows the user to select any of the previously-run items in the database, and display the results.
 8. Databases Utilized
    - Table of user-selected polygon data and associated outputs from the various scripts (userpolygons).
    - Grid of sample points (samples).
