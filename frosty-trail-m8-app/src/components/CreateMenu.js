@@ -285,7 +285,7 @@ function CreateMenu() {
         <div>
           <div className='inputFieldCoordinateContainer'>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>NE Latitude</label>
+              <label className='inputFieldCoordinateLabel'>N Latitude</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._northEast.lat : ''} 
@@ -294,7 +294,7 @@ function CreateMenu() {
               />
             </div>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>SW Longitude</label>
+              <label className='inputFieldCoordinateLabel'>W Longitude</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._southWest.lng : ''} 
@@ -305,7 +305,7 @@ function CreateMenu() {
           </div>
           <div className='inputFieldCoordinateContainer'>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>SW Latitude</label>
+              <label className='inputFieldCoordinateLabel'>S Latitude</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._southWest.lat : ''} 
@@ -314,7 +314,7 @@ function CreateMenu() {
               />
             </div>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>NE Longitude</label>
+              <label className='inputFieldCoordinateLabel'>E Longitude</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._northEast.lng : ''} 
