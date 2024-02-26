@@ -1,8 +1,10 @@
+import traceback
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import subprocess
-from geoalchemy2 import Geometry
+from flask import request
+import json
 
 DB_CONFIG = {
     "database": "FTM8",
@@ -61,28 +63,42 @@ def get_results():
     
     return jsonify(data)
 
-
-# Route to handle POST request for '/api/Create'
 @app.route('/api/create', methods=['POST'])
 def create_entry():
     # Example of handling POST data
     if request.method == 'POST':
-        # Assuming the POST request contains JSON data
-        data = request.json
-        # Process the data as needed
-        # For example, if the JSON contains 'area_name', 'elevation', 'coverage_percentage', etc.
-        # You can extract these values from the 'data' dictionary
-        startDate = data.get('startDate')
-        endDate = data.get('endDate')
-        coordinates = data.get('coordinates')
-        areaName = data.get('areaName')
-        distance = data.get('distance')
-        rasterBand = data.get('rasterBand')
         try:
-            subprocess.run(["python", "__main__.py", "-s", startDate, "-e", endDate, "-c", coordinates, "-n", areaName, "-d", distance, "-b", rasterBand])
+            # Accessing data using request.json
+            data = request.json
+            
+            # Log the received JSON data
+            print("Received JSON data:", data)
+            
+            # Extracting required fields from the JSON data
+            startDate = data.get('startDate')
+            endDate = data.get('endDate')
+            coordinates = data.get('coordinates')
+            areaName = data.get('areaName')
+            distance = data.get('distance')
+            rasterBand = data.get('rasterBand')
+
+            # Validate that all required fields are present
+            if None in [startDate, endDate, coordinates, areaName, distance, rasterBand]:
+                raise ValueError("Missing required fields")
+
+            # Convert coordinates to string
+            coordinates_str = json.dumps(coordinates)
+            
+            # Execute subprocess
+            subprocess.run(["python", "__main__.py", "-s", startDate, "-e", endDate, "-c", coordinates_str, "-n", areaName, "-d", distance, "-b", rasterBand])
+            
             return jsonify({'message': 'Script executed successfully'}), 201
+        except ValueError as ve:
+            return jsonify({'error': str(ve)}), 400  # Bad request due to missing fields
         except Exception as e:
-            return jsonify({'error': str(e)}), 500
+            # Log detailed error information
+            traceback.print_exc()
+            return jsonify({'error': 'Internal server error occurred. Please contact the administrator for assistance.'}), 500
     else:
         return jsonify({'error': 'Method not allowed'}), 405
 

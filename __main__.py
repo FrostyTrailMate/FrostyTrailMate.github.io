@@ -73,7 +73,7 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--start-date', default=six_days_ago(), help='Start date for image collection (default: 6 days ago)')
     parser.add_argument('-e', '--end-date', default=now(), help='End date for image collection (default: now)')
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-c', '--coordinates', nargs=4, type=float, help='Coordinates for bounding box: xmin ymin xmax ymax. Must be in WGS84 (EPSG:4326).')
+    group.add_argument('-c', '--coordinates', nargs='+', help='Coordinates for bounding box: xmin ymin xmax ymax. Must be in WGS84 (EPSG:4326).')
     group.add_argument('-p', '--shapefile-path', help='Path to a shapefile of a study area. Must be in WGS84 (EPSG:4326).')
     parser.add_argument('-n', '--search-area-name', required=True, help='Unique name to give the search area')
     parser.add_argument('-d', '--sampling-distance', type=float, default=0.005, help='Distance between sampling points (default: 0.005 (~500 meters))')
@@ -81,10 +81,20 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    # Remove quotes from coordinates if present
+    if args.coordinates:
+        # If coordinates are provided as a single string, split them into individual coordinates
+        if len(args.coordinates) == 1:
+            args.coordinates = args.coordinates[0].split()
+
+        args.coordinates = [coord.strip('"\'') for coord in args.coordinates]
+
     # Check if provided area_name already exists in the userpolygons table
     if check_area_name(db_connection, args.search_area_name):
         print(f"Error: provided -n argument ('{args.search_area_name}') already exists. Please choose another name for this run. Exiting.")
         sys.exit(1)
+
+    print(args.coordinates)
 
     if prompt_reset():
         run_script('Python Scripts/createDB.py', [])
@@ -93,16 +103,28 @@ if __name__ == "__main__":
     try:
         with db_connection.cursor() as cursor:
             if args.coordinates:
+                # Check if there are enough coordinates for a polygon
+                if len(args.coordinates) < 4:
+                    print("Error: Insufficient coordinates provided for creating a polygon.")
+                    sys.exit(1)
+
+                # Construct the polygon text
                 polygon_text = f"POLYGON(({args.coordinates[0]} {args.coordinates[1]}, {args.coordinates[2]} {args.coordinates[1]}, {args.coordinates[2]} {args.coordinates[3]}, {args.coordinates[0]} {args.coordinates[3]}, {args.coordinates[0]} {args.coordinates[1]}))"
-                cursor.execute("INSERT INTO userpolygons (area_name, datetime, arg_b, arg_s, arg_e, arg_d, geom) VALUES (%s, %s, %s, %s, %s, %s, ST_GeomFromText(%s, 4326))", (args.search_area_name, datetime.now(), args.band, args.start_date, args.end_date, args.sampling_distance, polygon_text))
+            elif args.shapefile_path:
+                # Handle shapefile case
+                polygon_text = "POLYGON_FROM_SHAPEFILE"  # Placeholder, replace with actual logic
             else:
-                cursor.execute("INSERT INTO userpolygons (area_name, datetime, arg_b, arg_s, arg_e, arg_d) VALUES (%s, %s, %s, %s, %s, %s)", (args.search_area_name, datetime.now(), args.band, args.start_date, args.end_date, args.sample_distance))
+                print("Error: No coordinates or shapefile path provided.")
+                sys.exit(1)
+
+            cursor.execute("INSERT INTO userpolygons (area_name, datetime, arg_b, arg_s, arg_e, arg_d, geom) VALUES (%s, %s, %s, %s, %s, %s, ST_GeomFromText(%s, 4326))", (args.search_area_name, datetime.now(), args.band, args.start_date, args.end_date, args.sampling_distance, polygon_text))
         db_connection.commit()
         print("New row inserted into userpolygons table with band information.")
     except psycopg2.Error as e:
         print("Error inserting row into userpolygons table:", e)
         db_connection.rollback()
         sys.exit(1)
+
 
     # Date Handling
     try:
