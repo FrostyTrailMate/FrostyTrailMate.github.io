@@ -5,7 +5,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 import { MapContainer, TileLayer, Rectangle, useMapEvents } from 'react-leaflet';
 import 'leaflet-draw';
-import 'leaflet-draw/dist/leaflet.draw.css'; // CSS for draw controls
+import 'leaflet-draw/dist/leaflet.draw.css';
 
 
 function Create() {

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import React, { useState, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, GeoJSON, FeatureGroup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import { EditControl } from 'react-leaflet-draw';
 import './CCStyles/MapComponent.css'; // Import external CSS file
 import TrailsYosemite from './geojsons/Trails.json'; // Import GeoJSON data file
 import SnowCoverage from './geojsons/ElevationPolygons.json'; // Import GeoJSON data file
@@ -9,6 +11,14 @@ const MapComponent = () => {
   const [basemap, setBasemap] = useState('stamenTerrain');
   const [showTrails, setShowTrails] = useState(true);
   const [showElevation, setShowElevation] = useState(true);
+  const [drawnItems, setDrawnItems] = useState([]);
+  const drawControlRef = useRef(null);
+
+  useEffect(() => {
+    if (drawControlRef.current) {
+      drawControlRef.current.leafletElement.options.edit.featureGroup.clearLayers();
+    }
+  }, [showElevation, showTrails]);
 
   const basemapUrls = {
     stamenTerrain: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png',
@@ -53,6 +63,15 @@ const MapComponent = () => {
     }
   };
 
+  const handleDrawCreated = (e) => {
+    const layer = e.layer;
+    setDrawnItems([...drawnItems, layer]);
+  };
+
+  const handleDrawDeleted = () => {
+    setDrawnItems([]);
+  };
+
   return (
     <div className="map-container">
       <div className="toggle-container">
@@ -69,7 +88,6 @@ const MapComponent = () => {
               {key === 'stamenTerrain' && '  Stamen Terrain  '}
               {key === 'thunderforest' && '  Thunderforest  '}
               {key === 'openStreetMap' && '  OpenStreetMap  '}
-
             </label>
           ))}
         </div>
@@ -110,11 +128,49 @@ const MapComponent = () => {
         {showTrails && (
           <GeoJSON data={TrailsYosemite} style={purpleTrailStyle} onEachFeature={onEachFeature} />
         )}
+
+        <FeatureGroup>
+          <EditControl
+            position="topright"
+            onCreated={handleDrawCreated}
+            onDeleted={handleDrawDeleted}
+            draw={{
+              rectangle: false,
+              circle: false,
+              circlemarker: false,
+              marker: false,
+              polyline: false,
+              polygon: {
+                allowIntersection: false,
+                drawError: {
+                  color: '#e1e100',
+                  message: '<strong>Error<strong> polygons cannot contain intersecting lines.',
+                },
+                shapeOptions: {
+                  color: '#6b8fb0',
+                },
+              },
+            }}
+            ref={drawControlRef}
+          />
+        </FeatureGroup>
       </MapContainer>
+      <div>
+        <h4>Drawn Polygons</h4>
+        <ul>
+          {drawnItems.map((item, index) => (
+            <li key={index}>
+              Polygon {index + 1}: {JSON.stringify(item.getLatLngs())}
+              <button onClick={() => setDrawnItems(drawnItems.filter((_, i) => i !== index))}>Remove</button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
 
 export default MapComponent;
+
 
 
