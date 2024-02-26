@@ -1,5 +1,4 @@
 import React from 'react';
-import MapCreate from '../MapCreate';
 import CreateMenu from  '../CreateMenu';
 
 import '../CCStyles/Create.css';
