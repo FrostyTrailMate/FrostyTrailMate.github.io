@@ -57,7 +57,7 @@ def get_results():
              'area_name': result.area_name, 
              'elevation': result.elevation,
              'coverage_percentage': result.coverage_percentage,
-             'ddatetime': result.datetime, 
+             'datetime': result.datetime, 
              'detected_points': result.detected_points, 
              'total_points': result.total_points} for result in resultftm8]
     

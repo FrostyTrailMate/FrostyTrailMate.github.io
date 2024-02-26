@@ -23,3 +23,33 @@
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
       'Lucida Sans', Arial, sans-serif;
   }
+
+  /* Home.css */
+
+.home-container {
+  padding: 20px;
+}
+
+.filter-container {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.filter-label {
+  margin-right: 10px;
+  font-size: 18px;
+  color: #efefef;
+}
+
+.filter-dropdown {
+  padding: 8px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.filter-dropdown:focus {
+  border-color: #007bff;
+}

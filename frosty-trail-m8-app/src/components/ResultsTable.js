@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const ResultsTable = () => {
+const ResultsTable = ({ selectedArea }) => {
     const [results, setResults] = useState([]);
 
     useEffect(() => {
@@ -13,15 +13,8 @@ const ResultsTable = () => {
                 console.error('Error fetching results:', error);
             });
     }, []);
-/*
-    // Function to format date to only include day, month, and year of the date field
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const day = date.getDate();
-        const month = date.toLocaleString('default', { month: 'short' }).charAt(0).toUpperCase() + date.toLocaleString('default', { month: 'short' }).slice(1);
-        const year = date.getFullYear();
-        return `${day} ${month} ${year}`;
-    };*/
+
+    const filteredResults = selectedArea ? results.filter(result => result.area_name === selectedArea) : results;
 
     // Function to convert results data to CSV format
     const convertToCSV = (data) => {
@@ -42,7 +35,7 @@ const ResultsTable = () => {
 
     // Function to trigger download of CSV file
     const downloadCSV = () => {
-        const csvContent = convertToCSV(results);
+        const csvContent = convertToCSV(filteredResults);
         const blob = new Blob([csvContent], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -66,7 +59,7 @@ const ResultsTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {results
+                        {filteredResults
                             .sort((a, b) => {
                                 // Extract the first number from the string value of elevation
                                 const firstNumberA = parseInt(a.elevation.match(/\d+/)[0]);
@@ -90,9 +83,6 @@ const ResultsTable = () => {
             <button className="download-btn" onClick={downloadCSV}>Download Table as CSV</button>
         </div>
     );
-    
 };
 
 export default ResultsTable;
-
-
