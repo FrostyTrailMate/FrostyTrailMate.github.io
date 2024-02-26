@@ -12,6 +12,7 @@ import '../CCStyles/Graph.css';
 function Home() {
   const [selectedArea, setSelectedArea] = useState(null); // Change to null
   const [uniqueAreaNames, setUniqueAreaNames] = useState([]);
+  
 
   useEffect(() => {
     axios.get('http://127.0.0.1:5000/api/results')
@@ -44,7 +45,7 @@ function Home() {
           </select>
         </div>
       </div>
-      <MapComponent />
+      <MapComponent selectedArea={selectedArea} />
       <ResultsTable selectedArea={selectedArea} />
       <ElevationCoverageGraph selectedArea={selectedArea} />
     </>

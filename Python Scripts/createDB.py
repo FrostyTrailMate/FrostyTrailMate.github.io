@@ -121,7 +121,7 @@ except Exception as e:
     print("Error clearing contents of 'Output' folder:", e)
 
 # Recreate subfolders
-subfolders = ['DEM', 'Samples', 'SAR', os.path.join('Shapefiles','ElevationStrata'), os.path.join('Shapefiles','SamplePoints'), os.path.join('SAR', 'temp')]
+subfolders = ['DEM', 'Samples', 'SAR', os.path.join('Shapefiles','ElevationStrata'), os.path.join('Shapefiles','SamplePoints'), os.path.join('SAR', 'temp'), os.path.join('frosty-trail-m8-app','src','components','geojsons'), os.path.join('Shapefiles','SamplePoints'), os.path.join('SAR', 'temp'), os.path.join('frosty-trail-m8-app','src','components','geojsons', 'temp')]
 try:
     os.makedirs(output_folder, exist_ok=True)
     for folder in subfolders:

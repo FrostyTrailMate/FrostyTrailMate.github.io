@@ -3,12 +3,13 @@ This script defines a Flask application to handle requests related to querying r
 """
 
 import traceback
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import subprocess
 import json
-#from geoalchemy2 import Geometry
+from sqlalchemy.exc import SQLAlchemyError
+import os
 
 # Database configuration
 DB_CONFIG = {
@@ -74,8 +75,23 @@ def get_results():
              'coverage_percentage': result.coverage_percentage,
              'datetime': result.datetime,
              'detected_points': result.detected_points,
-             'total_points': result.total_points} for result in resultftm8]
+             'total_points': result.total_points}
+            for result in resultftm8]
     return jsonify(data)
+
+class APIError(Exception):
+    """Base class for API-related errors"""
+    def __init__(self, message, status_code=400):
+        super().__init__(message)
+        self.status_code = status_code
+
+class InvalidDataError(APIError):
+    """Error for invalid data submitted by the user"""
+    pass
+
+class DatabaseError(APIError):
+    """Error caused by an issue with the database"""
+    pass
 
 @app.route('/api/create', methods=['POST'])
 def create_entry():
@@ -112,12 +128,56 @@ def create_entry():
             
             return jsonify({'message': 'Script executed successfully'}), 201
         except ValueError as ve:
-            return jsonify({'error': str(ve)}), 400  # Bad request due to missing fields
-        except Exception as e:
+            raise InvalidDataError(str(ve))
+        except SQLAlchemyError as sqle: # Example for database problems
+            raise DatabaseError("Error encountered while processing database query")  
+        except Exception as e: 
             traceback.print_exc()
-            return jsonify({'error': 'Internal server error occurred. Please contact the administrator for assistance.'}), 500
+            raise APIError('Internal server error. Contact the administrator.', 500)
     else:
-        return jsonify({'error': 'Method not allowed'}), 405
+        raise APIError('Method not allowed', 405)
+    
+
+import os
+import logging
+
+# Configure logging
+logging.basicConfig(filename='flask.log', level=logging.INFO)
+
+@app.route('/api/geojson/<selected_area>')
+def get_geojson(selected_area):
+    """
+    Endpoint to fetch the geojson file for the selected area.
+
+    Args:
+        selected_area (str): The name of the selected area.
+
+    Returns:
+        file: The geojson file for the selected area.
+    """
+    try:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        geojson_dir = os.path.join(base_dir, 'components', 'geojsons') 
+        file_path = os.path.join(geojson_dir, f'{selected_area}.geojson')
+
+        if not os.path.exists(file_path):
+             return jsonify({'error': 'GeoJSON file not found'}), 404
+
+        return send_file(file_path, as_attachment=True, mimetype='application/json')
+
+    except FileNotFoundError:
+        return jsonify({'error': 'GeoJSON file not found'}), 404
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': 'An error occurred'}), 500 
+
+
+@app.errorhandler(APIError)
+def handle_api_error(error):
+    response = jsonify({'error': error.message})
+    response.status_code = error.status_code
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
