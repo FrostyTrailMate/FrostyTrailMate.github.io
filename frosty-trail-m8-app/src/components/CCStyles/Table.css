@@ -9,6 +9,12 @@
   flex-direction: column;
 }
 
+/* Style for the message container */
+.message-container {
+  color: white; /* White text color */
+  margin-top: 20px; /* Add buffer */
+}
+
 /* Style for the scrollable table container */
 .scrollable-table {
   max-height: 350px; /* Adjust the maximum height as needed */
@@ -97,5 +103,3 @@
   cursor: pointer;
   border-radius: 15px;
 }
-
-

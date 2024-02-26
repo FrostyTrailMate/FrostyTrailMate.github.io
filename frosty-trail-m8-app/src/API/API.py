@@ -5,6 +5,7 @@ from flask_cors import CORS
 import subprocess
 from flask import request
 import json
+from geoalchemy2 import Geometry
 
 DB_CONFIG = {
     "database": "FTM8",
@@ -46,7 +47,7 @@ class results(db.Model):
     
 # Route to fetch data
 # This function will be called when a request is made to the '/api/results' endpoint
-# Route to fetch sorted data by altitude
+# Route to fetch sorted data by altitude 
 
 @app.route('/api/results')   
 def get_results():

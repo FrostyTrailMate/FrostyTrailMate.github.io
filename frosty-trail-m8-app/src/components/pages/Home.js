@@ -10,7 +10,7 @@ import '../CCStyles/Table.css';
 import '../CCStyles/Graph.css';
 
 function Home() {
-  const [selectedArea, setSelectedArea] = useState('');
+  const [selectedArea, setSelectedArea] = useState(null); // Change to null
   const [uniqueAreaNames, setUniqueAreaNames] = useState([]);
 
   useEffect(() => {
@@ -19,6 +19,9 @@ function Home() {
         const areas = response.data.map(result => result.area_name);
         const uniqueAreas = [...new Set(areas)];
         setUniqueAreaNames(uniqueAreas);
+        if (uniqueAreas.length > 0) {
+          setSelectedArea(uniqueAreas[uniqueAreas.length - 1]); // Select the last area
+        }
       })
       .catch(error => {
         console.error('Error fetching results:', error);
@@ -33,7 +36,6 @@ function Home() {
         <div className="filter-container">
           <label htmlFor="areaFilter">Filter reports by area:</label>
           <select id="areaFilter" value={selectedArea} onChange={e => setSelectedArea(e.target.value)}>
-            <option value="">All Areas</option>
             {uniqueAreaNames.map(area => (
               <option key={area} value={area}>{area}</option>
             ))}

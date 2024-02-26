@@ -3,16 +3,23 @@ import axios from 'axios';
 
 const ResultsTable = ({ selectedArea }) => {
     const [results, setResults] = useState([]);
+    const [areaGeneratedDateTime, setAreaGeneratedDateTime] = useState(null);
 
     useEffect(() => {
         axios.get('http://127.0.0.1:5000/api/results')
             .then(response => {
                 setResults(response.data);
+                if (selectedArea) {
+                    const filteredResult = response.data.find(result => result.area_name === selectedArea);
+                    if (filteredResult) {
+                        setAreaGeneratedDateTime(filteredResult.datetime);
+                    }
+                }
             })
             .catch(error => {
                 console.error('Error fetching results:', error);
             });
-    }, []);
+    }, [selectedArea]);
 
     const filteredResults = selectedArea ? results.filter(result => result.area_name === selectedArea) : results;
 
@@ -80,6 +87,11 @@ const ResultsTable = ({ selectedArea }) => {
                     </tbody>
                 </table>
             </div>
+            {areaGeneratedDateTime && (
+                <div className = "message-container">
+                    Custom area {selectedArea} was generated on {areaGeneratedDateTime}.
+                </div>
+            )}
             <button className="download-btn" onClick={downloadCSV}>Download Table as CSV</button>
         </div>
     );
