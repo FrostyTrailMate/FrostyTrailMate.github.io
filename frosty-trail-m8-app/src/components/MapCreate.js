@@ -3,11 +3,11 @@ import { MapContainer, TileLayer, GeoJSON, FeatureGroup} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { EditControl } from 'react-leaflet-draw';
-import './CCStyles/MapComponent.css'; // Import external CSS file
+import './CCStyles/MapCreate.css';
 import TrailsYosemite from './geojsons/Trails.json'; // Import GeoJSON data file
 import SnowCoverage from './geojsons/ElevationPolygons.json'; // Import GeoJSON data file
 
-const MapComponent = () => {
+const MapCreate = () => {
   const [basemap, setBasemap] = useState('stamenTerrain');
   const [showTrails, setShowTrails] = useState(true);
   const [showElevation, setShowElevation] = useState(true);
@@ -79,11 +79,11 @@ const MapComponent = () => {
   };
 
   return (
-    <div className="map-container">
-      <div className="toggle-container">
-        <div className="basemap-toggles" >
+    <div className="map-container-c">
+      <div className="toggle-container-c">
+        <div className="basemap-toggles-c" >
           {Object.keys(basemapUrls).map((key) => (
-            <label key={key} className="basemap-toggle">
+            <label key={key} className="basemap-toggle-c">
               <input
                 type="radio"
                 name="basemap"
@@ -97,29 +97,29 @@ const MapComponent = () => {
             </label>
           ))}
         </div>
-        <div className="geojson-toggles">
-          <label className="geojson-toggle">
+        <div className="geojson-toggles-c">
+          <label className="geojson-toggle-c">
             <input
               type="checkbox"
               checked={showTrails}
               onChange={handleTrailsToggle}
             />
-            <span className="toggle-text">Hiking Trails</span>
+            <span className="toggle-text-c">Hiking Trails</span>
           </label>
-          <label className="geojson-toggle">
+          <label className="geojson-toggle-c">
             <input
               type="checkbox"
               checked={showElevation}
               onChange={handleElevationToggle}
             />
-            <span className="toggle-text">Snow Coverage</span>
+            <span className="toggle-text-c">Snow Coverage</span>
           </label>
         </div>
       </div>
       <MapContainer
         center={[37.8451, -119.5383]}
         zoom={10}
-        className="leaflet-container"
+        className="leaflet-container-c"
       >
         <TileLayer
           url={basemapUrls[basemap]}
@@ -151,22 +151,12 @@ const MapComponent = () => {
               marker: false,
               polyline: false,
               polygon: false,
-                /*allowIntersection: false,
-                drawError: {
-                  color: '#e1e100',
-                  message: '<strong>Error<strong> polygons cannot contain intersecting lines.',
-                },
-                shapeOptions: {
-                  color: '#6b8fb0',
-                },*/
-        
             }}
             ref={drawControlRef}
           />
         </FeatureGroup>
       </MapContainer>
       <div>
-        <h4>Drawn Areas</h4>
         <ul>
           {drawnItems.map((item, index) => (
             <li key={index}>
@@ -180,4 +170,5 @@ const MapComponent = () => {
   );
 };
 
-export default MapComponent;
+export default MapCreate;
+
