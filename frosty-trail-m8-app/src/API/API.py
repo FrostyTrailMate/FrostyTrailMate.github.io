@@ -79,6 +79,66 @@ def get_results():
             for result in resultftm8]
     return jsonify(data)
 
+# Define the SQLAlchemy model
+class userpolygons(db.Model):
+    """
+    SQLAlchemy model for 'userpolygons' table.
+
+    Attributes:
+        id (int): A serial (unique) identifier for the table.
+        area_name (str): The name of the area. This is the primary key.
+        datetime (timestamp): The date and time of the entry.
+        geom (geometry): The geometry of the area.
+        dem_path (str): The path to the DEM file.
+        dem_processed (str): The path to the processed DEM file.
+        sar_path (str): The path to the SAR file.
+        sar_processed (str): The path to the processed SAR file.
+        arg_s (str): The start date for the query.
+        arg_e (str): The end date for the query.
+        arg_b (str): The raster band for the query.
+        arg_d (str): The distance for the query.
+        arg_p (str): The path to a shapefile, which can be used in place of the -c argument on the __main__.py script.
+    """
+    id = db.Column(db.Integer)
+    area_name = db.Column(db.String(), primary_key=True)
+    datetime = db.Column(db.DateTime)
+    geom = db.Column(db.String()) # Not used in the API, so it's processed as a string to prevent errors.
+    dem_path = db.Column(db.String())
+    dem_processed = db.Column(db.String())
+    sar_path = db.Column(db.String())
+    sar_processed = db.Column(db.String())
+    arg_s = db.Column(db.String())
+    arg_e = db.Column(db.String())
+    arg_b = db.Column(db.String(2))
+    arg_d = db.Column(db.String())
+    arg_p = db.Column(db.String())
+    
+
+@app.route('/api/userpolygons')
+def get_userpolygons():
+    """
+    Endpoint to fetch all entries from the 'userpolygons' table.
+
+    Returns:
+        json: JSON response containing all results from the 'userpolygons' table.
+    """
+    userftm8 = userpolygons.query.order_by(userpolygons.id).all()
+    data = [{'id': userpolygon.id,
+            'area_name': userpolygon.area_name,
+            'datetime': userpolygon.datetime,
+            'geom': userpolygon.geom,
+            'dem_path': userpolygon.dem_path,
+            'dem_processed': userpolygon.dem_processed,
+            'sar_path': userpolygon.sar_path,
+            'sar_processed': userpolygon.sar_processed,
+            'arg_s': userpolygon.arg_s,
+            'arg_e': userpolygon.arg_e,
+            'arg_b': userpolygon.arg_b,
+            'arg_d': userpolygon.arg_d,
+            'arg_p': userpolygon.arg_p}
+            for userpolygon in userftm8]
+    return jsonify(data)
+
 class APIError(Exception):
     """Base class for API-related errors"""
     def __init__(self, message, status_code=400):
@@ -96,7 +156,7 @@ class DatabaseError(APIError):
 @app.route('/api/create', methods=['POST'])
 def create_entry():
     """
-    Endpoint to create an entry in the 'results' table.
+    Endpoint to run the __main__.py script with the provided data.
 
     Returns:
         json: JSON response indicating the success of the operation.
@@ -136,13 +196,6 @@ def create_entry():
             raise APIError('Internal server error. Contact the administrator.', 500)
     else:
         raise APIError('Method not allowed', 405)
-    
-
-import os
-import logging
-
-# Configure logging
-logging.basicConfig(filename='flask.log', level=logging.INFO)
 
 @app.route('/api/geojson/<selected_area>')
 def get_geojson(selected_area):

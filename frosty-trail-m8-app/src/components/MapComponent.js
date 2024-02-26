@@ -28,21 +28,20 @@ const MapComponent = ({ selectedArea }) => {
       // Load GeoJSON data for the selected area from Flask server
       axios.get(`http://127.0.0.1:5000/api/geojson/${selectedArea}`)
         .then(response => {
-          setGeojsonData(response.data);
+          const data = response.data;
+          setGeojsonData(data);
+  
+          // Set map center when geojsonData is updated
+          if (data && data.features.length > 0) {
+            const coordinates = data.features[0].geometry.coordinates[0][0];
+            setMapCenter([coordinates[1], coordinates[0]]);
+          }
         })
         .catch(error => {
           console.error('Error fetching GeoJSON data:', error);
         });
     }
   }, [selectedArea]);
-
-  useEffect(() => {
-    // Set map center when geojsonData is updated
-    if (geojsonData && geojsonData.features.length > 0) {
-      const coordinates = geojsonData.features[0].geometry.coordinates[0][0];
-      setMapCenter([coordinates[1], coordinates[0]]);
-    }
-  }, [geojsonData]);
 
   const handleBasemapChange = (newBasemap) => {
     setBasemap(newBasemap);
@@ -99,7 +98,7 @@ const MapComponent = ({ selectedArea }) => {
           </label>
         </div>
         <button className="refresh-button" onClick={handleRefreshMap}>
-          Refresh Map
+          Center Map
         </button>
       </div>
       <MapContainer
@@ -115,6 +114,7 @@ const MapComponent = ({ selectedArea }) => {
         />
         {showElevation && geojsonData && (
           <GeoJSON
+            key={JSON.stringify(geojsonData)} // Add key attribute here
             data={geojsonData}
             style={polygonStyle}
             onEachFeature={(feature, layer) => {
