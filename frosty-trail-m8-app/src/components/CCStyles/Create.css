@@ -99,8 +99,8 @@
   color: #721c24;
 }
 
-.leaflet-container {
-  height: 800px; /* Adjust as needed */
+.leaflet-create-container {
+  height: 550px; /* Adjust as needed */
   width: 80%; 
   margin-bottom: 20px;
 }
