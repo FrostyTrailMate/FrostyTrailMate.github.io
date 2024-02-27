@@ -115,8 +115,11 @@ function Create() {
     setDrawnItems([...editedItems]);
   };
 
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const sixDaysAgo = new Date();
+  sixDaysAgo.setDate(sixDaysAgo.getDate() - 6);
+
+  const [startDate, setStartDate] = useState(sixDaysAgo);
+  const [endDate, setEndDate] = useState(new Date());
   const [areaName, setAreaName] = useState('');
   const [distance, setDistance] = useState('500');
   const [rasterBand, setRasterBand] = useState('VV');
