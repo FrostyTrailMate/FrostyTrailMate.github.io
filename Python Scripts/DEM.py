@@ -1,3 +1,38 @@
+"""
+Script: DEM.py
+Author: [Author Name]
+
+Description:
+    This script downloads Digital Elevation Model (DEM) data from OpenTopography within a specified bounding box or shapefile. The downloaded data is saved and processed, including clipping to the provided envelope boundary and updating the database with the file paths.
+
+Usage:
+    $ python DEM.py [-h] -n NAME (-c xmin ymin xmax ymax | -p SHAPEFILE)
+
+Dependencies:
+    - os
+    - requests
+    - geopandas
+    - rasterio
+    - argparse
+    - shapely.geometry
+    - psycopg2
+
+Required Arguments:
+    -n NAME, --name NAME
+        Name of the search area.
+
+    Either:
+    -c xmin ymin xmax ymax, --coordinates xmin ymin xmax ymax
+        Coordinates for bounding box (e.g., "-119.5 37.5 -119.0 37.0").
+
+    -p SHAPEFILE, --shapefile SHAPEFILE
+        Relative path to a shapefile.
+
+Example:
+    $ python DEM.py -n "ExampleArea" -c -119.5 37.5 -119.0 37.0
+
+"""
+
 import os
 import requests
 import geopandas as gpd
@@ -30,7 +65,7 @@ def download_dem(api_token, envelope, output_folder, area_name, conn):
         # Set up the bounding box for the request
         xmin, ymin, xmax, ymax = envelope.total_bounds
 
-        # API url
+        # Define the API url
         url = f'https://portal.opentopography.org/API/globaldem?demtype=COP30&south={ymin}&north={ymax}&west={xmin}&east={xmax}&outputFormat=GTiff&API_Key={api_token}'
 
         print("Downloading DEM data...")
@@ -45,8 +80,7 @@ def download_dem(api_token, envelope, output_folder, area_name, conn):
                         f.write(chunk)
             print("DEM data downloaded successfully.")
 
-            # Clip downloaded DEM to envelope boundary.
-            # Primarily needed for the shapefile (-p) argument.
+            # Clip downloaded DEM to envelope boundary. Primarily needed for the shapefile (-p) argument.
             dem_clipped_file = os.path.join(output_folder, f'{area_name}_DEM_4326.tif')
             with rasterio.open(dem_downloaded_file) as src:
                 out_image, out_transform = mask(src, envelope.geometry, crop=True)
@@ -63,7 +97,7 @@ def download_dem(api_token, envelope, output_folder, area_name, conn):
 
             print("DEM data clipped and saved successfully.")
 
-            # Update existing row
+            # Update existing row in the userpolygons table with the DEM file paths
             with conn.cursor() as cur:
                 print("Updating DEM file path in database...")
                 cur.execute("UPDATE userpolygons SET dem_path = %s, dem_processed = %s WHERE area_name = %s",
@@ -88,6 +122,7 @@ def main():
 
     args = parser.parse_args()
 
+    # Get the envelope of the search area
     if args.coordinates:
         xmin, ymin, xmax, ymax = args.coordinates
         envelope = gpd.GeoSeries([Polygon([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])])
@@ -108,7 +143,7 @@ def main():
         port="5432"
     )
 
-    # API token
+    # Define API token
     print('Please change the API token in "Python Scripts/DEM.py" to your own OpenTopography API token. The current token is for demonstration purposes only.')
     api_token = '8ff3b062b8621b8a71a957083bba09e0'
 

@@ -18,19 +18,36 @@ import rasterio.warp
 
 print("++++++++++ Running sentinel.py ++++++++++")
 
-# Function to clear the folder 'Outputs/SAR/temp'
+import shutil
+import os
+from datetime import datetime, timedelta
+
 def clear_temp_folder():
-    """Clears the folder 'Outputs/SAR/temp' at the end of the script."""
+    """
+    Clears the temporary folder 'Outputs/SAR/temp'.
+    """
     shutil.rmtree('Outputs/SAR/temp', ignore_errors=True)
     os.makedirs('Outputs/SAR/temp', exist_ok=True)
     print("Temporary raster files cleared.")
 
-# Set up default dates
 def six_days_ago():
+    """
+    Calculates the date six days before the current date.
+    
+    Returns:
+        str: A string representing the date six days ago in the format 'YYYY-MM-DD'.
+    """
     return (datetime.now() - timedelta(days=6)).strftime('%Y-%m-%d')
 
 def now():
+    """
+    This function retrieves the current date.
+    
+    Returns:
+        str: A string representing the current date in the format 'YYYY-MM-DD'.
+    """
     return datetime.now().strftime('%Y-%m-%d')
+
 
 # --- Argument Parsing ---
 parser = argparse.ArgumentParser(description='Download and process Sentinel-1 SAR data.')
@@ -53,7 +70,18 @@ args = parser.parse_args()
 interrupted = False
 
 def signal_handler(sig, frame):
-    """Signal handler function to handle interrupt signal (Ctrl+C)."""
+    """
+    Handles the interrupt signal (Ctrl+C) gracefully.
+
+    This function is a signal handler that catches the interrupt signal (Ctrl+C) 
+    and sets a global flag `interrupted` to indicate that the process has been interrupted.
+    It also attempts to perform cleanup tasks such as clearing temporary files before exiting.
+
+    Args:
+        sig (int): The signal number.
+        frame (object): The current execution frame.
+
+    """
     global interrupted
     interrupted = True
     print("Process interrupted. Cancelling pending tasks...")
@@ -130,7 +158,7 @@ elif args.shapefile:
 print("Converting bounding box to UTM projection...")
 utm_bbox = to_utm_bbox(bbox)
 
-# Define evalscript
+# Define evalscript. This is used to tell Sentinel Hub what data is required. Raster values are returned in decibles (dB) via the evaluatePixel() function.
 print("Defining evalscript...")
 evalscript = """
 //VERSION=3
@@ -156,17 +184,17 @@ function evaluatePixel(samples) {
 }
 """
 
-# Define resolution in meters per pixel
-resolution = 10  # Adjust the resolution as needed
+# Define spatial resolution in meters per pixel
+resolution = 10 
 
-# Split bounding box into smaller sub-boxes with size limited to 2500 pixels
+# Split bounding box into smaller sub-boxes with individual size limited to 2500 pixels
 split_size = (2500, 2500)
 print("Splitting bounding box into smaller sub-boxes...")
 bbox_splitter = BBoxSplitter([utm_bbox], utm_bbox.crs, split_size=split_size)
 sub_bbox_list = bbox_splitter.get_bbox_list()
 
-end_date = datetime.now(timezone.utc)
-start_date = end_date - timedelta(days=5)
+start_date = datetime.fromisoformat(args.start_date)
+end_date = datetime.fromisoformat(args.end_date)
 
 # Function to make requests for a single sub-box with interruption check
 def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
@@ -185,47 +213,44 @@ def request_images_for_sub_box(sub_bbox, evalscript, data_folder, index):
     sys.stdout.write(f"\rRequesting sub-box {index+1}/{len(sub_bbox_list)}..."), sys.stdout.flush()
     sys.stdout.flush()
 
-    # Check if the process is interrupted
+    # Check if the process is interrupted. Remove temporary files and and recreate the temp folder.
     if interrupted:
         print("Process interrupted. Exiting...")
+        shutil.rmtree(data_folder, ignore_errors=True)
+        os.makedirs(data_folder, exist_ok=True)
         sys.exit(0)
 
-    # Define the filename based on the bounding box coordinates
-    filename = os.path.join(data_folder, f"image_{index}.tif")
-    # Check if the file already exists locally
-    if os.path.exists(filename):
-        print(f"File for sub-box {index+1} already exists locally. Skipping...")
-    else:
-        try:
-            request_image = SentinelHubRequest(
-                evalscript=evalscript,
-                config=config,
-                input_data=[
-                    SentinelHubRequest.input_data(
-                        data_collection=DataCollection.SENTINEL1_IW,
-                        time_interval=(start_date, end_date),
-                        other_args={
-                            "processing": {
-                                "speckleFilter": {
-                                    "type": "LEE",
-                                    "windowSizeX": 3,
-                                    "windowSizeY": 3
-                                },
+    # Send search parameters to Sentinel Hub and retrieve the sub-box
+    try:
+        request_image = SentinelHubRequest(
+            evalscript=evalscript,
+            config=config,
+            input_data=[
+                SentinelHubRequest.input_data(
+                    data_collection=DataCollection.SENTINEL1_IW,
+                    time_interval=(start_date, end_date),
+                    other_args={
+                        "processing": {
+                            "speckleFilter": {
+                                "type": "LEE",
+                                "windowSizeX": 3,
+                                "windowSizeY": 3
                             },
-                        }
-                    )
-                ],
-                responses=[
-                    SentinelHubRequest.output_response('default', MimeType.TIFF)
-                ],
-                bbox=sub_bbox,
-                size=bbox_to_dimensions(sub_bbox, resolution=resolution),
-                data_folder=data_folder
-            )
-            request_image.get_data(save_data=True)
-        except Exception as e:
-            print(f"Error occurred while requesting sub-box {index+1}: {e}")
-            clear_temp_folder()
+                        },
+                    }
+                )
+            ],
+            responses=[
+                SentinelHubRequest.output_response('default', MimeType.TIFF)
+            ],
+            bbox=sub_bbox,
+            size=bbox_to_dimensions(sub_bbox, resolution=resolution),
+            data_folder=data_folder
+        )
+        request_image.get_data(save_data=True)
+    except Exception as e:
+        print(f"Error occurred while requesting sub-box {index+1}: {e}")
+        clear_temp_folder()
 
 # Function to download images for multiple sub-boxes using multithreading, with interruption check
 def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
@@ -239,8 +264,9 @@ def download_images_multi_thread(sub_bbox_list, evalscript, data_folder):
     Returns:
         None
     """
+    max_workers = 5
     global interrupted
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {executor.submit(request_images_for_sub_box, sub_bbox, evalscript, data_folder, i): i for i, sub_bbox in enumerate(sub_bbox_list)}
         for future in concurrent.futures.as_completed(futures):
             try:
@@ -282,20 +308,20 @@ if not image_files:
     exit()
 
 # Merge all downloaded images
-print("\nMerging downloaded images...")
+print("Merging downloaded images...")
 merged_image, out_trans = merge(image_files)
 
 # Save the merged image to 'Outputs/SAR'
 merged_image_path = os.path.join('Outputs/SAR', f'{args.name}_merged.tiff')
 
-# Define the CRS for the merged image
+# Define the appropriate UTM CRS for the merged image
 utm_zone = (utm_bbox.crs.epsg % 100) if (utm_bbox.crs.epsg % 100 != 0) else 60
 ogc_string = utm_bbox.crs.ogc_string()
 utm_hemisphere = 'N' if '+north' in ogc_string else 'S'
 crs_string = f'+proj=utm +zone={utm_zone} +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
 print(f"CRS of the merged image: {crs_string}")
 
-
+# Save the merged image
 with rasterio.open(merged_image_path, 'w', driver='GTiff', 
                    height = merged_image.shape[1], width=merged_image.shape[2], 
                    count = merged_image.shape[0], 
@@ -333,7 +359,8 @@ with rasterio.open(merged_image_path) as src:
 print("Reprojection completed. Merged image saved in WGS84 (EPSG:4326) format: ", reprojected_image_path)
 
 def update_database(image_path, time_collected, area_name):
-    """Updates the PostgreSQL database.
+    """
+    Updates the PostgreSQL database with the locations of the files and the times collected. Uses area_name to determine the row to update.
 
     Args:
         image_path (str): Path to the image file.
@@ -344,6 +371,7 @@ def update_database(image_path, time_collected, area_name):
         None
     """
     try:
+        print("Connecting to database...")
         connection = psycopg2.connect(
             user="postgres",
             password="admin",
@@ -354,8 +382,8 @@ def update_database(image_path, time_collected, area_name):
 
         cursor = connection.cursor()
         
-        print("Connecting to database...")
-        time.sleep(5)
+        # Allow a few seconds for previous processes to complete
+        time.sleep(3)
 
         # SQL query to update data in the table
         update_query = "UPDATE userpolygons SET sar_path = %s, datetime = %s WHERE area_name = %s"
@@ -366,7 +394,7 @@ def update_database(image_path, time_collected, area_name):
         # Execute the SQL command
         cursor.execute(update_query, record_to_update)
 
-        # Commit your changes in the database
+        # Commit changes in the database
         connection.commit()
         print("Data updated successfully in PostgreSQL")
 
@@ -374,7 +402,7 @@ def update_database(image_path, time_collected, area_name):
         print("Error while updating data in PostgreSQL:", error)
 
     finally:
-        # Closing database connection
+        # Close database connection
         if connection:
             connection.commit()
             cursor.close()
@@ -385,7 +413,7 @@ def update_database(image_path, time_collected, area_name):
 time_now = datetime.now()
 update_database(reprojected_image_path, time_now, args.name)
 
-# Clear the folder 'Outputs/SAR/temp' at the end of the script
+# Clear the folder 'Outputs/SAR/temp' at the end of the script to prevent problems with future script runs.
 clear_temp_folder()
 
 print("---------- sentinel.py completed ----------")

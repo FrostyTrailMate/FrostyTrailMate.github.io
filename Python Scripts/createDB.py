@@ -14,6 +14,7 @@ port = '5432'
 # Connection URL
 connection_url = f'postgresql://{user}:{password}@{host}:{port}/{dbname}'
 
+# Connect to the database
 try:
     print("Connecting to FTM8 database...")
     engine = create_engine(connection_url)
@@ -110,11 +111,13 @@ conn.commit()
 conn.close()
 print("Database connection closed.")
 
-# Clear contents of the 'Output' folder
+# Clear contents of the 'Output' and geojsons folders
 output_folder = 'Outputs'
+geojsons_folder = os.path.join('frosty-trail-m8-app','src','components','geojsons')
 try:
     shutil.rmtree(output_folder)
-    print(f"Contents of '{output_folder}' cleared successfully.")
+    shutil.rmtree(geojsons_folder)
+    print(f"Contents of '{output_folder}' and '{geojsons_folder}' cleared successfully.")
 except FileNotFoundError:
     pass
 except Exception as e:

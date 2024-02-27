@@ -4,62 +4,43 @@ import rasterio
 from shapely.geometry import Point, box
 import psycopg2
 from datetime import datetime
-import pyproj
 import signal
 import sys
 import os
 
 print("++++++++++ Running sampling.py ++++++++++")
 
-# Define a signal handler for interrupt (Ctrl+C)
+import signal
+import argparse
+import sys
+
 def signal_handler(sig, frame):
+    """
+    Signal handler function for interrupt (Ctrl+C). Allows the sampling process to be stopped and rolled back.
+
+    Args:
+        sig (int): Signal number.
+        frame (frame): Current stack frame.
+
+    Returns:
+        None
+    """
     print("\nWriting process interrupted. Rolling back changes...")
     conn.rollback()  # Rollback the transaction to remove the added points
-    conn.close()  # Close the database connection
+    conn.close() 
     print("Changes rolled back. Exiting...")
     sys.exit(0)
 
 # Set the interrupt signal handler
 signal.signal(signal.SIGINT, signal_handler)
 
-# Function to get elevation from raster file for a given point
-def get_elevation_for_point(point, dem_dataset, dem_crs):
-    """
-    Get elevation for a given point from a digital elevation model (DEM) dataset.
-
-    Parameters:
-    - point (shapely.geometry.Point): The point for which elevation is to be retrieved.
-    - dem_dataset (rasterio.io.DatasetReader): The raster dataset containing elevation data.
-    - dem_crs (CRS): The coordinate reference system (CRS) of the DEM dataset.
-
-    Returns:
-    - float: The elevation value at the given point.
-    """
-    lon, lat = point.x, point.y
-    easting, northing = transform_coords(lon, lat, dem_crs, dem_dataset.crs)
-    row, col = dem_dataset.index(easting, northing)
-    elevation = dem_dataset.read(1)[row, col]
-    return elevation
-
-# Function to transform coordinates
-def transform_coords(lon, lat, src_crs, dst_crs):
-    """
-    Transform coordinates from one coordinate reference system (CRS) to another.
-
-    Parameters:
-    - lon (float): Longitude coordinate.
-    - lat (float): Latitude coordinate.
-    - src_crs (CRS): Source CRS.
-    - dst_crs (CRS): Destination CRS.
-
-    Returns:
-    - tuple: Transformed (x, y) coordinates.
-    """
-    transformer = pyproj.Transformer.from_crs(src_crs, dst_crs, always_xy=True)
-    x, y = transformer.transform(lon, lat)
-    return x, y
-
 def parse_args():
+    """
+    Parse command-line arguments.
+
+    Returns:
+        argparse.Namespace: Parsed command-line arguments.
+    """
     parser = argparse.ArgumentParser(description='Generate sample points within a specified area.')
     parser.add_argument('-n', '--name', required=True, help='Name of the search area')
     parser.add_argument('-p', '--shapefile', type=str, help='Relative path to a shapefile')
@@ -68,6 +49,7 @@ def parse_args():
 
 # Load command-line arguments
 args = parse_args()
+
 
 # Set the datetime at the start of processing
 current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -107,10 +89,8 @@ print("Loading DEM and retrieving bounding box coordinates...")
 try:
     dem_dataset = rasterio.open(dem_file_path)
     minx, miny, maxx, maxy = dem_dataset.bounds
-    dem_crs = dem_dataset.crs
-    print("Bounding box coordinates retrieved from the DEM file.")
     
-    # Generate points within the boundary box
+    # Generate points within the boundary box for the user's -d argument
     print("Generating points within the boundary box...")
     spacing = args.distance
     boundary_box = box(minx, miny, maxx, maxy)
@@ -131,9 +111,10 @@ try:
     # Insert data into the database
     print("Inserting data into the database...")
     for i, point in enumerate(points):
-        elevation = float(get_elevation_for_point(point, dem_dataset, dem_crs))
+        elevation = float(next(dem_dataset.sample([(point.x, point.y)]))[0])  # Extract the first element of the array
         area_name = args.name
         point_geom = point.wkb_hex  # Convert Shapely geometry to WKB format
+        
         # Insert the data into the database
         cur.execute(
             "INSERT INTO samples (datetime, area_name, point_geom, elevation) VALUES (%s, %s, ST_GeomFromWKB(%s::geometry), %s)",
@@ -141,22 +122,24 @@ try:
         )
         print(f"\rWriting point {i+1}/{len(points)} to database.", end='', flush=True)
     
-    print("\nDatabase write completed.")  # Add a newline after completion
-    conn.commit()  # Commit the transaction if no errors occurred
+    print("Database write completed.")
+    conn.commit()
 
-    # Export sample points to a shapefile
+    # Export sample points to a shapefile for testing purposes
     output_dir = 'Outputs/Shapefiles/SamplePoints'
     os.makedirs(output_dir, exist_ok=True)
-    sample_points_gdf = gpd.GeoDataFrame(geometry=points, crs=dem_crs)
+    sample_points_gdf = gpd.GeoDataFrame(geometry=points)
     sample_points_gdf.to_file(os.path.join(output_dir, f'{args.name}_sample_points.shp'), driver='ESRI Shapefile')
 
+# Rollback the transaction and close the database connection if an error occurs
 except Exception as e:
     print(f"\nError inserting point: {e}")
-    conn.rollback()  # Rollback the transaction in case of error
+    conn.rollback() 
+    conn.close()
 
 finally:
     if 'dem_dataset' in locals():
-        dem_dataset.close()  # Close the raster dataset if it was opened
-    conn.close()  # Close the database connection regardless of the outcome
+        dem_dataset.close()  # Close the raster dataset
+    conn.close()  
 
 print("---------- sampling.py completed ----------")

@@ -6,8 +6,13 @@ import threading
 import sys
 import psycopg2
 
-# Function to establish PostgreSQL connection
 def connect_to_postgres():
+    """
+    Establishes a connection to the FTM8 database.
+
+    Returns:
+        connection: psycopg2 connection object
+    """
     try:
         connection = psycopg2.connect(
             database='FTM8',
@@ -21,8 +26,17 @@ def connect_to_postgres():
         print("Error connecting to PostgreSQL database:", e)
         sys.exit(1)
 
-# Function to check if area_name already exists in userpolygons table
 def check_area_name(connection, area_name):
+    """
+    Checks if the provided area_name already exists in the userpolygons table.
+
+    Args:
+        connection: psycopg2 connection object
+        area_name (str): Name of the area to check
+
+    Returns:
+        bool: True if the area_name exists, False otherwise
+    """
     try:
         cursor = connection.cursor()
         cursor.execute("SELECT area_name FROM userpolygons WHERE area_name = %s", (area_name,))
@@ -37,15 +51,40 @@ def check_area_name(connection, area_name):
         sys.exit(1)
 
 def run_script(script_path, args):
+    """
+    Runs a Python script with specified arguments using subprocess.
+
+    Args:
+        script_path (str): Path to the Python script to be executed
+        args (list): List of command-line arguments for the script
+    """
     subprocess.run(["python", script_path, *args])
 
 def six_days_ago():
+    """
+    Returns the date six days prior to the current date.
+
+    Returns:
+        str: Date in the format '%Y-%m-%d'
+    """
     return (datetime.now() - timedelta(days=6)).strftime('%Y-%m-%d')
 
 def now():
+    """
+    Returns the current date.
+
+    Returns:
+        str: Current date in the format '%Y-%m-%d'
+    """
     return datetime.now().strftime('%Y-%m-%d')
 
 def prompt_reset():
+    """
+    Prompts the user to reset the database and returns their selection.
+
+    Returns:
+        bool: True if the user chooses to reset the database, False otherwise
+    """
     def _input():
         choice = input("Will proceed without resetting the database in 5 seconds. Do you want to reset the database and saved data? (y/n): ").lower()
         return choice
@@ -65,7 +104,7 @@ def prompt_reset():
         return input_thread.user_input == 'y'
 
 if __name__ == "__main__":
-    # Connect to PostgreSQL database
+    # Connect to the FTM8 database
     db_connection = connect_to_postgres()
 
     # Parse command-line arguments
@@ -81,12 +120,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Remove quotes from coordinates if present
+    # Remove quotes from coordinates if present. If coordinates are provided as a single string, split them into individual coordinates
     if args.coordinates:
-        # If coordinates are provided as a single string, split them into individual coordinates
         if len(args.coordinates) == 1:
             args.coordinates = args.coordinates[0].split()
-
         args.coordinates = [coord.strip('"\'') for coord in args.coordinates]
 
     # Check if provided area_name already exists in the userpolygons table
@@ -96,10 +133,11 @@ if __name__ == "__main__":
 
     print(args.coordinates)
 
+    # Clear the database and output folders if the user chooses to reset
     if prompt_reset():
         run_script('Python Scripts/createDB.py', [])
 
-    # Insert new row into userpolygons table with provided area_name, current datetime, and band information
+    # Insert new row into userpolygons table with provided area_name, current datetime, and selected band information
     try:
         with db_connection.cursor() as cursor:
             if args.coordinates:
@@ -125,8 +163,7 @@ if __name__ == "__main__":
         db_connection.rollback()
         sys.exit(1)
 
-
-    # Date Handling
+    # Clean dates for proper formatting
     try:
         start_date = datetime.strptime(args.start_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
         end_date = datetime.strptime(args.end_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
