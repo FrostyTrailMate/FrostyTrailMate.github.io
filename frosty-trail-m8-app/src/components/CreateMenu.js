@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, GeoJSON, FeatureGroup} from 'react-leaflet';
+import { MapContainer, TileLayer, FeatureGroup} from 'react-leaflet';
 import React, { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import { format } from 'date-fns';
