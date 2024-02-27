@@ -309,7 +309,7 @@ function Create() {
       </div>
       <div style={{paddingTop:'15px'}}>
       <div style={{paddingBottom:'10px'}}>
-          <label htmlFor='distance'>Distance between sampling (.005 = 500 meters): </label>
+          <label htmlFor='distance'>Distance between sampling points (Meters): </label>
           <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
         </div>
         <div style={{paddingTop:'15px',paddingBottom:'10px', alignItems:'center'}}>
