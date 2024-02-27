@@ -11,4 +11,4 @@ shapely
 numpy
 flask
 flask_cors
-flask_sqlalchemy
+flask-sqlalchemy
