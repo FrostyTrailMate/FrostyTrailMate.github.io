@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { XYPlot, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, LineSeries, MarkSeries, Crosshair } from 'react-vis';
 import "react-vis/dist/style.css";
-import './CCStyles/Graph.css'; // Import the graph component
+import './CSStyles/Graph.css'; // Import the graph component
 
 const ElevationCoverageGraph = ({ selectedArea }) => {
     const [results, setResults] = useState([]);

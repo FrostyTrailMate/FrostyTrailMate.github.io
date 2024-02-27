@@ -5,9 +5,9 @@ import ElevationCoverageGraph from '../Graph';
 import axios from 'axios';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import '../CCStyles/Results.css';
-import '../CCStyles/Table.css';
-import '../CCStyles/Graph.css';
+import '../CSStyles/Results.css';
+import '../CSStyles/Table.css';
+import '../CSStyles/Graph.css';
 
 function Results() {
   const [selectedArea, setSelectedArea] = useState(null); // Change to null
