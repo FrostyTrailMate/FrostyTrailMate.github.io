@@ -19,6 +19,24 @@ function Create() {
   const [resetSuccess, setResetSuccess] = useState(false);
   const [areaNameError, setAreaNameError] = useState();
 
+  const Tooltip = ({ text, children }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+
+    return (
+      <div className="tooltip-container">
+        <div
+          className="tooltip-icon"
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          ?
+        </div>
+        {showTooltip && <div className="tooltip-text">{text}</div>}
+        {children}
+      </div>
+    );
+  };
+
   const togglePopup = () => {
     setShowPopup(!showPopup);
   };
@@ -189,9 +207,12 @@ function Create() {
       <div className="map-container-c">
         <div className="toggle-container-c">
           <div className="basemap-toggles-c" >
+          <Tooltip text="Select a basemap. Has no effect on the program.">
           <strong >Select your Basemap: </strong>
+          </Tooltip>
             {Object.keys(basemapUrls).map((key) => (
               <label key={key} className="basemap-toggle-c">
+
                 <input
                   type="radio"
                   name="basemap"
@@ -202,6 +223,7 @@ function Create() {
                 {key === 'stamenTerrain' && '  Stamen Terrain  '}
                 {key === 'thunderforest' && '  Thunderforest  '}
                 {key === 'openStreetMap' && '  OpenStreetMap  '}
+
               </label>
             ))}
           </div>
