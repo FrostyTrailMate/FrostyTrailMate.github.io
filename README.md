@@ -51,7 +51,7 @@ Project Overview (in the order of operation)
    - Create a Flask web application that serves an API endpoint (/api/results) to fetch data from a PostgreSQL database table (results). The data is retrieved and returned as JSON format through the API endpoint when a GET request received.
    - Create a Flask web application that serves an API endpoint (/api/create) to allow users to input the required arguments and run the snow detection process (via __main__.py). 
    - Create a table at the website that display the most relevant fields of the table served at the API endpoint. 
-   - Display results in an interactive geojson map (Polygon Layer: Snow Coverage % per Altitude; Polyline Layer: Hiking Trails at Yosemite's)
+   - Display results in an interactive geojson map (Polygon Layer: Snow Coverage % per Elevation Strata)
    - Create a graph to display the relation between the altitude and the % of snow coverage.
    - Create a filter which allows the user to select any of the previously-run items in the database, and display the results.
 8. Databases Utilized
