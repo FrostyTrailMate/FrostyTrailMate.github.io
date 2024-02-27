@@ -163,7 +163,7 @@ function Create() {
           setApiStatus({ success: true, message: `Data sent successfully! Please check the Results page.` });
         })
         .catch(error => {
-          setApiStatus({ success: false, message: `Error: ${error.message}+ '. Please ensure all the parameters are filled out correctly'` });
+          setApiStatus({ success: false, message: `Error: ${error.message}. Please ensure all the parameters are filled out correctly` });
         });
     }, 2000);
   };
