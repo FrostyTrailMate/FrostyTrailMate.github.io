@@ -28,12 +28,12 @@ function Navbar() {
           </div>
           <ul className={click ? 'nav-menu active' : 'nav-menu'}>
           <li className='nav-item'>
-              <Link to='/create' className='nav-links' onClick={handleClick}>
+              <Link to='/' className='nav-links' onClick={handleClick}>
                 Create
               </Link>
             </li>
             <li className='nav-item'>
-              <Link to='/' className='nav-links' onClick={handleClick}>
+              <Link to='/Results' className='nav-links' onClick={handleClick}>
                 Results
               </Link>
             </li>

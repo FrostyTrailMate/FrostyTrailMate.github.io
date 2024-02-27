@@ -5,11 +5,11 @@ import ElevationCoverageGraph from '../Graph';
 import axios from 'axios';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import '../CCStyles/HomeCover.css';
+import '../CCStyles/Results.css';
 import '../CCStyles/Table.css';
 import '../CCStyles/Graph.css';
 
-function Home() {
+function Results() {
   const [selectedArea, setSelectedArea] = useState(null); // Change to null
   const [uniqueAreaNames, setUniqueAreaNames] = useState([]);
   
@@ -48,4 +48,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Results;
