@@ -31,7 +31,7 @@ def download_dem(api_token, envelope, output_folder, area_name, conn):
         xmin, ymin, xmax, ymax = envelope.total_bounds
 
         # API url
-        url = f'https://portal.opentopography.org/API/globaldem?demtype=NASADEM&south={ymin}&north={ymax}&west={xmin}&east={xmax}&outputFormat=GTiff&API_Key={api_token}'
+        url = f'https://portal.opentopography.org/API/globaldem?demtype=COP30&south={ymin}&north={ymax}&west={xmin}&east={xmax}&outputFormat=GTiff&API_Key={api_token}'
 
         print("Downloading DEM data...")
         response = requests.get(url, stream=True)
