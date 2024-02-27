@@ -6,16 +6,25 @@ from math import ceil
 from datetime import datetime
 import time
 
-print("Taking a short rest. Please wait 3 seconds.")
-time.sleep(3)
 print("++++++++++ Running snow_detect.py ++++++++++")
+# Allow a few seconds for previous processes to complete
+time.sleep(3)
 
-
-# Function to parse command line arguments
 def parse_arguments():
+    """
+    Parse command line arguments for the snow detection script.
+
+    Returns:
+        argparse.Namespace: An object containing parsed arguments.
+            - area_name (str): Name of the search area.
+            - band (str): Band selection, defaults to 'VV'. Choices are 'VV' or 'VH'.
+    
+    Raises:
+        argparse.ArgumentError: If required arguments are missing or invalid choices are provided.
+    """
     parser = argparse.ArgumentParser(description="Snow detection script")
     parser.add_argument("-n", "--area_name", type=str, required=True, help="Name of the search area")
-    parser.add_argument("-b", "--band", type=str, default = 'VV', choices=['VV', 'VH'], help="Specify 'VV' or 'VH' for band selection")
+    parser.add_argument("-b", "--band", type=str, default='VV', choices=['VV', 'VH'], help="Specify 'VV' or 'VH' for band selection. Default: VV.")
     return parser.parse_args()
 
 # Database connection parameters

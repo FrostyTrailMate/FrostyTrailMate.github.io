@@ -46,19 +46,39 @@ Project Overview (in the order of operation)
    - Save the number of positive detections, total points, and coverage percentage in each strata to the database table 'results'.
 6. Create polygonal strata of the elevation topographic lines ('Python Scripts/strata.py')
    - Generate contour intervals (100 meters) and save them to a shapefile (for testing purposes) and to the database table 'results' (for website visualization).
-7. Output
-   - Create a webpage for visual display using JavaScript React and Node.js.
-   - Create a Flask web application that serves an API endpoint (/api/results) to fetch data from a PostgreSQL database table (results). The data is retrieved and returned as JSON format through the API endpoint when a GET request received.
-   - Create a Flask web application that serves an API endpoint (/api/create) to allow users to input the required arguments and run the snow detection process (via __main__.py). 
-   - Create a table at the website that display the most relevant fields of the table served at the API endpoint. 
-   - Display results in an interactive geojson map (Polygon Layer: Snow Coverage % per Elevation Strata)
-   - Create a graph to display the relation between the altitude and the % of snow coverage.
-   - Create a filter which allows the user to select any of the previously-run items in the database, and display the results.
-8. Databases Utilized
+7. Output (Website)
+   - Create a webpage ('Results') for visual display using JavaScript React and Node.js.
+     - Create Flask servers for api endpoints (/frosty-trail-m8-app/src/API/API.py):
+       -  /api/create - passes arguments to and runs the __main__.py script
+       -  /api/geojson/<selected_area> - retrieves stored strata polygons geojsons
+       -  /api/reset - allows the user to reset the database and storage folders by running createDB.py
+       -  /api/results - retrieves data from the 'results' table in the FTM8 database
+       -  /api/userpolygons - retrieves data from the 'userpolygons' table in the FTM8 database
+     - Create a filter which allows the user to select any of the previously-run items in the database, and display the results without conflict from the other results.
+     - Display a table with the elevation strata, number of detected and total number of points, and the coverage percentage. 
+     - Display results in an interactive geojson map (Polygon Layer: Snow Coverage % per Elevation Strata). Includes highlighting of all the polygons within the same elevation strata, and a pop-up with the elevation strata and coverage percentage.
+     - Create a graph to display the relation between the altitude and the % of snow coverage.
+     - Display information on the image parameters: collection date and SAR band.
+   - Create a webpage ('Create') for passing the required arguments to run __main__.py, as well as graphical selection of a study area.
+     - Includes processes to prevent the use of special characters and spaces in the area_name. 
+     - Includes feedback to the user on the process progress. 
+     - Includes the option to clear and reset the database and output folders.
+8. Javascript files
+   -
+   -
+   -
+   -
+   -
+   -
+   -
+   -
+
+9. Databases Utilized
    - Table of user-selected polygon data and associated outputs from the various scripts (userpolygons).
    - Grid of sample points (samples).
    - Results by elevation interval (results).
    - Spatial Reference Systems (spatial_ref_sys). Installed by PostGIS.
-9. Other files
+10. Other files
+   - environment.yml: The environment used to operate the scripts and products.
     - requirements.txt: Contains a list of the python libraries and imports that are required for the project. Can be used as an installation file in pip or conda (only tested with these, may work with others). 
     - requirementsJS.txt: Contains a list of the javascript libraries that are required for the project. As of writing, all needs can be met by installing Node.js, available at nodejs.org. 
