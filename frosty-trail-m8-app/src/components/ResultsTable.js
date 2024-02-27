@@ -2,15 +2,17 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const ResultsTable = ({ selectedArea }) => {
-    const [results, setResults] = useState([]);
+    const [filteredResults, setFilteredResults] = useState([]);
     const [areaGeneratedDateTime, setAreaGeneratedDateTime] = useState(null);
+    const [areaDetails, setAreaDetails] = useState(null);
 
     useEffect(() => {
         axios.get('http://127.0.0.1:5000/api/results')
             .then(response => {
-                setResults(response.data);
+                const data = response.data;
+                setFilteredResults(data);
                 if (selectedArea) {
-                    const filteredResult = response.data.find(result => result.area_name === selectedArea);
+                    const filteredResult = data.find(result => result.area_name === selectedArea);
                     if (filteredResult) {
                         setAreaGeneratedDateTime(filteredResult.datetime);
                     }
@@ -19,9 +21,24 @@ const ResultsTable = ({ selectedArea }) => {
             .catch(error => {
                 console.error('Error fetching results:', error);
             });
-    }, [selectedArea]);
 
-    const filteredResults = selectedArea ? results.filter(result => result.area_name === selectedArea) : results;
+        if (selectedArea) {
+            axios.get(`http://127.0.0.1:5000/api/userpolygons`)
+                .then(response => {
+                    const data = response.data;
+                    setAreaDetails(data);
+                    if (selectedArea) {
+                        const filteredResult = data.find(result => result.area_name === selectedArea);
+                        if (filteredResult) {
+                            setAreaDetails(filteredResult);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching area details:', error);
+                });
+        }
+    }, [selectedArea]);
 
     // Function to convert results data to CSV format
     const convertToCSV = (data) => {
@@ -88,6 +105,11 @@ const ResultsTable = ({ selectedArea }) => {
             {areaGeneratedDateTime && (
                 <div className = "message-container">
                     Custom area "{selectedArea}" was generated on {areaGeneratedDateTime}.
+                </div>
+            )}
+            {areaDetails && (
+                <div className="message-container">
+                    Results were generated using the "{areaDetails.arg_b}"" band and imagery found between {areaDetails.arg_s} - {areaDetails.arg_e}.
                 </div>
             )}
             <button className="download-btn" onClick={downloadCSV}>Download Table as CSV</button>
