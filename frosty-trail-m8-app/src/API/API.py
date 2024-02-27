@@ -226,6 +226,28 @@ def get_geojson(selected_area):
         return jsonify({'error': 'An error occurred'}), 500 
 
 
+@app.route('/api/reset', methods=['POST'])
+def resetDB():
+    """
+    Endpoint to run the createDB.py script with the provided data.
+
+    Returns:
+        json: JSON response indicating the success of the operation.
+
+    Raises:
+        Exception: For any unexpected error during the process.
+    """
+    if request.method == 'POST':
+        try:
+            # Execute subprocess for createDB.py
+            subprocess.run(["python", "Python Scripts/createDB.py"])
+            
+            return jsonify({'message': 'Script executed successfully'}), 201
+        except Exception as e: 
+            traceback.print_exc()
+            raise APIError('Internal server error.', 500)
+
+
 @app.errorhandler(APIError)
 def handle_api_error(error):
     response = jsonify({'error': error.message})

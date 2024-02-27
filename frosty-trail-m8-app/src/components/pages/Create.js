@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { EditControl } from 'react-leaflet-draw';
-
+import Popup from '../Popup';
 import '../CCStyles/Create.css'
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -15,12 +15,54 @@ function Create() {
   const [basemap, setBasemap] = useState('stamenTerrain');
   const [drawnItems, setDrawnItems] = useState([]);
   const drawControlRef = useRef(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
 
+  const togglePopup = () => {
+    setShowPopup(!showPopup);
+  };
+
+  const resetDatabase = () => {
+    setPopupMessage('Are you sure you want to reset the database?');
+    togglePopup();
+  };
+
+  const handleResetCancellation = () => {
+    togglePopup(); 
+  };
+  
   const updateCoordinates = (key, value) => {
     setCoordinates(prevCoordinates => ({
       ...prevCoordinates,
       [key]: value
     }));
+  };
+
+  const handleResetConfirmation = () => {
+    fetch('http://127.0.0.1:5000/api/reset', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to reset database');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Resetting database...');
+        togglePopup();
+        setResetSuccess(true); // Set reset success to true after successful reset
+        setTimeout(() => {
+          setResetSuccess(false); // Reset the success message after a certain delay
+        }, 5000); // Adjust delay as needed
+      })
+      .catch(error => {
+        console.error('Error resetting database:', error);
+      });
   };
 
   useEffect(() => {
@@ -278,8 +320,25 @@ function Create() {
       <div style={{display:'flex', justifyContent:'center', backgroundColor:'#272727',paddingBottom: '20px'}}>
 
         <button onClick={sendDataToAPI} className='submitButton'>Submit to API</button>
-      </div>
 
+        <button onClick={resetDatabase} className='resetButton'>Reset Database</button>
+      </div>
+      <div style={{backgroundColor:'#272727',paddingBottom: '30px'}}>
+        {showPopup && (
+          <div>
+          <Popup
+            message={popupMessage}
+            onConfirm={handleResetConfirmation}
+            onCancel={handleResetCancellation}
+          />
+          </div>
+        )}
+        {resetSuccess && (
+          <div className="successMessage">
+            Database reset successfully!
+          </div>
+      )}
+        </div>
       <div style={{backgroundColor:'#272727',paddingBottom: '30px'}}>   
         {apiStatus.message && (
         <div className={`apiMessage ${apiStatus.success ? 'success' : 'error'}`}>
@@ -287,6 +346,7 @@ function Create() {
         </div>
         )}
       </div>
+
     </>
   );
 }

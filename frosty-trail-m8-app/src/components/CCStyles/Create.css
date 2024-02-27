@@ -232,10 +232,31 @@
     display: inline-block;
     font-size: 18px;
     margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
     cursor: pointer;
     border-radius: 15px;
+    width: 200px;
   }
   
+  .resetButton {
+    background-color: #ff0000;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 13px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    cursor: pointer;
+    border-radius: 15px;
+    width: 200px;
+  }
+
   .coordinates {
     color: #ffffff;
     background-color: #272727;
@@ -244,6 +265,59 @@
     border-radius: 5px;
   }
   
+  .popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999; /* Ensure the popup appears on top of other content */
+  }
+  
+  .popup {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+  .popup button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #ffffff;
+    cursor: pointer;
+    margin-right: 5px;
+    margin-left: 5px;
+  }
+  
+  .popup button:hover {
+    background-color: #0056b3;
+  }
+  
+  .successMessage {
+    color: #00d274;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
   .apiMessage {
     font-size: 18px;
     margin: 0;
