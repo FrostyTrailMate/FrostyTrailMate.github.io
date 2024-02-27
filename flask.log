@@ -381,3 +381,77 @@ INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 22:37:09] "[36mGET /api/geojson/whatth
 INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 22:37:17] "[36mGET /api/geojson/whatthefuckmanitsworking HTTP/1.1[0m" 304 -
 WARNING:werkzeug: * Debugger is active!
 INFO:werkzeug: * Debugger PIN: 231-404-771
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:17:45] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:17:45] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:17:45] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:17:46] "[33mGET /api/geojson/aaaaaaaaaaaaaaaaaaa HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:17:46] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:17:52] "[33mGET /api/geojson/whatthefuckman2 HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:17:52] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:19:36] "[33mGET /api/geojson/whatthefuckman99 HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:19:36] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:23:30] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:23:39] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:23:44] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:24:16] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:24:32] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:24:39] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:25:10] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:25:25] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:26:36] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:26:58] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:26:58] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:26:58] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:26:58] "[33mGET /api/geojson/aaaaaaaaaaaaaaaaaaa HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:26:58] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:29:10] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:29:18] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:29:18] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:29:18] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:29:18] "[33mGET /api/geojson/aaaaaaaaaaaaaaaaaaa HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:29:18] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:30:01] "[33mGET /api/geojson/FornitetimeNow HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:30:01] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:30:24] "GET /api/geojson/whatthefuckman100 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:30:24] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:41:29] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:41:29] "[35m[1mPOST /api/create HTTP/1.1[0m" 500 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:41:43] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:41:43] "[35m[1mPOST /api/create HTTP/1.1[0m" 500 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:42:03] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:42:03] "[35m[1mPOST /api/create HTTP/1.1[0m" 500 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:43:04] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:43:04] "[35m[1mPOST /api/create HTTP/1.1[0m" 500 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:44:17] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:44:17] "[35m[1mPOST /api/create HTTP/1.1[0m" 500 -
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 231-404-771
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:44:47] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:44:58] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:45:24] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:45:24] "[35m[1mPOST /api/create HTTP/1.1[0m" 500 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:45:59] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:46:55] "[35m[1mPOST /api/create HTTP/1.1[0m" 201 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:15] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:15] "[35m[1mPOST /api/create HTTP/1.1[0m" 500 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:35] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:35] "[35m[1mPOST /api/create HTTP/1.1[0m" 500 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:50] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:50] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:50] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:51] "[33mGET /api/geojson/TestNewSebs HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:51] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:58] "[33mGET /api/geojson/whatthefuckman3 HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:47:58] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:48:01] "[33mGET /api/geojson/TestNewSebs HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:48:01] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:48:08] "[33mGET /api/geojson/whatthefuckman5 HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:48:08] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:48:14] "[36mGET /api/geojson/whatthefuckman100 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:48:14] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:49:46] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:51:08] "[35m[1mPOST /api/create HTTP/1.1[0m" 201 -

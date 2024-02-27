@@ -9,7 +9,6 @@ import { EditControl } from 'react-leaflet-draw';
 import 'react-datepicker/dist/react-datepicker.css';
 import './CCStyles/Create.css';
 import './CCStyles/CreateMenu.css';
-import TrailsYosemite from './geojsons/Trails.json';
 
 function CreateMenu() {
 
@@ -128,7 +127,7 @@ function CreateMenu() {
       })
         .then(response => {
           if (!response.ok) {
-            throw new Error('Network response was not successful: Please ensure all the parameters are filled out correctly');
+            throw new Error('Network response was not successful... Please ensure all the parameters are filled out correctly');
           }
           return response.json();
         })
@@ -136,7 +135,7 @@ function CreateMenu() {
           setApiStatus({ success: true, message: `Data sent successfully\nServer Response: ${data.status}` });
         })
         .catch(error => {
-          setApiStatus({ success: false, message: `Error: ${error.message}` });
+          setApiStatus({ success: false, message: `Error: ${error.message}`+ '. Please ensure all the parameters are filled out correctly' });
         });
     }, 2000);
   };
@@ -170,16 +169,6 @@ function CreateMenu() {
             </label>
           ))}
         </div>
-        <div className="geojson-toggles-c">
-          <label className="geojson-toggle-c">
-            <input
-              type="checkbox"
-              checked={showTrails}
-              onChange={handleTrailsToggle}
-            />
-            <span className="toggle-text-c">Hiking Trails</span>
-          </label>
-        </div>
       </div>
       <MapContainer
         center={[37.8451, -119.5383]}
@@ -191,9 +180,6 @@ function CreateMenu() {
           subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
           attribution={basemapAttributions[basemap]}
         />
-        {showTrails && (
-          <GeoJSON data={TrailsYosemite} style={purpleTrailStyle} onEachFeature={onEachFeature} />
-        )}
 
         <FeatureGroup>
           <EditControl
