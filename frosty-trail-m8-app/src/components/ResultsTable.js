@@ -10,12 +10,15 @@ const ResultsTable = ({ selectedArea }) => {
         axios.get('http://127.0.0.1:5000/api/results')
             .then(response => {
                 const data = response.data;
-                setFilteredResults(data);
                 if (selectedArea) {
-                    const filteredResult = data.find(result => result.area_name === selectedArea);
+                    const filteredData = data.filter(result => result.area_name === selectedArea);
+                    setFilteredResults(filteredData);
+                    const filteredResult = filteredData[0]; // Assuming you only need the first filtered result for datetime
                     if (filteredResult) {
                         setAreaGeneratedDateTime(filteredResult.datetime);
                     }
+                } else {
+                    setFilteredResults(data);
                 }
             })
             .catch(error => {
@@ -118,3 +121,4 @@ const ResultsTable = ({ selectedArea }) => {
 };
 
 export default ResultsTable;
+
