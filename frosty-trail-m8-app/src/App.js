@@ -7,8 +7,8 @@ import About from './components/pages/About';
 import Footer from './components/Footer';
 
 import './App.css';
-import './components/CCStyles/Navbar.css';
-import './components/CCStyles/Footer.css';
+import './components/CSStyles/Navbar.css';
+import './components/CSStyles/Footer.css';
 
 function App() {
   return (

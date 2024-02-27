@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
-import './CCStyles/MapComponent.css'; // Import external CSS file
+import './CSStyles/MapComponent.css'; // Import external CSS file
 
 const MapComponent = ({ selectedArea }) => {
   const [basemap, setBasemap] = useState('stamenTerrain');
