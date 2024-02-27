@@ -134,7 +134,7 @@ function Create() {
   
     const apiUrl = 'http://127.0.0.1:5000/api/create';
   
-    setApiStatus({ success: true, message: `Sending data to API...` });
+    setApiStatus({ success: true, message: `Sending data to API. Please wait for a successful response.` });
   
     setTimeout(() => {
       fetch(apiUrl, {
