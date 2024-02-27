@@ -7,7 +7,6 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import { EditControl } from 'react-leaflet-draw';
 import Popup from '../Popup';
 import '../CCStyles/Create.css'
-
 import 'react-datepicker/dist/react-datepicker.css';
 
 function Create() {
@@ -18,6 +17,7 @@ function Create() {
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [areaNameError, setAreaNameError] = useState();
 
   const togglePopup = () => {
     setShowPopup(!showPopup);
@@ -74,6 +74,15 @@ function Create() {
       updateCoordinates('xmax', bounds._northEast.lng);
     }
   }, [drawnItems]);
+
+  const handleAreaNameChange = (value) => {
+    if (/^[a-zA-Z0-9]*$/.test(value)) {
+      setAreaName(value);
+      setAreaNameError('');
+    } else {
+      setAreaNameError('Special characters and spaces are not allowed');
+    }
+  };
 
   const basemapUrls = {
     stamenTerrain: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png',
@@ -253,7 +262,8 @@ function Create() {
       </div>
       <div>
         <label htmlFor='area_name'>Area Name: </label>
-        <input type='text' id='area_name' value={areaName} onChange={e => setAreaName(e.target.value)} className='inputField' />
+        <input type='text' id='area_name' value={areaName} onChange={e => handleAreaNameChange(e.target.value)} className='inputField' />
+        {areaNameError && <p style={{ color: 'red' }}>{areaNameError}</p>}
       </div>
       <div style={{paddingTop:'15px'}}>
       <div style={{paddingBottom:'10px'}}>
