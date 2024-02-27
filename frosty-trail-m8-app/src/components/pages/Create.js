@@ -101,8 +101,14 @@ function Create() {
   };
 
   const handleDrawCreated = (e) => {
+    // Check if there's already a rectangle drawn
+    if (drawnItems.length > 0) {
+      // Remove the existing rectangle
+      setDrawnItems([]);
+    }
+  
     const layer = e.layer;
-    setDrawnItems([...drawnItems, layer]);
+    setDrawnItems([layer]);
   };
 
   const handleDrawDeleted = () => {
@@ -221,10 +227,7 @@ function Create() {
             onEdited={handleDrawEdited}
             onDeleted={handleDrawDeleted}
             draw={{
-              rectangle: {
-                allowIntersection: false,
-                /*shapeOptions: {color: '#426980'},*/
-              },
+              rectangle: drawnItems.length===1 ? false : {},
               circle: false,
               circlemarker: false,
               marker: false,
@@ -238,52 +241,10 @@ function Create() {
 
     </div>
     <div className='container-menu-full'>
-      <div className='create-text'>
-      </div>
-      <div style={{paddingBottom:'20px'}}>
-        <label style={{paddingRight:'15px'}} htmlFor='start_date'>Start Date:</label>
-        <DatePicker 
-          id='start_date'
-          selected={startDate}
-          onChange={date => setStartDate(date)}
-          dateFormat='yyyy-MM-dd'
-          placeholderText='Select Start Date'
-          className='inputField'
-        />
-        <label htmlFor='end_date'>End Date:</label>
-        <DatePicker 
-          id='end_date'
-          selected={endDate}
-          onChange={date => setEndDate(date)}
-          dateFormat='yyyy-MM-dd'
-          placeholderText='Select End Date'
-          className='inputField'
-        />
-      </div>
-      <div>
-        <label htmlFor='area_name'>Area Name: </label>
-        <input type='text' id='area_name' value={areaName} onChange={e => handleAreaNameChange(e.target.value)} className='inputField' />
-        {areaNameError && <p style={{ color: 'red' }}>{areaNameError}</p>}
-      </div>
-      <div style={{paddingTop:'15px'}}>
-      <div style={{paddingBottom:'10px'}}>
-          <label htmlFor='distance'>Distance between sampling (.005 = 500 meters): </label>
-          <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
-        </div>
-        <div style={{paddingTop:'15px',paddingBottom:'10px', alignItems:'center'}}>
-        <div className='radioGroup'>
-          <label1 htmlFor='distance'>Choose Raster Band:</label1>
-          <input style={{position:'relative', top:'6px'}}
-            type='radio' id='vv' name='raster_band' value='VV' checked={rasterBand === 'VV'} onChange={() => setRasterBand('VV')} />
-          <label htmlFor='vv'>VV</label>
-          <input style={{position:'relative', top:'6px'}}
-            type='radio' id='vh' name='raster_band' value='VH' checked={rasterBand === 'VH'} onChange={() => setRasterBand('VH')} />
-          <label htmlFor='vh'>VH</label>
-        </div>
-        </div>
-        <div>
+    <div>
           <div className='inputFieldCoordinateContainer'>
             <div className='inputFieldCoordinateWrapper'>
+ 
               <label style={{paddingBottom:'10px'}}
                   className='inputFieldCoordinateLabel'>North Coordinate</label>
               <input 
@@ -324,6 +285,49 @@ function Create() {
               />
             </div>
           </div>
+        </div>
+      <div className='create-text'>
+      </div>
+      <div style={{paddingBottom:'20px'}}>
+        <label style={{paddingRight:'15px'}} htmlFor='start_date'>Start Date:</label>
+        <DatePicker 
+          id='start_date'
+          selected={startDate}
+          onChange={date => setStartDate(date)}
+          dateFormat='yyyy-MM-dd'
+          placeholderText='Select Start Date'
+          className='inputField'
+        />
+        <label htmlFor='end_date'>End Date:</label>
+        <DatePicker 
+          id='end_date'
+          selected={endDate}
+          onChange={date => setEndDate(date)}
+          dateFormat='yyyy-MM-dd'
+          placeholderText='Select End Date'
+          className='inputField'
+        />
+      </div>
+      <div>
+        <label htmlFor='area_name'>Area Name: </label>
+        <input type='text' id='area_name' value={areaName} onChange={e => handleAreaNameChange(e.target.value)} className='inputField' />
+        {areaNameError && <p style={{ color: 'red', paddingLeft:'90px' }}>{areaNameError}</p>}
+      </div>
+      <div style={{paddingTop:'15px'}}>
+      <div style={{paddingBottom:'10px'}}>
+          <label htmlFor='distance'>Distance between sampling (.005 = 500 meters): </label>
+          <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
+        </div>
+        <div style={{paddingTop:'15px',paddingBottom:'10px', alignItems:'center'}}>
+        <div className='radioGroup'>
+          <label1 htmlFor='distance'>Choose Raster Band:</label1>
+          <input style={{position:'relative', top:'6px'}}
+            type='radio' id='vv' name='raster_band' value='VV' checked={rasterBand === 'VV'} onChange={() => setRasterBand('VV')} />
+          <label htmlFor='vv'>VV</label>
+          <input style={{position:'relative', top:'6px'}}
+            type='radio' id='vh' name='raster_band' value='VH' checked={rasterBand === 'VH'} onChange={() => setRasterBand('VH')} />
+          <label htmlFor='vh'>VH</label>
+        </div>
         </div>
       </div>
       </div>
