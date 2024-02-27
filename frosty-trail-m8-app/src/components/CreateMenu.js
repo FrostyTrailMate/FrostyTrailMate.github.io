@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, GeoJSON, FeatureGroup} from 'react-leaflet';
+import { MapContainer, TileLayer,FeatureGroup} from 'react-leaflet';
 import React, { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import { format } from 'date-fns';
@@ -13,7 +13,6 @@ import './CCStyles/CreateMenu.css';
 function CreateMenu() {
 
   const [basemap, setBasemap] = useState('stamenTerrain');
-  const [showTrails, setShowTrails] = useState(true);
   const [drawnItems, setDrawnItems] = useState([]);
   const drawControlRef = useRef(null);
 
@@ -34,13 +33,6 @@ function CreateMenu() {
     }
   }, [drawnItems]);
 
-
-  useEffect(() => {
-    if (drawControlRef.current) {
-      drawControlRef.current.leafletElement.options.edit.featureGroup.clearLayers();
-    }
-  }, [showTrails]);
-
   const basemapUrls = {
     stamenTerrain: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png',
     thunderforest: 'https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=749cd9dc6622478d9454b931ded7943d',
@@ -55,21 +47,6 @@ function CreateMenu() {
 
   const handleBasemapChange = (newBasemap) => {
     setBasemap(newBasemap);
-  };
-
-  const handleTrailsToggle = () => {
-    setShowTrails(!showTrails);
-  };
-
-  const purpleTrailStyle = {
-    color: '#A348B2', // Light purple color
-    weight: 1.2, // Adjust the weight of the trail
-  };
-
-  const onEachFeature = (feature, layer) => {
-    if (feature.properties && feature.properties.popupContent) {
-      layer.bindPopup(feature.properties.popupContent);
-    }
   };
 
   const handleDrawCreated = (e) => {
@@ -135,7 +112,7 @@ function CreateMenu() {
           setApiStatus({ success: true, message: `Data sent successfully\nServer Response: ${data.status}` });
         })
         .catch(error => {
-          setApiStatus({ success: false, message: `Error: ${error.message}`+ '. Please ensure all the parameters are filled out correctly' });
+          setApiStatus({ success: false, message: `Error: ${error.message}+ '. Please ensure all the parameters are filled out correctly'` });
         });
     }, 2000);
   };
