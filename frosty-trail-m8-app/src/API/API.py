@@ -1,5 +1,5 @@
 """
-This script defines a Flask application to handle requests related to querying results and creating entries.
+This script defines a Flask application to handle requests related to querying database tables and creating entries.
 """
 
 import traceback
@@ -11,7 +11,7 @@ import json
 from sqlalchemy.exc import SQLAlchemyError
 import os
 
-# Database configuration
+# Set up atabase configuration
 DB_CONFIG = {
     "database": "FTM8",
     "username": "editor_sebas",
@@ -26,7 +26,7 @@ app = Flask(__name__)
 # Enable Cross-Origin Resource Sharing (CORS) for all routes
 CORS(app)
 
-# Set the database connection URI in the app configuration
+# Set the database connection URI
 username = DB_CONFIG['username']
 password = DB_CONFIG['password']
 host = DB_CONFIG['host']
@@ -38,7 +38,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 # Create object to control SQLAlchemy from the Flask app
 db = SQLAlchemy(app)
 
-# Define the SQLAlchemy model
+# Define the SQLAlchemy model for the results table
 class results(db.Model):
     """
     SQLAlchemy model for 'results' table.
@@ -60,6 +60,7 @@ class results(db.Model):
     detected_points = db.Column(db.Integer)
     total_points = db.Column(db.Integer)
 
+# Define the route to fetch data from the 'results' table
 @app.route('/api/results')
 def get_results():
     """
@@ -79,7 +80,7 @@ def get_results():
             for result in resultftm8]
     return jsonify(data)
 
-# Define the SQLAlchemy model
+# Define the SQLAlchemy model for the userpolygons table
 class userpolygons(db.Model):
     """
     SQLAlchemy model for 'userpolygons' table.
@@ -113,7 +114,7 @@ class userpolygons(db.Model):
     arg_d = db.Column(db.String())
     arg_p = db.Column(db.String())
     
-
+# Define the route to fetch data from the 'userpolygons' table
 @app.route('/api/userpolygons')
 def get_userpolygons():
     """
@@ -139,6 +140,7 @@ def get_userpolygons():
             for userpolygon in userftm8]
     return jsonify(data)
 
+# Create additional error classes for the /api/create endpoint
 class APIError(Exception):
     """Base class for API-related errors"""
     def __init__(self, message, status_code=400):
@@ -153,6 +155,7 @@ class DatabaseError(APIError):
     """Error caused by an issue with the database"""
     pass
 
+# Define the route to process user inputs and run the __main__.py script
 @app.route('/api/create', methods=['POST'])
 def create_entry():
     """
@@ -183,13 +186,13 @@ def create_entry():
 
             coordinates_str = json.dumps(coordinates)
             
-            # Execute subprocess
+            # Execute __main__.py using provided arguments
             subprocess.run(["python", "__main__.py", "-s", startDate, "-e", endDate, "-c", coordinates_str, "-n", areaName, "-d", distance, "-b", rasterBand])
             
             return jsonify({'message': 'Script executed successfully'}), 201
         except ValueError as ve:
             raise InvalidDataError(str(ve))
-        except SQLAlchemyError as sqle: # Example for database problems
+        except SQLAlchemyError as sqle: 
             raise DatabaseError("Error encountered while processing database query")  
         except Exception as e: 
             traceback.print_exc()
@@ -197,6 +200,7 @@ def create_entry():
     else:
         raise APIError('Method not allowed', 405)
 
+# Define the route to fetch the geojson file baesd on area_name (the -n argument)
 @app.route('/api/geojson/<selected_area>')
 def get_geojson(selected_area):
     """
@@ -209,6 +213,7 @@ def get_geojson(selected_area):
         file: The geojson file for the selected area.
     """
     try:
+        # Set up the routing to find the geojson file
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         geojson_dir = os.path.join(base_dir, 'components', 'geojsons') 
         file_path = os.path.join(geojson_dir, f'{selected_area}.geojson')
@@ -225,7 +230,7 @@ def get_geojson(selected_area):
         traceback.print_exc()
         return jsonify({'error': 'An error occurred'}), 500 
 
-
+# Define the route to reset the database and output folders
 @app.route('/api/reset', methods=['POST'])
 def resetDB():
     """
@@ -247,7 +252,7 @@ def resetDB():
             traceback.print_exc()
             raise APIError('Internal server error.', 500)
 
-
+# Define the route to handle API errors
 @app.errorhandler(APIError)
 def handle_api_error(error):
     response = jsonify({'error': error.message})
