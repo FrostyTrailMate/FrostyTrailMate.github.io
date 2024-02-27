@@ -455,3 +455,26 @@ INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:48:14] "[36mGET /api/geojson/whatth
 INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:48:14] "GET /api/results HTTP/1.1" 200 -
 INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:49:46] "OPTIONS /api/create HTTP/1.1" 200 -
 INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:51:08] "[35m[1mPOST /api/create HTTP/1.1[0m" 201 -
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 231-404-771
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:56:59] "OPTIONS /api/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 23:58:36] "[35m[1mPOST /api/create HTTP/1.1[0m" 201 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:00:56] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:00:56] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:00:56] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:00:57] "GET /api/geojson/FornitetimesS HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:00:57] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:03:02] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:03:02] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:03:02] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:03:03] "[36mGET /api/geojson/FornitetimesS HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:03:03] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:05:04] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:05:04] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:05:04] "GET /api/results HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:05:05] "[36mGET /api/geojson/FornitetimesS HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [27/Feb/2024 00:05:05] "GET /api/results HTTP/1.1" 200 -
