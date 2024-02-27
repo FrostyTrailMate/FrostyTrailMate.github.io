@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { EditControl } from 'react-leaflet-draw';
 import Popup from '../Popup';
-import '../CCStyles/Create.css'
+import '../CSStyles/Create.css'
 import 'react-datepicker/dist/react-datepicker.css';
 
 function Create() {
@@ -101,12 +101,6 @@ function Create() {
   };
 
   const handleDrawCreated = (e) => {
-    // Check if there's already a rectangle drawn
-    if (drawnItems.length > 0) {
-      // Remove the existing rectangle
-      setDrawnItems([]);
-    }
-  
     const layer = e.layer;
     setDrawnItems([layer]);
   };
@@ -124,7 +118,7 @@ function Create() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [areaName, setAreaName] = useState('');
-  const [distance, setDistance] = useState('.005');
+  const [distance, setDistance] = useState('500');
   const [rasterBand, setRasterBand] = useState('VV');
   const [coordinates, setCoordinates] = useState(null);
   const [apiStatus, setApiStatus] = useState({});
@@ -227,7 +221,7 @@ function Create() {
             onEdited={handleDrawEdited}
             onDeleted={handleDrawDeleted}
             draw={{
-              rectangle: drawnItems.length===1 ? false : {},
+              rectangle: true,
               circle: false,
               circlemarker: false,
               marker: false,
