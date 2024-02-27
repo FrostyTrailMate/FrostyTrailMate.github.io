@@ -31,9 +31,10 @@
 }
 
 .filter-container {
-  margin-top: 20px;
   display: flex;
+  justify-content: center;
   align-items: center;
+  background-color: #272727;
 }
 
 .filter-label {

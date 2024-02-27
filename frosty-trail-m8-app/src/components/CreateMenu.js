@@ -119,34 +119,39 @@ function CreateMenu() {
 
   return (
     <>
-    <div style={{background: '#272727', fontSize: '25px',
-                fontFamily: 'Arial', display:'flex', 
-                justifyContent:'center', paddingTop: '30px',
-                paddingBottom: '15px', color: 'white'
-                }}>
-      <p>
-        <strong>Create a new study area below!</strong>
-      </p>
-    </div>
-    <div className="map-container-c">
-      <div className="toggle-container-c">
-        <div className="basemap-toggles-c" >
-          {Object.keys(basemapUrls).map((key) => (
-            <label key={key} className="basemap-toggle-c">
-              <input
-                type="radio"
-                name="basemap"
-                value={key}
-                checked={basemap === key}
-                onChange={() => handleBasemapChange(key)}
-              />
-              {key === 'stamenTerrain' && '  Stamen Terrain  '}
-              {key === 'thunderforest' && '  Thunderforest  '}
-              {key === 'openStreetMap' && '  OpenStreetMap  '}
-            </label>
-          ))}
-        </div>
+      <div className='homecover-container-menu'>
+        <h1> FROSTY TRAIL MATE </h1>
+        <p> Explore Trails with Confidence </p>
       </div>
+      <div style={{background: '#272727', fontSize: '25px',
+                  fontFamily: 'Arial', display:'flex', 
+                  justifyContent:'center', paddingTop: '30px',
+                  paddingBottom: '15px', color: 'white'
+                  }}>
+        <p>
+          <strong>Create a new study area below!</strong>
+        </p>
+      </div>
+      <div className="map-container-c">
+        <div className="toggle-container-c">
+          <div className="basemap-toggles-c" >
+          <strong >Select your Basemap: </strong>
+            {Object.keys(basemapUrls).map((key) => (
+              <label key={key} className="basemap-toggle-c">
+                <input
+                  type="radio"
+                  name="basemap"
+                  value={key}
+                  checked={basemap === key}
+                  onChange={() => handleBasemapChange(key)}
+                />
+                {key === 'stamenTerrain' && '  Stamen Terrain  '}
+                {key === 'thunderforest' && '  Thunderforest  '}
+                {key === 'openStreetMap' && '  OpenStreetMap  '}
+              </label>
+            ))}
+          </div>
+        </div>
       <MapContainer
         center={[37.8451, -119.5383]}
         zoom={10}
@@ -211,7 +216,7 @@ function CreateMenu() {
       <div style={{paddingTop:'20px'}}>
         <label htmlFor='distance'>Distance between sampling (.005 = 500 meters): </label>
         <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
-        <div style={{paddingTop:'15px'}}>
+        <div style={{paddingTop:'15px',paddingBottom:'10px'}}>
         <div className='radioGroup'>
           <label1 htmlFor='distance'>Choose Raster Band:</label1>
           <input type='radio' id='vv' name='raster_band' value='VV' checked={rasterBand === 'VV'} onChange={() => setRasterBand('VV')} />
@@ -223,7 +228,8 @@ function CreateMenu() {
         <div>
           <div className='inputFieldCoordinateContainer'>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>Ymax</label>
+              <label style={{paddingBottom:'10px'}}
+                  className='inputFieldCoordinateLabel'>North Coordinate</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._northEast.lat : ''} 
@@ -232,7 +238,8 @@ function CreateMenu() {
               />
             </div>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>Xmin</label>
+              <label style={{paddingBottom:'10px'}}
+                className='inputFieldCoordinateLabel'>West Coordinate</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._southWest.lng : ''} 
@@ -241,7 +248,8 @@ function CreateMenu() {
               />
             </div>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>Ymin</label>
+              <label style={{paddingBottom:'10px'}}
+                className='inputFieldCoordinateLabel'>South Coordinate</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._southWest.lat : ''} 
@@ -250,7 +258,8 @@ function CreateMenu() {
               />
             </div>
             <div className='inputFieldCoordinateWrapper'>
-              <label className='inputFieldCoordinateLabel'>Xmax</label>
+              <label style={{paddingBottom:'10px'}}
+                className='inputFieldCoordinateLabel'>East Coordinate</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._northEast.lng : ''} 
@@ -262,12 +271,12 @@ function CreateMenu() {
         </div>
       </div>
       </div>
-      <div style={{display:'flex', justifyContent:'center', backgroundColor:'#272727'}}>
+      <div style={{display:'flex', justifyContent:'center', backgroundColor:'#272727',paddingBottom: '20px'}}>
 
         <button onClick={sendDataToAPI} className='submitButton'>Submit to API</button>
       </div>
 
-      <div style={{backgroundColor:'#272727',paddingBottom: '30px', paddingTop:'25px'}}>   
+      <div style={{backgroundColor:'#272727',paddingBottom: '30px'}}>   
         {apiStatus.message && (
         <div className={`apiMessage ${apiStatus.success ? 'success' : 'error'}`}>
             {apiStatus.message}

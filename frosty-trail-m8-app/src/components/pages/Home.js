@@ -33,10 +33,8 @@ function Home() {
 
   return (
     <>
-      <div className='homecover-container'>
-        <h1> FROSTY TRAIL MATE </h1>
-        <p> Explore Trails with Confidence </p>
-        <div className="filter-container">
+      <MapComponent selectedArea={selectedArea} />
+      <div className="filter-container">
           <label htmlFor="areaFilter">Filter reports by area:</label>
           <select id="areaFilter" value={selectedArea} onChange={e => setSelectedArea(e.target.value)}>
             {uniqueAreaNames.map(area => (
@@ -44,8 +42,6 @@ function Home() {
             ))}
           </select>
         </div>
-      </div>
-      <MapComponent selectedArea={selectedArea} />
       <ResultsTable selectedArea={selectedArea} />
       <ElevationCoverageGraph selectedArea={selectedArea} />
     </>
