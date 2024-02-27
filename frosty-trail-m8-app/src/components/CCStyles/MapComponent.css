@@ -108,15 +108,6 @@
   opacity: 1;
 }
 
-/* Font Styling */
-.basemap-toggle span,
-.geojson-toggle span {
-  font-family: 'Arial', sans-serif;
-  font-size: 18px;
-  color: #fff;
-  letter-spacing: 0.2px;
-}
-
 .geojson-toggles button{
 
   background-color: rgba(0, 216, 235, 0.811);

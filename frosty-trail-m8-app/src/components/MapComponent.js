@@ -91,7 +91,7 @@ const MapComponent = ({ selectedArea }) => {
         <div className="geojson-toggles">
           <label className="geojson-toggle">
             <input type="checkbox" checked={showElevation} onChange={handleElevationToggle}/>
-            <span className="toggle-text">Coverage Layer:  {selectedArea}</span>
+            <span className="toggle-text">Snow Coverage Layer: {selectedArea}</span>
           </label>
               <button style={{fontWeight:'bold', fontSize:'15px',backgroundColor:'rgba(200, 216, 235, 0.511)',borderRadius:'5px'}}
                 onClick={handleRefreshMap}>
