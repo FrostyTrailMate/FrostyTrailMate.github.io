@@ -74,15 +74,40 @@ Project Overview (in the order of operation)
      - Folder for the images used on the website.
    - /frosty-trail-m8-app/components/pages
      - About.js
+       - Structure for a simple 'About Us' page.
      - Create.js
+       - Structure for the 'Create' page. 
+       - Tooltip pop-ups with help messages for the argument and basemap inputs.
+       - Option to reset the database with a button. Connects to the /api/reset endpoint and includes a pop-up asking for user confirmation. 
+       - Automatically updates the coordinate boxes with values from the map when a new polygon is drawn. 
+       - Restricts the use of special characters or spaces in the area_name input.
+       - Auto-fills the date pickers, band, and sampling distances. 
+       - Submits user arguments to the /api/create endpoint, which processes the values and submits them to the __main__.py script. Provides feedback to the user upon completion or on error. 
      - Results.js
+       - Structure for the 'Results' page. 
+       - Connects to the /api/results endpoint and collects data from the FTM8 database table 'results'. 
+       - Provides a filter that passes to MapComponent, Graph, and ResultsTable, to limit the displayed data to a single study area at one time.  
    - /frosty-trail-m8-app/components
      - Footer.js
+       - Basic structure for the website footer.
      - Graph.js
+       - Structure for the graph that plots on the 'Results' page. Obtains data from the /api/results endpoint.
+       - Auto-adjusts to the elevation ranges and provides a regression line for the available data.
+       - Includes a pop-up on mouse-over to display point-specific results.
+       - Filters to the selected area_name.
      - MapComponent.js
+       - Structure for the interactive map on the 'Results' page. Obtains data from the /api/results and the /api/geojson endpoints.
+       - Provides options for basemaps. 
+       - Allows the user to enable and disable the display of polygons.
+       - Highlights the selected polygons and all other polygons within the same elevation strata.
      - Navbar.js
+       - Basic structure for the website header (navigation bar).
      - Popup.js
+       - Structure for the 'Reset Database' pop-up on user's click of the 'Reset Database' button. 
      - ResultsTable.js
+       - Structure for the table of results on the 'Results' page. Obtains data from the /api/results and /api/userpolygons endpoints.
+       - Provides options to download the table of data as a .csv file.
+       - Displays data about the construction parameters of the study area. Includes: dates searched for imagery, and the SAR polarization used to detect the snow.
 9. Databases Utilized
    - Table of user-selected polygon data and associated outputs from the various scripts (userpolygons).
    - Grid of sample points (samples).
