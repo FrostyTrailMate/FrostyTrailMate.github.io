@@ -151,7 +151,7 @@ function Create() {
           return response.json();
         })
         .then(data => {
-          setApiStatus({ success: true, message: `Data sent successfully\nServer Response: ${data.status}` });
+          setApiStatus({ success: true, message: `Data sent successfully! Please check the Results page.` });
         })
         .catch(error => {
           setApiStatus({ success: false, message: `Error: ${error.message}+ '. Please ensure all the parameters are filled out correctly'` });
