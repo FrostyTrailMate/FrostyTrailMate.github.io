@@ -37,6 +37,7 @@
   background-color: #272727;
   padding: 20px;
   font-weight: bold;
+  font-size: 20px;
 }
 .filter-container select {
   display: block;

@@ -34,7 +34,8 @@ function Results() {
   return (
     <>
       <div className="filter-container">
-          <label htmlFor="areaFilter">Filter reports by area:</label>
+          <label style={{fontSize: '20px', fontFamily:'Arial'}}
+                htmlFor="areaFilter">Filter reports by area:</label>
           <select id="areaFilter" value={selectedArea} onChange={e => setSelectedArea(e.target.value)}>
             {uniqueAreaNames.map(area => (
               <option key={area} value={area}>{area}</option>
