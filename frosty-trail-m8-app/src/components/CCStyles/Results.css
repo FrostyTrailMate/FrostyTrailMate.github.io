@@ -35,6 +35,19 @@
   justify-content: center;
   align-items: center;
   background-color: #272727;
+  padding: 20px;
+  font-weight: bold;
+  font-size: 20px;
+}
+.filter-container select {
+  display: block;
+  padding: 10px;
+  font-size: 17px;
+  border-radius: 8px; /* Similar border-radius to the table */
+  background-color: #4f4f4f; /* Similar background color to the table */
+  color: #ffffff; /* Similar text color to the table */
+  outline: none; /* Remove default focus outline */
+  cursor: pointer;
 }
 
 .filter-label {
