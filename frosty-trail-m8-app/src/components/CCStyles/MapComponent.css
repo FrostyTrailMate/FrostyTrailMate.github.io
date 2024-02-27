@@ -6,10 +6,18 @@
   align-items: center;
 }
 
+.leaflet-container {
+  width: 80%; /* Ensure the Leaflet map container takes full width */
+  height: 500px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+  margin-bottom: 20px; /* Add margin-bottom to separate the map from toggles */
+}
+
 .toggle-container {
   display: flex;
   flex-direction: column;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
 }
 
 .geojson-toggles {
@@ -26,18 +34,31 @@
 .basemap-toggles{
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
-  font-family: 'Arial', sans-serif;
-  font-size: 18px;
-  color: #fff;
-  margin: auto
+  padding-bottom: 8px;
 }
+
+.basemap-toggles strong {
+  color: #ffffff;
+  font-size: 20px;
+  font-family: 'Arial', sans-serif;
+  padding-right: 20px;
+}
+
+.geojson-toggles strong {
+  color: #ffffff;
+  font-size: 20px;
+  font-family: 'Arial', sans-serif;
+  padding-right: 20px;
+}
+
 .basemap-toggle,
 .geojson-toggle {
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 10px;
+  padding-top: 10px;
+  color: #fff;
+  padding-bottom: 10px;
 }
 
 .basemap-toggle input[type="radio"],
@@ -90,10 +111,15 @@
   letter-spacing: 0.2px;
 }
 
-.leaflet-container {
-  width: 80%; /* Ensure the Leaflet map container takes full width */
-  height: 530px;
-  border-radius: 10px;
-  box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
-  margin-bottom: 20px; /* Add margin-bottom to separate the map from toggles */
+.geojson-toggles button{
+
+  background-color: rgba(0, 216, 235, 0.811);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
 }

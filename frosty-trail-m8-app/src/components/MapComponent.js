@@ -72,6 +72,7 @@ const MapComponent = ({ selectedArea }) => {
     <div className="map-container">
       <div className="toggle-container">
         <div className="basemap-toggles" >
+        <strong >Select your Basemap: </strong>
           {Object.keys(basemapUrls).map((key) => (
             <label key={key} className="basemap-toggle">
               <input
@@ -89,17 +90,14 @@ const MapComponent = ({ selectedArea }) => {
         </div>
         <div className="geojson-toggles">
           <label className="geojson-toggle">
-            <input
-              type="checkbox"
-              checked={showElevation}
-              onChange={handleElevationToggle}
-            />
-            <span className="toggle-text">Snow Coverage</span>
+            <input type="checkbox" checked={showElevation} onChange={handleElevationToggle}/>
+            <span className="toggle-text">Coverage Layer: {selectedArea}</span>
           </label>
+              <button style={{fontWeight:'bold', fontSize:'15px',backgroundColor:'rgba(200, 216, 235, 0.511)',borderRadius:'5px'}}
+                onClick={handleRefreshMap}>
+                Center Map to Layer
+              </button>
         </div>
-        <button className="refresh-button" onClick={handleRefreshMap}>
-          Center Map
-        </button>
       </div>
       <MapContainer
         center={mapCenter}

@@ -33,6 +33,16 @@
     flex-direction: column;
     align-items: center;
   }
+
+ 
+  /* Leaflet Map Container */
+  .leaflet-container-c {
+    width: 80%; /* Ensure the Leaflet map container takes full width */
+    height: 530px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+    margin-bottom: 10px; /* Add margin-bottom to separate the map from toggles */
+  }
   
   /* Toggle Container */
   .toggle-container-c {
@@ -110,15 +120,7 @@
     color: #fff;
     letter-spacing: 0.2px;
   }
-  
-  /* Leaflet Map Container */
-  .leaflet-container-c {
-    width: 80%; /* Ensure the Leaflet map container takes full width */
-    height: 530px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
-    margin-bottom: 10px; /* Add margin-bottom to separate the map from toggles */
-  }
+
 
   .container-menu-full {
     display: flex;
