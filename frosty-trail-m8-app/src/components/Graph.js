@@ -101,13 +101,14 @@ const ElevationCoverageGraph = ({ selectedArea }) => {
                         };
                     }}
                     itemsFormat={(values) => {
-                        return values.map((v, i) => {
+                        return values.map((v) => {
                             if (v) {
                                 return {
                                     value: <span style={{ fontWeight: 'bold',fontSize: '14px'}}>{v.y} %</span>, // Make the y-value bold
                                     title: <span style={{ fontWeight: 'bold',fontSize: '14px'}}>Snow Coverage</span> 
                                 };
                             }
+                            return null;
                         });
                 }}/>
                 </XYPlot >
