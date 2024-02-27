@@ -10,6 +10,7 @@ const MapComponent = ({ selectedArea }) => {
   const [geojsonData, setGeojsonData] = useState(null);
   const [refreshMap, setRefreshMap] = useState(false); // State to trigger map refresh
   const [mapCenter, setMapCenter] = useState([37.8451, -119.5383]); // Default center
+  const [selectedFeatures, setSelectedFeatures] = useState([]); // State to keep track of selected features
 
   const basemapUrls = {
     stamenTerrain: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png',
@@ -56,6 +57,7 @@ const MapComponent = ({ selectedArea }) => {
   };
 
   const polygonStyle = (feature) => {
+    const isSelected = selectedFeatures.includes(feature);
     const coveragePercentage = feature.properties.coverage_percentage;
     const opacity = coveragePercentage ? coveragePercentage / 100 : 1; // Assuming coverage_percentage is a percentage value
     
@@ -63,9 +65,15 @@ const MapComponent = ({ selectedArea }) => {
       color: '#555',
       weight: 1.5,
       fill: true,
-      fillColor: '#006688',
+      fillColor: isSelected ? '#ff0000' : '#006688', // Highlight if selected
       fillOpacity: opacity,
     };
+  };
+
+  const selectFeaturesWithSameElevation = (feature) => {
+    const elevation = feature.properties.elevation;
+    const featuresWithSameElevation = geojsonData.features.filter(f => f.properties.elevation === elevation);
+    setSelectedFeatures(featuresWithSameElevation);
   };
 
   return (
@@ -116,6 +124,9 @@ const MapComponent = ({ selectedArea }) => {
             data={geojsonData}
             style={polygonStyle}
             onEachFeature={(feature, layer) => {
+              layer.on({
+                click: () => selectFeaturesWithSameElevation(feature) // Select features with same elevation on click
+              });
               layer.bindPopup(`Elevation: ${feature.properties.elevation}<br>Coverage Percentage: ${feature.properties.coverage_percentage}%`);
             }}
           />
