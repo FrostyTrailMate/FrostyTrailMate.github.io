@@ -6,7 +6,7 @@ const Popup = ({ message, onConfirm, onCancel }) => {
       <div className="popup">
         <div className="popup-content">
           <p>{message}</p>
-          <div className="button-container">
+          <div className="button-container-pop">
             <button onClick={onConfirm}>Yes</button>
             <button onClick={onCancel}>No</button>
           </div>

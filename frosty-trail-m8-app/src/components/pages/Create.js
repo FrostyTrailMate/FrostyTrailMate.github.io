@@ -271,20 +271,17 @@ function Create() {
     </div>
     <div className='container-menu-full'>
     <div>
-    <div>
-              <Tooltip style={{color:'blue'}} text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
-              </div>
+    <div style={{ transform: 'translate(0%, 20%)'}}><Tooltip style={{ transform: 'translate(120%, 25%)'}}
+         text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
+    </div>
           <div className='inputFieldCoordinateContainer'>
-
             <div className='inputFieldCoordinateWrapper'>
-
               <label style={{paddingBottom:'10px'}} className='inputFieldCoordinateLabel'>North Coordinate</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._northEast.lat : ''} 
                 onChange={e => updateCoordinates('ymax', e.target.value)} 
                 className='inputFieldCoordinate'
-                
               />
             </div>
               <div className='inputFieldCoordinateWrapper'>
@@ -353,12 +350,13 @@ function Create() {
       <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
           <label htmlFor='distance'>Distance between sampling points (Meters): </label>
           <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
-      </div>
-        {calculateArea() !== 0 && (
-          <label style={{ fontSize: '18px', color: '#32f898', paddingLeft: '320px', marginRight: '20px' }} htmlFor='area_name'> 
-            Approximate sampling points expected: &nbsp;<strong>{Math.round(calculateArea() / (distance * distance))}&nbsp;</strong>
+          {calculateArea() !== 0 && (
+          <label style={{borderRadius:'10px', fontSize: '18px', color: 'white',paddingRight: '20px', paddingLeft: '20px', marginRight: '20px',
+                         backgroundColor:'#bc75ff',padding:'11px'}} htmlFor='area_name'> 
+            Sampling Points Expected &nbsp; ≈ &nbsp;<strong>{Math.round(calculateArea() / (distance * distance))}&nbsp;</strong>
           </label>
         )}
+      </div>
         <div style={{paddingTop:'10px',paddingBottom:'10px'}}>
         <div className='radioGroup'>
         <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>

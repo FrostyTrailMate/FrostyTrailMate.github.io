@@ -127,15 +127,15 @@
     flex-direction: column;
     align-items: flex-start;
     background-color: #272727;
-    padding-left: 140px;
+    padding-left: 200px;
     padding-top: 25px;
 
   }
   
   label,.inputFieldCoordinateLabel {
     color: #ffffff;
-    margin-right: 10px;
-    margin-left: 40px;
+    margin-right: 20px;
+    margin-left: 20px;
     font-size: 18px;
     font-family: 'Arial', sans-serif;
     
@@ -152,7 +152,7 @@
   .inputFieldCoordinateWrapper{
     display: flex;
     align-items: center;
-    padding-right: 40px;
+    padding-right: 20px;
     flex-direction: column;
   }
 
@@ -186,7 +186,6 @@
   .radioGroup label1 {
     color: #ffffff;
     margin-right: 30px;
-    margin-left: 20px;
     font-size: 18px;
     font-family: 'Arial', sans-serif;
     padding-left: 20px;
@@ -222,7 +221,7 @@
   }
   
   .submitButton {
-    background-color:rgba(0, 216, 235, 0.811);
+    background-color:#00d595f2;
     font-weight: bold;
     color: rgb(255, 255, 255);
     border: none;
@@ -240,7 +239,7 @@
   }
   
   .resetButton {
-    background-color: #ff0000;
+    background-color: #f41e46;
     font-weight: bold;
     color: rgb(255, 255, 255);
     border: none;
@@ -289,27 +288,31 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-weight: bold;
+    font-size: 17px;
   }
   
-  .button-container {
+  .button-container-pop {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
+    margin-top: 20px;
   }
   
   .popup button {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
-    background-color: #007bff;
+    background-color: #00c2ed;
     color: #ffffff;
     cursor: pointer;
-    margin-right: 5px;
-    margin-left: 5px;
+    margin-right: 10px;
+    margin-left: 10px;
+    font-weight: bold;
+    font-size: 16px;
   }
   
   .popup button:hover {
-    background-color: #0056b3;
+    background-color: #00d0ff83;
   }
   
   .successMessage {
@@ -346,7 +349,7 @@
   .tooltip-icon {
     cursor: pointer;
     color: rgb(0, 255, 234);
-    font-size: 18px;
+    font-size: 16px;
     position: absolute;
     width: 24px; /* Adjust size of the circle */
     height: 24px; /* Adjust size of the circle */
@@ -355,13 +358,12 @@
     display: flex; /* Center the icon */
     justify-content: center; /* Center the icon */
     align-items: center; /* Center the icon */
+    transform: translate(-120%, 25%);
   }
-  
   .tooltip-text {
     position: absolute;
-    left: 50%; /* Center horizontally */
     bottom: 150%; /* Position above the icon */
-    transform: translateX(-50%);
+    transform: translateX(-20%);
     background-color: rgb(6, 201, 215); /* Semi-transparent background */
     color: white; /* Text color */
     padding: 8px 10px;
