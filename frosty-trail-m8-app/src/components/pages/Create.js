@@ -271,22 +271,23 @@ function Create() {
     </div>
     <div className='container-menu-full'>
     <div>
+    <div>
+              <Tooltip style={{color:'blue'}} text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
+              </div>
           <div className='inputFieldCoordinateContainer'>
-          <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
 
             <div className='inputFieldCoordinateWrapper'>
- 
-              <label style={{paddingBottom:'10px'}}
-                  className='inputFieldCoordinateLabel'>North Coordinate</label>
+
+              <label style={{paddingBottom:'10px'}} className='inputFieldCoordinateLabel'>North Coordinate</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._northEast.lat : ''} 
                 onChange={e => updateCoordinates('ymax', e.target.value)} 
-                className='inputFieldCoordinate' 
+                className='inputFieldCoordinate'
+                
               />
             </div>
-            
-            <div className='inputFieldCoordinateWrapper'>
+              <div className='inputFieldCoordinateWrapper'>
               <label style={{paddingBottom:'10px'}}
                 className='inputFieldCoordinateLabel'>West Coordinate</label>
               <input 
@@ -316,7 +317,6 @@ function Create() {
                 className='inputFieldCoordinate' 
               />
             </div>
-
           </div>
         </div>
       <div className='create-text'>
@@ -353,14 +353,13 @@ function Create() {
       <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
           <label htmlFor='distance'>Distance between sampling points (Meters): </label>
           <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
-        </div>
+      </div>
         {calculateArea() !== 0 && (
           <label style={{ fontSize: '18px', color: '#32f898', paddingLeft: '320px', marginRight: '20px' }} htmlFor='area_name'> 
-            Approximate sampling points expected: &nbsp;<strong>{Math.round(calculateArea() / (distance * distance))}</strong>
+            Approximate sampling points expected: &nbsp;<strong>{Math.round(calculateArea() / (distance * distance))}&nbsp;</strong>
           </label>
         )}
-
-        <div style={{paddingTop:'15px',paddingBottom:'10px', alignItems:'center'}}>
+        <div style={{paddingTop:'10px',paddingBottom:'10px'}}>
         <div className='radioGroup'>
         <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
           <label1 htmlFor='distance'>Choose Raster Band:</label1>
@@ -375,9 +374,7 @@ function Create() {
       </div>
       </div>
       <div style={{display:'flex', justifyContent:'center', backgroundColor:'#272727',paddingBottom: '20px'}}>
-
         <button onClick={sendDataToAPI} className='submitButton'>Submit to API</button>
-
         <button onClick={resetDatabase} className='resetButton'>Reset Database</button>
       </div>
       <div style={{backgroundColor:'#272727',paddingBottom: '30px'}}>

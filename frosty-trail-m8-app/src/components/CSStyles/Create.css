@@ -135,15 +135,14 @@
   label,.inputFieldCoordinateLabel {
     color: #ffffff;
     margin-right: 10px;
-    margin-left: 20px;
+    margin-left: 40px;
     font-size: 18px;
     font-family: 'Arial', sans-serif;
     
   }
 
 .inputFieldCoordinateContainer{
-    padding-top: 15px;
-    padding-left: 20px;
+    padding-left: 65px;
     padding-bottom: 20px;
     display: flex;
     align-items: center;
@@ -153,7 +152,7 @@
   .inputFieldCoordinateWrapper{
     display: flex;
     align-items: center;
-    padding-right: 30px;
+    padding-right: 40px;
     flex-direction: column;
   }
 
@@ -161,7 +160,7 @@
   .inputFieldDist,
   .inputFieldCoordinate{
     width: 250px;
-    padding: 10px;
+    padding: 9px;
     border-radius: 10px;
     border: 1px solid #000000;
     background-color: #fffffff4;
@@ -190,6 +189,7 @@
     margin-left: 20px;
     font-size: 18px;
     font-family: 'Arial', sans-serif;
+    padding-left: 20px;
   }
   .radioGroup input[type="radio"] {
     appearance:none;
@@ -339,29 +339,34 @@
     color: white;
     text-align: center;
   }
-  
   .tooltip-container {
     position: relative;
   }
   
   .tooltip-icon {
     cursor: pointer;
-    color: rgb(255, 255, 255);
-    font-size: 20px;
-    margin-right: 20px;
-    margin-left: 10px;
-    border-radius: 12px;
-
+    color: rgb(0, 255, 234);
+    font-size: 18px;
+    position: absolute;
+    width: 24px; /* Adjust size of the circle */
+    height: 24px; /* Adjust size of the circle */
+    border: 1px solid white; /* Add white border */
+    border-radius: 50%; /* Make it a circle */
+    display: flex; /* Center the icon */
+    justify-content: center; /* Center the icon */
+    align-items: center; /* Center the icon */
   }
   
   .tooltip-text {
     position: absolute;
-
-    transform: translateX(-80%);
-    background-color: rgb(6, 201, 215); /* Semi-transparent black background */
-    color: white; /* Color of the tooltip text */
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 15px; 
-    z-index: 999; /* Ensure the tooltip appears above other content */
+    left: 50%; /* Center horizontally */
+    bottom: 150%; /* Position above the icon */
+    transform: translateX(-50%);
+    background-color: rgb(6, 201, 215); /* Semi-transparent background */
+    color: white; /* Text color */
+    padding: 8px 10px;
+    border-radius: 7px;
+    font-size: 16px;
+    z-index: 999;
   }
+  
