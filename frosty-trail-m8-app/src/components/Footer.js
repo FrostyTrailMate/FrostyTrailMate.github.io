@@ -16,7 +16,7 @@ function Footer() {
         </div>
         <div className='footer-link-wrapper'>
           <div className='footer-link-items'>
-            <a href='https://www.youtube.com/watch?v=yBDHkveJUf4'><h2>Tutorial <i className='fab fa-youtube'/></h2></a>
+            <a href='https://www.youtube.com/watch?v=yBDHkveJUf4'><h2>Youtube <i className='fab fa-youtube'/></h2></a>
           </div>
           <div className='footer-link-items'>
             <a href='https://www.instagram.com/sbastiansuarezz/'><h2>Instagram <i className='fab fa-instagram'/> </h2></a>

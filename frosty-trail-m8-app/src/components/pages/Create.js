@@ -77,7 +77,7 @@ function Create() {
         setResetSuccess(true); // Set reset success to true after successful reset
         setTimeout(() => {
           setResetSuccess(false); // Reset the success message after a certain delay
-        }, 5000); // Adjust delay as needed
+        }, 10000); // Adjust delay as needed
       })
       .catch(error => {
         console.error('Error resetting database:', error);
@@ -105,14 +105,15 @@ function Create() {
 
   const basemapUrls = {
     stamenTerrain: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png',
-    thunderforest: 'https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=749cd9dc6622478d9454b931ded7943d',
-    openStreetMap: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+    esriWorldTopoMap: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    esriWorldImagery: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
   };
 
   const basemapAttributions = {
     stamenTerrain: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.',
-    thunderforest: '© Thunderforest by Gravitystorm Limited.',
-    openStreetMap: '© OpenStreetMap contributors',
+    esriWorldTopoMap: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
+    esriWorldImagery: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+
   };
 
   const handleBasemapChange = (newBasemap) => {
@@ -216,7 +217,7 @@ function Create() {
       </div>
       <div className="map-container-c">
         <div className="toggle-container-c">
-        <Tooltip text="Select a basemap. Has no effect on the program."></Tooltip>
+        <Tooltip text="Select a Basemap. It has no effect on the results"></Tooltip>
           <div style={{ transform: 'translate(0%, -11%)'}}className="basemap-toggles-c" >
             <strong style={{ transform: 'translate(8%, 0%)'}}>Select your Basemap:</strong>
             {Object.keys(basemapUrls).map((key) => (
@@ -229,9 +230,8 @@ function Create() {
                   onChange={() => handleBasemapChange(key)}
                 />
                 {key === 'stamenTerrain' && '  Stamen Terrain  '}
-                {key === 'thunderforest' && '  Thunderforest  '}
-                {key === 'openStreetMap' && '  OpenStreetMap  '}
-
+                {key === 'esriWorldTopoMap' && ' Topographic Map  '}
+                {key === 'esriWorldImagery' && '  World Imagery  '}
               </label>
             ))}
           </div>
@@ -267,7 +267,7 @@ function Create() {
       </MapContainer>
     </div>
     <div className='container-menu-full'>
-    <div><Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
+    <div><Tooltip text="Input the coordinates by drawing a rectangle on the map above"></Tooltip>
           <div style={{ transform: 'translate(0%, -20%)'}}className='inputFieldCoordinateContainer'>
             <div className='inputFieldCoordinateWrapper'>
               <label style={{paddingBottom:'13px'}} className='inputFieldCoordinateLabel'>North Coordinate</label>
@@ -310,9 +310,18 @@ function Create() {
             </div>
           </div>
         </div>
-      <div className='create-text'>
+        <div style={{paddingBottom:'15px'}}>
+      <Tooltip text="Specify the distance between sampling points for the analysis. Increasing the number of sampling points enhances result accuracy but extends processing time."></Tooltip>
+          <label htmlFor='distance'>Distance between sampling points (Meters): </label>
+          <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
+          {calculateArea() !== 0 && (
+          <label style={{borderRadius:'10px', fontSize: '18px', color: 'white',paddingRight: '20px', paddingLeft: '20px', marginRight: '20px',
+                         backgroundColor:'#bc75ff',padding:'11px'}} htmlFor='area_name'> 
+            Sampling Points Expected &nbsp; ≈ &nbsp;<strong>{Math.round(calculateArea() / (distance * distance))}&nbsp;</strong>
+          </label>
+        )}
       </div>
-      <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
+      <Tooltip text="The Sentinel-1 data used for the analysis will fall within the specified Start and End dates"></Tooltip>
       <div style={{paddingBottom:'20px'}}>
         <label style={{paddingRight:'15px'}} htmlFor='start_date'>Start Date:</label>
         <DatePicker 
@@ -334,26 +343,15 @@ function Create() {
         />
       </div>
       <div>
-      <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
+      <Tooltip text="Enter a unique name for this study area. Avoid using special characters or spaces. It cannot be empty"></Tooltip>
         <label htmlFor='area_name'>Area Name: </label>
         <input type='text' id='area_name' value={areaName} onChange={e => handleAreaNameChange(e.target.value)} className='inputField' />
         {areaNameError && <p style={{ color: 'red', paddingLeft:'90px' }}>{areaNameError}</p>}
       </div>
       <div style={{paddingTop:'15px'}}>
-      <div style={{paddingBottom:'10px'}}>
-      <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
-          <label htmlFor='distance'>Distance between sampling points (Meters): </label>
-          <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
-          {calculateArea() !== 0 && (
-          <label style={{borderRadius:'10px', fontSize: '18px', color: 'white',paddingRight: '20px', paddingLeft: '20px', marginRight: '20px',
-                         backgroundColor:'#bc75ff',padding:'11px'}} htmlFor='area_name'> 
-            Sampling Points Expected &nbsp; ≈ &nbsp;<strong>{Math.round(calculateArea() / (distance * distance))}&nbsp;</strong>
-          </label>
-        )}
-      </div>
         <div style={{paddingTop:'10px',paddingBottom:'10px'}}>
         <div className='radioGroup'>
-        <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
+        <Tooltip text="Select the Raster Band for the analysis: VV (Vertical-Vertical) or VH (Vertical-Horizontal)."></Tooltip>
           <label1 htmlFor='distance'>Choose Raster Band:</label1>
           <input style={{position:'relative', top:'6px'}}
             type='radio' id='vv' name='raster_band' value='VV' checked={rasterBand === 'VV'} onChange={() => setRasterBand('VV')} />
@@ -365,11 +363,11 @@ function Create() {
         </div>
       </div>
       </div>
-      <div style={{display:'flex', justifyContent:'center', backgroundColor:'#272727',paddingBottom: '20px'}}>
+      <div style={{display:'flex', justifyContent:'center', backgroundColor:'#272727'}}>
         <button onClick={sendDataToAPI} className='submitButton'>Submit to API</button>
         <button onClick={resetDatabase} className='resetButton'>Reset Database</button>
       </div>
-      <div style={{backgroundColor:'#272727',paddingBottom: '30px'}}>
+      <div style={{backgroundColor:'#272727',paddingBottom: '20px',paddingTop: '20px'}}>
         {showPopup && (
           <div>
           <Popup
@@ -377,15 +375,22 @@ function Create() {
             onConfirm={handleResetConfirmation}
             onCancel={handleResetCancellation}
           />
-          </div>
+          </div >
+          
         )}
+        <div style={{paddingLeft: '625px', paddingTop: '15px', scrollPaddingBottom: '15px',
+            backgroundColor:'#272727'}} >
         {resetSuccess && (
-          <div className="successMessage">
-            Database reset successfully!
-          </div>
+            <strong style={{ fontSize: '17px', color: '#ffffff',padding: '12px', 
+            backgroundColor:'rgb(17, 222, 137)', borderRadius:'15px', textAlign:'center'
+
+
+
+            }}>Database Reset Successfully!</strong>
       )}
+      </div>
         </div>
-      <div style={{backgroundColor:'#272727',paddingBottom: '30px'}}>   
+      <div style={{backgroundColor:'#272727',paddingBottom: '40px',paddingTop: '20px'}}>   
         {apiStatus.message && (
         <div className={`apiMessage ${apiStatus.success ? 'success' : 'error'}`}>
             {apiStatus.message}

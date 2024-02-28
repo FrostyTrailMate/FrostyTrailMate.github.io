@@ -98,7 +98,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   opacity: 0;
   transition: opacity 0.2s;
 }
@@ -123,9 +123,9 @@
 .ButtonRefreshMap{
   font-weight: bold;
   font-size: 15px;
-  background-color: #0098af;
+  background-color: rgba(0, 216, 235, 0.756);
   border-radius: 5px;
 }
 .ButtonRefreshMap:hover {
-  background-color: #0098afda;
+  background-color: rgb(0, 202, 221);
 }

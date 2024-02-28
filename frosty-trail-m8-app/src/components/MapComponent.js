@@ -14,14 +14,14 @@ const MapComponent = ({ selectedArea }) => {
 
   const basemapUrls = {
     stamenTerrain: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png',
-    thunderforest: 'https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=749cd9dc6622478d9454b931ded7943d',
-    openStreetMap: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+    esriWorldTopoMap: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    esriWorldImagery: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
   };
 
   const basemapAttributions = {
     stamenTerrain: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.',
-    thunderforest: '© Thunderforest by Gravitystorm Limited.',
-    openStreetMap: '© OpenStreetMap contributors',
+    esriWorldTopoMap: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
+    esriWorldImagery: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
   };
 
   useEffect(() => {
@@ -56,19 +56,24 @@ const MapComponent = ({ selectedArea }) => {
     setRefreshMap(prev => !prev); // Toggle refreshMap state to trigger map refresh
   };
 
-  const polygonStyle = (feature) => {
-    const isSelected = selectedFeatures.includes(feature);
-    const coveragePercentage = feature.properties.coverage_percentage;
-    const opacity = coveragePercentage ? coveragePercentage / 100 : 1; // Assuming coverage_percentage is a percentage value
-    
-    return {
-      color: '#555',
-      weight: 1.5,
-      fill: true,
-      fillColor: isSelected ? '#ff0000' : '#006688', // Highlight if selected
-      fillOpacity: opacity,
-    };
+const polygonStyle = (feature) => {
+  const isSelected = selectedFeatures.includes(feature);
+  const coveragePercentage = feature.properties.coverage_percentage;
+  const opacity = coveragePercentage ? coveragePercentage / 100 : 1; // Assuming coverage_percentage is a percentage value
+  
+  return {
+    color: '#000000',
+    weight: 0.4,
+    fill: true,
+    fillColor: isSelected ? 'rgb(255, 126, 241)' : '#ffffff', // Highlight if selected
+    fillOpacity: opacity,
+    dashArray: '4', // Example: a dash pattern with 5px dashes followed by 5px gaps
+
+    smoothFactor: 1, // Example: no smoothing
+    className: 'custom-polygon-class' // Example: add a custom class for additional styling
   };
+};
+
 
   const selectFeaturesWithSameElevation = (feature) => {
     const elevation = feature.properties.elevation;
@@ -77,6 +82,7 @@ const MapComponent = ({ selectedArea }) => {
   };
 
   return (
+    
     <div className="map-container">
       <div className="toggle-container">
         <div className="basemap-toggles" >
@@ -91,8 +97,8 @@ const MapComponent = ({ selectedArea }) => {
                 onChange={() => handleBasemapChange(key)}
               />
               {key === 'stamenTerrain' && '  Stamen Terrain  '}
-              {key === 'thunderforest' && '  Thunderforest  '}
-              {key === 'openStreetMap' && '  OpenStreetMap  '}
+              {key === 'esriWorldTopoMap' && ' Topographic Map  '}
+              {key === 'esriWorldImagery' && ' World Imagery  '}
             </label>
           ))}
         </div>
@@ -127,7 +133,8 @@ const MapComponent = ({ selectedArea }) => {
               layer.on({
                 click: () => selectFeaturesWithSameElevation(feature) // Select features with same elevation on click
               });
-              layer.bindPopup(`Elevation: ${feature.properties.elevation}<br>Coverage Percentage: ${feature.properties.coverage_percentage}%`);
+              layer.bindPopup(`<strong>Elevation:</strong> ${feature.properties.elevation}<br><strong>Coverage Percentage:</strong> ${feature.properties.coverage_percentage}%`);
+
             }}
           />
         )}

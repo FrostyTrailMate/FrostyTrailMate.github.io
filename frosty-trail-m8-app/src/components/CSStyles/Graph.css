@@ -7,7 +7,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  
 }
 
 .graph-container-dark .graph-title-dark {
@@ -19,6 +18,7 @@
 .graph-container-dark .rv-xy-plot__axis__tick__text {
   fill: #ffffff; /* White text for axis tick labels */
   font-size: 14px;
+
 }
 
 .react-vis-xy-plot-dark {

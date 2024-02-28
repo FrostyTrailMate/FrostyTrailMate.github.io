@@ -138,6 +138,7 @@
     margin-left: 20px;
     font-size: 18px;
     font-family: 'Arial', sans-serif;
+    font-weight:550;
     
   }
 
@@ -187,6 +188,7 @@
     font-size: 18px;
     font-family: 'Arial', sans-serif;
     padding-left: 20px;
+    font-weight:550;
   }
   .radioGroup input[type="radio"] {
     appearance:none;
@@ -219,7 +221,7 @@
   }
   
   .submitButton {
-    background-color:#00d595f2;
+    background-color:#01e6a1d7;
     font-weight: bold;
     color: rgb(255, 255, 255);
     border: none;
@@ -237,11 +239,11 @@
   }
 
   .submitButton:hover {
-    background-color: #00d595ca;
+    background-color: #00e7a1;
   }
   
   .resetButton {
-    background-color: #f41e46;
+    background-color: #fe0734e4;
     font-weight: bold;
     color: rgb(255, 255, 255);
     border: none;
@@ -259,7 +261,7 @@
   }
 
   .resetButton:hover {
-    background-color: #f41e45ca;
+    background-color: #fe1b45;
   }
 
   .coordinates {
@@ -288,6 +290,7 @@
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+    border: 4px solid #01add3ce; /* Set border color to red */
   }
   
   .popup-content {
@@ -308,7 +311,7 @@
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
-    background-color: #00c2ed;
+    background-color: #01add3ce;
     color: #ffffff;
     cursor: pointer;
     margin-right: 10px;
@@ -318,35 +321,31 @@
   }
   
   .popup button:hover {
-    background-color: #00d0ff83;
-  }
-  
-  .successMessage {
-    color: #00d274;
-    font-size: 18px;
-    margin-bottom: 10px;
+    background-color: #0cd1fd;
   }
 
-  .apiMessage {
+  .apiMessage{
     font-size: 18px;
     margin: 0;
     margin-left: 500px;
     margin-right: 500px;
     border-radius: 20px;
     line-height: 1.5;
-    padding: 15px; /* Adjusted to account for the additional margin */
+    padding: 13px; /* Adjusted to account for the additional margin */
   }
   
   .apiMessage.success {
     background-color: rgb(0, 210, 116);
     color: white;
     text-align: center;
+    font-weight:550;
   }
   
   .apiMessage.error {
     background-color: rgb(255, 53, 53);
     color: white;
     text-align: center;
+    font-weight:550;
   }
   .tooltip-container {
     position: relative;
@@ -369,12 +368,13 @@
   .tooltip-text {
     position: absolute;
     bottom: 150%; /* Position above the icon */
-    transform: translateX(-20%);
+    transform: translateX(-15%);
     background-color: rgb(6, 201, 215); /* Semi-transparent background */
     color: white; /* Text color */
     padding: 8px 10px;
     border-radius: 7px;
     font-size: 16px;
     z-index: 999;
+    line-height: 1.3;
   }
   
