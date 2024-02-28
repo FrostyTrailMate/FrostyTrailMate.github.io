@@ -1,22 +1,36 @@
-.About{
-    display: flex;
-    height: 100vh;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    background-image: url('../images/HikingAboutUs.png');
-    background-position: center;
-    background-size: cover;
-  }
-  
-  .About > p {
-    margin-top: -380px;
-    margin-left: 150px;
-    margin-right: 150px;
-    text-align: justify;
-    color: #fffef1;
-    font-size: 20px;
-    line-height: 1.4;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande','Lucida Sans', Arial, sans-serif;
-  }
-  
+
+#video-background {
+  position:fixed;
+  top: -25%; /* Adjust the top position to crop the video from the top */
+  width: 100%;
+  z-index: -1;
+}
+
+.textabout{
+  position: relative;
+
+  margin-top: 10px; /* Adjust the top margin to position the text */
+  text-align:justify;
+  padding-left: 250px;
+  padding-right: 250px;
+  padding-top: 40px;
+  padding-bottom: 240px;
+  color: #ffffff;
+  font-size: 21px;
+  line-height: 1.7;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+.textabout2 {
+  position: relative;
+  margin-top: 10px; /* Adjust the top margin to position the text */
+  text-align:justify;
+  padding-left: 250px;
+  padding-right: 250px;
+  padding-top: 50px;
+  padding-bottom: 68px;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.6;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}

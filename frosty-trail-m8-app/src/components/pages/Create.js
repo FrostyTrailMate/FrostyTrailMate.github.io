@@ -363,7 +363,7 @@ function Create() {
         </div>
       </div>
       </div>
-      <div style={{display:'flex', justifyContent:'center', backgroundColor:'#272727'}}>
+      <div style={{display:'flex', justifyContent:'center', backgroundColor:'#272727', paddingTop:'20px'}}>
         <button onClick={sendDataToAPI} className='submitButton'>Submit to API</button>
         <button onClick={resetDatabase} className='resetButton'>Reset Database</button>
       </div>
@@ -381,7 +381,7 @@ function Create() {
         <div style={{paddingLeft: '625px', paddingTop: '15px', scrollPaddingBottom: '15px',
             backgroundColor:'#272727'}} >
         {resetSuccess && (
-            <strong style={{ fontSize: '17px', color: '#ffffff',padding: '12px', 
+            <strong style={{ fontSize: '16px', color: '#ffffff',padding: '13px', 
             backgroundColor:'rgb(17, 222, 137)', borderRadius:'15px', textAlign:'center'
 
 
@@ -390,7 +390,7 @@ function Create() {
       )}
       </div>
         </div>
-      <div style={{backgroundColor:'#272727',paddingBottom: '40px',paddingTop: '20px'}}>   
+      <div style={{backgroundColor:'#272727',paddingBottom: '30px',paddingTop: '20px'}}>   
         {apiStatus.message && (
         <div className={`apiMessage ${apiStatus.success ? 'success' : 'error'}`}>
             {apiStatus.message}
