@@ -77,7 +77,7 @@ function Create() {
         setResetSuccess(true); // Set reset success to true after successful reset
         setTimeout(() => {
           setResetSuccess(false); // Reset the success message after a certain delay
-        }, 10000); // Adjust delay as needed
+        }, 5000); // Adjust delay as needed
       })
       .catch(error => {
         console.error('Error resetting database:', error);
