@@ -1,38 +1,3 @@
-"""
-Script: DEM.py
-Author: [Author Name]
-
-Description:
-    This script downloads Digital Elevation Model (DEM) data from OpenTopography within a specified bounding box or shapefile. The downloaded data is saved and processed, including clipping to the provided envelope boundary and updating the database with the file paths.
-
-Usage:
-    $ python DEM.py [-h] -n NAME (-c xmin ymin xmax ymax | -p SHAPEFILE)
-
-Dependencies:
-    - os
-    - requests
-    - geopandas
-    - rasterio
-    - argparse
-    - shapely.geometry
-    - psycopg2
-
-Required Arguments:
-    -n NAME, --name NAME
-        Name of the search area.
-
-    Either:
-    -c xmin ymin xmax ymax, --coordinates xmin ymin xmax ymax
-        Coordinates for bounding box (e.g., "-119.5 37.5 -119.0 37.0").
-
-    -p SHAPEFILE, --shapefile SHAPEFILE
-        Relative path to a shapefile.
-
-Example:
-    $ python DEM.py -n "ExampleArea" -c -119.5 37.5 -119.0 37.0
-
-"""
-
 import os
 import requests
 import geopandas as gpd
@@ -80,8 +45,8 @@ def download_dem(api_token, envelope, output_folder, area_name, conn):
                         f.write(chunk)
             print("DEM data downloaded successfully.")
 
-            # Clip downloaded DEM to envelope boundary. Primarily needed for the shapefile (-p) argument.
-            dem_clipped_file = os.path.join(output_folder, f'{area_name}_DEM_4326.tif')
+            # Ensure the data is projected to EPSG:4326
+            dem_projected_file = os.path.join(output_folder, f'{area_name}_DEM_4326.tif')
             with rasterio.open(dem_downloaded_file) as src:
                 out_image, out_transform = mask(src, envelope.geometry, crop=True)
                 out_meta = src.meta.copy()
@@ -92,7 +57,7 @@ def download_dem(api_token, envelope, output_folder, area_name, conn):
                                  "transform": out_transform,
                                  "crs": 'EPSG:4326'})
 
-                with rasterio.open(dem_clipped_file, "w", **out_meta) as dest:
+                with rasterio.open(dem_projected_file, "w", **out_meta) as dest:
                     dest.write(out_image)
 
             print("DEM data clipped and saved successfully.")
@@ -101,7 +66,7 @@ def download_dem(api_token, envelope, output_folder, area_name, conn):
             with conn.cursor() as cur:
                 print("Updating DEM file path in database...")
                 cur.execute("UPDATE userpolygons SET dem_path = %s, dem_processed = %s WHERE area_name = %s",
-                            (dem_downloaded_file, dem_clipped_file, area_name))
+                            (dem_downloaded_file, dem_projected_file, area_name))
                 conn.commit()
 
         else:
@@ -126,8 +91,8 @@ def main():
     if args.coordinates:
         xmin, ymin, xmax, ymax = args.coordinates
         envelope = gpd.GeoSeries([Polygon([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])])
-    elif args.shapefile_path:
-        shapefile = gpd.read_file(args.shapefile_path)
+    elif args.shapefile:
+        shapefile = gpd.read_file(args.shapefile)
         envelope = shapefile.envelope
     else:
         raise ValueError("Bounding box coordinates or shapefile path are required")

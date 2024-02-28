@@ -4,7 +4,7 @@ from shapely.geometry import Polygon
 import psycopg2
 from psycopg2 import sql
 import numpy as np
-from shapely.ops import unary_union
+from shapely.ops import unary_union, cascaded_union
 import geopandas as gpd
 import pandas as pd
 import math
@@ -21,7 +21,7 @@ time.sleep(3)
 
 # Define output directory for shapefiles
 output_dir = 'Outputs/Shapefiles/ElevationStrata'
-output_geojson_dir = 'frosty-trail-m8-app/src/components/geojsons'  
+output_geojson_dir = 'frosty-trail-m8-app/src/components/geojsons'
 temp_geojson_dir = 'frosty-trail-m8-app/src/components/geojsons/temp'  # Temporary directory for individual GeoJSON files. Cleared after each run.
 
 # Connect to PostgreSQL
@@ -47,7 +47,7 @@ def connect_to_postgres():
         print(f"Error connecting to PostgreSQL: {e}")
         return None
 
-def generate_polygons(dem_file, conn, area_name):
+def generate_polygons(dem_file, conn, area_name, clip_shapefile):
     """
     Generates polygons for each elevation band from the digital elevation model (DEM) file and updates the results table with the output.
 
@@ -55,6 +55,7 @@ def generate_polygons(dem_file, conn, area_name):
         dem_file (rasterio.io.DatasetReader): A rasterio dataset reader object representing the DEM file.
         conn (psycopg2.extensions.connection): A connection object to the PostgreSQL database.
         area_name (str): Name of the area associated with the polygon.
+        clip_shapefile (str): Path to the shapefile for clipping polygons (optional).
     """
     try:
         print("Generating polygons for each elevation band and updating existing polygons...")
@@ -104,6 +105,12 @@ def generate_polygons(dem_file, conn, area_name):
                 if val != 0:
                     geom = rasterio.warp.transform_geom(dem_file.crs, 'EPSG:4326', geom, precision=6)
                     polygon = Polygon(geom['coordinates'][0])
+
+                    if clip_shapefile:
+                        # Clip the polygon to the extent of the shapefile
+                        clip_gdf = gpd.read_file(clip_shapefile)
+                        clip_polygon = clip_gdf.geometry.unary_union
+                        polygon = polygon.intersection(clip_polygon)
 
                     if previous_multipolygon:
                         for higher_polygon in previous_multipolygon:
@@ -186,7 +193,6 @@ def update_polygon(conn, area_name, lower_bound, upper_bound, geometry):
         with conn.cursor() as cursor:
             # Convert lower_bound and upper_bound to integers for consistency
             elevation_range = f"{int(lower_bound)}-{int(upper_bound)}"
-            print(f"Elevation range: {elevation_range}")
             
             update_query = sql.SQL("""
                 UPDATE results 
@@ -244,8 +250,6 @@ def main(area_name):
         area_name (str): Name of the area to retrieve DEM file path.
     """
     try:
-        print("Connecting to PostgreSQL...")
-        
         # Connect to PostgreSQL
         conn = connect_to_postgres()
         if conn is None:
@@ -262,7 +266,7 @@ def main(area_name):
 
         # Generate and update polygons
         with rasterio.open(dem_file_path) as dem_file:
-            generate_polygons(dem_file, conn, area_name)
+            generate_polygons(dem_file, conn, area_name, args.shapefile)
 
         # Close database connection
         conn.close()
@@ -304,6 +308,7 @@ if __name__ == "__main__":
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Generate elevation strata polygons")
     parser.add_argument("-n", "--area_name", type=str, required=True, help="Name of the area")
+    parser.add_argument("-p", "--shapefile", type=str, help="Path to the shapefile for clipping polygons (optional)")
     args = parser.parse_args()
 
     if args.area_name:

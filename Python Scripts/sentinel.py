@@ -8,7 +8,7 @@ from sentinelhub.geo_utils import bbox_to_dimensions, to_utm_bbox
 import rasterio
 from rasterio.merge import merge
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import concurrent.futures
 import signal
 import psycopg2 
@@ -17,10 +17,6 @@ import time
 import rasterio.warp
 
 print("++++++++++ Running sentinel.py ++++++++++")
-
-import shutil
-import os
-from datetime import datetime, timedelta
 
 def clear_temp_folder():
     """
@@ -308,7 +304,7 @@ if not image_files:
     exit()
 
 # Merge all downloaded images
-print("Merging downloaded images...")
+print("\nMerging downloaded images...")
 merged_image, out_trans = merge(image_files)
 
 # Save the merged image to 'Outputs/SAR'

@@ -27,8 +27,20 @@ except Exception as e:
 metadata = MetaData()
 
 # Define table dropping and creation queries
-table_queries = [
-        
+queries = [
+
+    # Create Database FTM8 if it doesn't exist
+    """
+    CREATE DATABASE "FTM8" IF NOT EXISTS
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LOCALE_PROVIDER = 'libc'
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+    """
+
+
     # Enable PostGIS extensions
     """
     CREATE EXTENSION IF NOT EXISTS postgis;
@@ -98,7 +110,7 @@ table_queries = [
 # Execute table dropping and creation queries
 try:
     print("Dropping and creating tables...")
-    for query in table_queries:
+    for query in queries:
         compiled_query = text(query)
         print("Executing query:", compiled_query)
         conn.execute(compiled_query)
