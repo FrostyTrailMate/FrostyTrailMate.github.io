@@ -29,18 +29,6 @@ metadata = MetaData()
 # Define table dropping and creation queries
 queries = [
 
-    # Create Database FTM8 if it doesn't exist
-    """
-    CREATE DATABASE "FTM8" IF NOT EXISTS
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LOCALE_PROVIDER = 'libc'
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
-    """
-
-
     # Enable PostGIS extensions
     """
     CREATE EXTENSION IF NOT EXISTS postgis;
