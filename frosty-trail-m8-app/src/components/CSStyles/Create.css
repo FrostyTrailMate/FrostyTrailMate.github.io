@@ -345,36 +345,23 @@
   }
   
   .tooltip-icon {
-    display: inline-block;
     cursor: pointer;
-    color: white;
-    font-size: 14px;
-    margin-right: 10px;
+    color: rgb(255, 255, 255);
+    font-size: 20px;
+    margin-right: 20px;
     margin-left: 10px;
+    border-radius: 12px;
+
   }
   
   .tooltip-text {
     position: absolute;
-    top: 30px; 
-    left: 50%; 
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+
+    transform: translateX(-80%);
+    background-color: rgb(6, 201, 215); /* Semi-transparent black background */
     color: white; /* Color of the tooltip text */
     padding: 5px 10px;
     border-radius: 5px;
-    font-size: 8px; 
+    font-size: 15px; 
     z-index: 999; /* Ensure the tooltip appears above other content */
-    white-space: nowrap;
   }
-  
-  .tooltip-text::after {
-    content: '';
-    position: absolute;
-    bottom: 100%; /* Position the arrow at the top */
-    left: 50%;
-    margin-left: -5px; /* Half of the arrow width */
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent rgba(0, 0, 0, 0.7) transparent; /* Semi-transparent black arrow */
-  }
-  

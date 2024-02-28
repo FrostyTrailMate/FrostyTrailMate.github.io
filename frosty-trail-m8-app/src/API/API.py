@@ -177,7 +177,7 @@ def create_entry():
             endDate = data.get('endDate')
             coordinates = data.get('coordinates')
             areaName = data.get('areaName')
-            distance = str(float(data.get('distance')) / 100000)  # Convert aproximately distance from meters to °
+            distance = str(float(data.get('distance'))/ 100000)  # Convert aproximately distance from meters to °
             rasterBand = data.get('rasterBand')
 
             # Validate that all required fields are present

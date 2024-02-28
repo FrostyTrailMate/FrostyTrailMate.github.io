@@ -1,4 +1,5 @@
 import { MapContainer, TileLayer,FeatureGroup} from 'react-leaflet';
+import L from 'leaflet';
 import React, { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import { format } from 'date-fns';
@@ -189,6 +190,15 @@ function Create() {
     }, 2000);
   };
 
+  const calculateArea = () => {
+    if (drawnItems.length > 0) {
+      const area = L.GeometryUtil.geodesicArea(drawnItems[0].getLatLngs()[0]);
+      return area.toFixed(2); // Return area rounded to 2 decimal places
+    }
+    return 0; // Return 0 if no polygon is drawn
+  };
+  
+  
   return (
     <>
       <div className='homecover-container-menu'>
@@ -208,7 +218,7 @@ function Create() {
         <div className="toggle-container-c">
           <div className="basemap-toggles-c" >
           <Tooltip text="Select a basemap. Has no effect on the program.">
-          <strong >Select your Basemap: </strong>
+            <strong>Select your Basemap:</strong>
           </Tooltip>
             {Object.keys(basemapUrls).map((key) => (
               <label key={key} className="basemap-toggle-c">
@@ -262,6 +272,8 @@ function Create() {
     <div className='container-menu-full'>
     <div>
           <div className='inputFieldCoordinateContainer'>
+          <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
+
             <div className='inputFieldCoordinateWrapper'>
  
               <label style={{paddingBottom:'10px'}}
@@ -273,6 +285,7 @@ function Create() {
                 className='inputFieldCoordinate' 
               />
             </div>
+            
             <div className='inputFieldCoordinateWrapper'>
               <label style={{paddingBottom:'10px'}}
                 className='inputFieldCoordinateLabel'>West Coordinate</label>
@@ -303,10 +316,12 @@ function Create() {
                 className='inputFieldCoordinate' 
               />
             </div>
+
           </div>
         </div>
       <div className='create-text'>
       </div>
+      <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
       <div style={{paddingBottom:'20px'}}>
         <label style={{paddingRight:'15px'}} htmlFor='start_date'>Start Date:</label>
         <DatePicker 
@@ -328,17 +343,26 @@ function Create() {
         />
       </div>
       <div>
+      <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
         <label htmlFor='area_name'>Area Name: </label>
         <input type='text' id='area_name' value={areaName} onChange={e => handleAreaNameChange(e.target.value)} className='inputField' />
         {areaNameError && <p style={{ color: 'red', paddingLeft:'90px' }}>{areaNameError}</p>}
       </div>
       <div style={{paddingTop:'15px'}}>
       <div style={{paddingBottom:'10px'}}>
+      <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
           <label htmlFor='distance'>Distance between sampling points (Meters): </label>
           <input type='text' id='distance' value={distance} onChange={e => setDistance(e.target.value)} className='inputFieldDist' />
         </div>
+        {calculateArea() !== 0 && (
+          <label style={{ fontSize: '18px', color: '#32f898', paddingLeft: '320px', marginRight: '20px' }} htmlFor='area_name'> 
+            Approximate sampling points expected: &nbsp;<strong>{Math.round(calculateArea() / (distance * distance))}</strong>
+          </label>
+        )}
+
         <div style={{paddingTop:'15px',paddingBottom:'10px', alignItems:'center'}}>
         <div className='radioGroup'>
+        <Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
           <label1 htmlFor='distance'>Choose Raster Band:</label1>
           <input style={{position:'relative', top:'6px'}}
             type='radio' id='vv' name='raster_band' value='VV' checked={rasterBand === 'VV'} onChange={() => setRasterBand('VV')} />
