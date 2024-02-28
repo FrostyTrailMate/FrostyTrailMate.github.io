@@ -392,7 +392,7 @@ def update_database(image_path, time_collected, area_name):
 
         # Commit changes in the database
         connection.commit()
-        print("Data updated successfully in PostgreSQL")
+        print("Data updated successfully in PostgreSQL.")
 
     except (Exception, psycopg2.Error) as error:
         print("Error while updating data in PostgreSQL:", error)
@@ -403,7 +403,7 @@ def update_database(image_path, time_collected, area_name):
             connection.commit()
             cursor.close()
             connection.close()
-            print("PostgreSQL connection is closed")
+            print("Closed database connection.")
 
 # Update data in PostgreSQL database
 time_now = datetime.now()
