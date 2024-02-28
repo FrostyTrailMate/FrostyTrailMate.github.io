@@ -229,7 +229,9 @@ if __name__ == "__main__":
         sentinel_process.get()
 
         # Run sampling.py after DEM and Sentinel
-        sampling_args = common_args[:] + ['-d', str(args.sampling_distance),'-p', args.shapefile_path]
+        sampling_args = common_args[:] + ['-d', str(args.sampling_distance)]
+        if args.shapefile_path:
+            sampling_args.extend(['-p', args.shapefile_path])
         pool.apply(run_script, ['Python Scripts/sampling.py', sampling_args])
 
         # Run snow_detect.py after sampling.py
@@ -237,7 +239,9 @@ if __name__ == "__main__":
         pool.apply(run_script, ['Python Scripts/snow_detect.py', snow_args])
 
         # Run strata.py after snow_detect.py
-        strata_args = common_args[:] + ['-p', args.shapefile_path]
+        strata_args = common_args[:]
+        if args.shapefile_path:
+            strata_args.extend(['-p', args.shapefile_path])
         pool.apply(run_script, ['Python Scripts/strata.py', strata_args])
 
         # Ensure all processes are finished before exiting
