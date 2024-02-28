@@ -22,6 +22,7 @@ def parse_arguments():
     Raises:
         argparse.ArgumentError: If required arguments are missing or invalid choices are provided.
     """
+
     parser = argparse.ArgumentParser(description="Snow detection script")
     parser.add_argument("-n", "--area_name", type=str, required=True, help="Name of the search area")
     parser.add_argument("-b", "--band", type=str, default='VV', choices=['VV', 'VH'], help="Specify 'VV' or 'VH' for band selection. Default: VV.")

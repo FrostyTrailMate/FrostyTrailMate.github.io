@@ -5,6 +5,7 @@ import subprocess
 import threading
 import sys
 import psycopg2
+import geopandas as gpd
 
 def connect_to_postgres():
     """
@@ -78,6 +79,31 @@ def now():
     """
     return datetime.now().strftime('%Y-%m-%d')
 
+def get_bounding_box_from_shapefile(shapefile_path):
+    """
+    Extracts the bounding box coordinates from a shapefile.
+
+    Parameters:
+        shapefile_path (str): The path to the shapefile.
+
+    Returns:
+        tuple: A tuple containing the bounding box coordinates in the form (xmin, ymin, xmax, ymax).
+        
+    Raises:
+        RuntimeError: If there is an error reading the shapefile or extracting bounding box coordinates.
+    """
+    try:
+        # Read the shapefile using geopandas
+        gdf = gpd.read_file(shapefile_path)
+        
+        # Extract bounding box coordinates
+        bbox = gdf.total_bounds
+        
+        return bbox
+    except Exception as e:
+        raise RuntimeError(f"Failed to extract bounding box from shapefile: {str(e)}")
+
+
 def prompt_reset():
     """
     Prompts the user to reset the database and returns their selection.
@@ -131,8 +157,6 @@ if __name__ == "__main__":
         print(f"Error: provided -n argument ('{args.search_area_name}') already exists. Please choose another name for this run. Exiting.")
         sys.exit(1)
 
-    print(args.coordinates)
-
     # Clear the database and output folders if the user chooses to reset
     if prompt_reset():
         run_script('Python Scripts/createDB.py', [])
@@ -150,10 +174,20 @@ if __name__ == "__main__":
                 polygon_text = f"POLYGON(({args.coordinates[0]} {args.coordinates[1]}, {args.coordinates[2]} {args.coordinates[1]}, {args.coordinates[2]} {args.coordinates[3]}, {args.coordinates[0]} {args.coordinates[3]}, {args.coordinates[0]} {args.coordinates[1]}))"
             elif args.shapefile_path:
                 # Handle shapefile case
-                polygon_text = "POLYGON_FROM_SHAPEFILE"  # Placeholder, replace with actual logic
-            else:
-                print("Error: No coordinates or shapefile path provided.")
-                sys.exit(1)
+                try:
+                    # Load the shapefile and extract bounding box coordinates
+                    bbox = get_bounding_box_from_shapefile(args.shapefile_path)
+                    
+                    # Check if bounding box coordinates are valid
+                    if len(bbox) != 4:
+                        print("Error: Invalid bounding box coordinates extracted from the shapefile.")
+                        sys.exit(1)
+                    
+                    # Construct the polygon text
+                    polygon_text = f"POLYGON(({bbox[0]} {bbox[1]}, {bbox[2]} {bbox[1]}, {bbox[2]} {bbox[3]}, {bbox[0]} {bbox[3]}, {bbox[0]} {bbox[1]}))"
+                except Exception as e:
+                    print(f"Error: Failed to process shapefile: {str(e)}")
+                    sys.exit(1)
 
             cursor.execute("INSERT INTO userpolygons (area_name, datetime, arg_b, arg_s, arg_e, arg_d, geom) VALUES (%s, %s, %s, %s, %s, %s, ST_GeomFromText(%s, 4326))", (args.search_area_name, datetime.now(), args.band, args.start_date, args.end_date, args.sampling_distance, polygon_text))
         db_connection.commit()
@@ -195,14 +229,15 @@ if __name__ == "__main__":
         sentinel_process.get()
 
         # Run sampling.py after DEM and Sentinel
-        sampling_args = common_args[:] + ['-d', str(args.sampling_distance)]
+        sampling_args = common_args[:] + ['-d', str(args.sampling_distance),'-p', args.shapefile_path]
         pool.apply(run_script, ['Python Scripts/sampling.py', sampling_args])
 
         # Run snow_detect.py after sampling.py
         snow_args = common_args[:] + ['-b', args.band]
         pool.apply(run_script, ['Python Scripts/snow_detect.py', snow_args])
 
-        strata_args = common_args[:]
+        # Run strata.py after snow_detect.py
+        strata_args = common_args[:] + ['-p', args.shapefile_path]
         pool.apply(run_script, ['Python Scripts/strata.py', strata_args])
 
         # Ensure all processes are finished before exiting
