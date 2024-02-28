@@ -321,6 +321,7 @@ function Create() {
           </label>
         )}
       </div>
+      <div>
       <Tooltip text="The Sentinel-1 data used for the analysis will fall within the specified Start and End dates"></Tooltip>
       <div style={{paddingBottom:'20px'}}>
         <label style={{paddingRight:'15px'}} htmlFor='start_date'>Start Date:</label>
@@ -341,6 +342,7 @@ function Create() {
           placeholderText='Select End Date'
           className='inputField'
         />
+      </div>
       </div>
       <div>
       <Tooltip text="Enter a unique name for this study area. Avoid using special characters or spaces. It cannot be empty"></Tooltip>
