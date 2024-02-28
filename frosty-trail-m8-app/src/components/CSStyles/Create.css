@@ -128,7 +128,7 @@
     align-items: flex-start;
     background-color: #272727;
     padding-left: 200px;
-    padding-top: 25px;
+    padding-top: 40px;
 
   }
   
@@ -142,11 +142,9 @@
   }
 
 .inputFieldCoordinateContainer{
-    padding-left: 65px;
-    padding-bottom: 20px;
+    padding-left: 50px;
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
   }
 
   .inputFieldCoordinateWrapper{
@@ -237,6 +235,10 @@
     border-radius: 15px;
     width: 200px;
   }
+
+  .submitButton:hover {
+    background-color: #00d595ca;
+  }
   
   .resetButton {
     background-color: #f41e46;
@@ -254,6 +256,10 @@
     cursor: pointer;
     border-radius: 15px;
     width: 200px;
+  }
+
+  .resetButton:hover {
+    background-color: #f41e45ca;
   }
 
   .coordinates {

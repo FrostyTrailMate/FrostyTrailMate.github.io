@@ -20,7 +20,7 @@
 }
 .toggle-text{
 
-  color: #fff;
+  color: #ffffff;
   font-size: 20px;
   font-family: 'Arial', sans-serif;
   font-weight: bold;
@@ -118,5 +118,14 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s;
+}
 
+.ButtonRefreshMap{
+  font-weight: bold;
+  font-size: 15px;
+  background-color: #0098af;
+  border-radius: 5px;
+}
+.ButtonRefreshMap:hover {
+  background-color: #0098afda;
 }

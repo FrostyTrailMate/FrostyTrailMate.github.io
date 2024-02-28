@@ -211,18 +211,16 @@ function Create() {
                   paddingBottom: '15px', color: 'white'
                   }}>
         <p>
-          <strong>Create a new study area below!</strong>
+          <strong>↓ Create a new study area below ↓ </strong>
         </p>
       </div>
       <div className="map-container-c">
         <div className="toggle-container-c">
-          <div className="basemap-toggles-c" >
-          <Tooltip text="Select a basemap. Has no effect on the program.">
-            <strong>Select your Basemap:</strong>
-          </Tooltip>
+        <Tooltip text="Select a basemap. Has no effect on the program."></Tooltip>
+          <div style={{ transform: 'translate(0%, -11%)'}}className="basemap-toggles-c" >
+            <strong style={{ transform: 'translate(8%, 0%)'}}>Select your Basemap:</strong>
             {Object.keys(basemapUrls).map((key) => (
               <label key={key} className="basemap-toggle-c">
-
                 <input
                   type="radio"
                   name="basemap"
@@ -238,7 +236,7 @@ function Create() {
             ))}
           </div>
         </div>
-      <MapContainer
+      <MapContainer  style={{zIndex:'10'}}
         center={[37.8451, -119.5383]}
         zoom={10}
         className="leaflet-container-c"
@@ -267,16 +265,12 @@ function Create() {
           />
         </FeatureGroup>
       </MapContainer>
-
     </div>
     <div className='container-menu-full'>
-    <div>
-    <div style={{ transform: 'translate(0%, 20%)'}}><Tooltip style={{ transform: 'translate(120%, 25%)'}}
-         text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
-    </div>
-          <div className='inputFieldCoordinateContainer'>
+    <div><Tooltip text="Select the coordinates by drawing a rectangle on the map above."></Tooltip>
+          <div style={{ transform: 'translate(0%, -20%)'}}className='inputFieldCoordinateContainer'>
             <div className='inputFieldCoordinateWrapper'>
-              <label style={{paddingBottom:'10px'}} className='inputFieldCoordinateLabel'>North Coordinate</label>
+              <label style={{paddingBottom:'13px'}} className='inputFieldCoordinateLabel'>North Coordinate</label>
               <input 
                 type='text' 
                 value={drawnItems.length > 0 ? drawnItems[0].getBounds()._northEast.lat : ''} 
@@ -285,7 +279,7 @@ function Create() {
               />
             </div>
               <div className='inputFieldCoordinateWrapper'>
-              <label style={{paddingBottom:'10px'}}
+              <label style={{paddingBottom:'13px'}}
                 className='inputFieldCoordinateLabel'>West Coordinate</label>
               <input 
                 type='text' 
@@ -295,7 +289,7 @@ function Create() {
               />
             </div>
             <div className='inputFieldCoordinateWrapper'>
-              <label style={{paddingBottom:'10px'}}
+              <label style={{paddingBottom:'13px'}}
                 className='inputFieldCoordinateLabel'>South Coordinate</label>
               <input 
                 type='text' 
@@ -305,7 +299,7 @@ function Create() {
               />
             </div>
             <div className='inputFieldCoordinateWrapper'>
-              <label style={{paddingBottom:'10px'}}
+              <label style={{paddingBottom:'13px'}}
                 className='inputFieldCoordinateLabel'>East Coordinate</label>
               <input 
                 type='text' 

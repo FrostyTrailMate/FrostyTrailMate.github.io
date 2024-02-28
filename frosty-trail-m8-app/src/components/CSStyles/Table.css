@@ -91,7 +91,7 @@
 /* Add this CSS to your existing stylesheet or create a new one */
 
 .download-btn {
-  background-color: rgba(0, 216, 235, 0.811); /* Green */
+  background-color: rgba(0, 216, 235, 0.858); /* Green */
   color: white;
   border: none;
   padding: 13px 20px;
@@ -102,4 +102,8 @@
   margin: 30px 10px;
   cursor: pointer;
   border-radius: 15px;
+}
+
+.download-btn:hover {
+  background-color: rgba(0, 216, 235, 0.734); /* Lighter green on hover */
 }

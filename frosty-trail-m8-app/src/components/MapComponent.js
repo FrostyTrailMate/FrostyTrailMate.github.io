@@ -101,13 +101,13 @@ const MapComponent = ({ selectedArea }) => {
             <input type="checkbox" checked={showElevation} onChange={handleElevationToggle}/>
             <span className="toggle-text">Snow Coverage Layer: {selectedArea}</span>
           </label>
-              <button style={{fontWeight:'bold', fontSize:'15px',backgroundColor:'rgba(200, 216, 235, 0.511)',borderRadius:'5px'}}
+              <button className='ButtonRefreshMap'
                 onClick={handleRefreshMap}>
                 Center Map to Layer
               </button>
         </div>
       </div>
-      <MapContainer
+      <MapContainer style={{zIndex:'10'}}
         center={mapCenter}
         zoom={10}
         className="leaflet-container"
