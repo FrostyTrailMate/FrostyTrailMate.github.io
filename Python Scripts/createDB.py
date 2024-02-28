@@ -124,7 +124,7 @@ except Exception as e:
     print("Error clearing contents of 'Output' folder:", e)
 
 # Recreate subfolders
-subfolders = ['DEM', 'Samples', 'SAR', os.path.join('Shapefiles','ElevationStrata'), os.path.join('Shapefiles','SamplePoints'), os.path.join('SAR', 'temp'), os.path.join('frosty-trail-m8-app','src','components','geojsons'), os.path.join('Shapefiles','SamplePoints'), os.path.join('SAR', 'temp'), os.path.join('frosty-trail-m8-app','src','components','geojsons', 'temp')]
+subfolders = ['DEM', 'Samples', 'SAR', os.path.join('Shapefiles','ElevationStrata'), os.path.join('Shapefiles','SamplePoints'), os.path.join('SAR', 'temp'), os.path.join('Shapefiles','SamplePoints'), os.path.join('SAR', 'temp')]
 try:
     os.makedirs(output_folder, exist_ok=True)
     for folder in subfolders:
@@ -132,5 +132,15 @@ try:
     print("Output subfolders created successfully.")
 except Exception as e:
     print("Error creating subfolders:", e)
+
+website_folder = 'frosty-trail-m8-app/src/components'
+website_subfolders = ['geojsons', os.path.join('geojsons', 'temp')]
+try:
+    os.makedirs(website_folder, exist_ok=True)
+    for folder in website_subfolders:
+        os.makedirs(os.path.join(website_folder, folder), exist_ok=True)
+    print("Website subfolders created successfully.")
+except Exception as e:
+    print("Error creating website subfolders:", e)
 
 print("---------- createDB.py completed -----------.")
