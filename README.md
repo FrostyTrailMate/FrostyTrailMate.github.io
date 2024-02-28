@@ -63,6 +63,8 @@ Project Overview (in the order of operation)
      - Includes processes to prevent the use of special characters and spaces in the area_name. 
      - Includes feedback to the user on the process progress. 
      - Includes the option to clear and reset the database and output folders.
+     - Provides an estimated number of sample points to help the user choose a reasonable number.
+     - Has pop-up help items for each of the user input options.
 8. Javascript files (broad overview) 
    - /frosty-trail-m8-app/API
      - Contains the API.py python script (described above in point 7).

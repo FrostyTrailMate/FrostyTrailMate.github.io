@@ -36,7 +36,7 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description='Generate sample points within a specified area.')
     parser.add_argument('-n', '--name', required=True, help='Name of the search area')
-    parser.add_argument('-p', '--shapefile', type=str, help='Relative path to a shapefile')
+    parser.add_argument('-p', '--shapefile', type=str, default=None, help='Relative path to a shapefile')
     parser.add_argument('-d', '--distance', type=float, default=0.005, help='Distance between sampling points (default: 0.005)')
     return parser.parse_args()
 
